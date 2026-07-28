@@ -1,0 +1,13 @@
+<view class="page" wx:if="{{topic}}">
+  <text class="crumb">学习 / {{module.name}} / {{topic.name}}</text>
+  <text class="page-title group-title">{{topic.name}}分组</text>
+  <text class="page-subtitle">共 {{total}} 条内容，默认每组 {{topic.groupSize}} 条。完成后也可以随时重新学习。</text>
+  <view class="section-heading"><text class="section-title">选择一组开始</text><text class="section-note">{{sets.length}} 组</text></view>
+  <view class="set-list">
+    <button wx:for="{{sets}}" wx:key="index" class="set-card card" style="width: 100%; min-height: 230rpx;" hover-class="set-hover" data-index="{{item.index}}" bindtap="onOpenSet">
+      <view class="set-head"><text class="set-name">{{item.name}}</text><text class="set-arrow">›</text></view>
+      <text class="set-range">第 {{item.start}} — {{item.end}} 条 · 共 {{item.count}} 条</text>
+      <view class="set-footer"><text class="set-status {{item.learnedCount ? 'has-progress' : ''}}">{{item.status}}</text><text wx:if="{{item.learnedCount}}" class="set-count">{{item.learnedCount}} / {{item.count}}</text></view>
+    </button>
+  </view>
+</view>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="116" y1="88" x2="900" y2="936" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7568F6"/>
+      <stop offset="1" stop-color="#5144D8"/>
+    </linearGradient>
+    <linearGradient id="leftPage" x1="228" y1="330" x2="520" y2="746" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F1F0FF"/>
+    </linearGradient>
+    <linearGradient id="rightPage" x1="516" y1="330" x2="824" y2="746" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F7F6FF"/>
+    </linearGradient>
+    <filter id="bookShadow" x="120" y="240" width="790" height="650" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#2F278E" flood-opacity=".28"/>
+    </filter>
+    <filter id="badgeShadow" x="658" y="611" width="262" height="262" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2F278E" flood-opacity=".3"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#background)"/>
+  <circle cx="152" cy="188" r="72" fill="#FFFFFF" opacity=".07"/>
+  <circle cx="875" cy="486" r="115" fill="#FFFFFF" opacity=".055"/>
+
+  <g filter="url(#bookShadow)">
+    <path d="M512 371C435 313 340 288 222 298C201 300 185 318 185 339V705C185 727 204 744 226 741C338 728 434 753 512 817V371Z" fill="url(#leftPage)"/>
+    <path d="M512 371C589 313 684 288 802 298C823 300 839 318 839 339V705C839 727 820 744 798 741C686 728 590 753 512 817V371Z" fill="url(#rightPage)"/>
+    <path d="M512 371V817" stroke="#D8D5FF" stroke-width="18" stroke-linecap="round"/>
+
+    <path d="M270 430C335 428 390 443 438 472" stroke="#B6B0F4" stroke-width="26" stroke-linecap="round"/>
+    <path d="M270 514C335 512 390 527 438 556" stroke="#D3D0FA" stroke-width="24" stroke-linecap="round"/>
+    <path d="M270 598C335 596 390 611 438 640" stroke="#D3D0FA" stroke-width="24" stroke-linecap="round"/>
+
+    <path d="M586 472C634 443 689 428 754 430" stroke="#B6B0F4" stroke-width="26" stroke-linecap="round"/>
+    <path d="M586 556C634 527 689 512 754 514" stroke="#D3D0FA" stroke-width="24" stroke-linecap="round"/>
+  </g>
+
+  <path d="M775 169L792 217L840 234L792 251L775 299L758 251L710 234L758 217L775 169Z" fill="#FFD76A"/>
+  <circle cx="687" cy="196" r="15" fill="#FFD76A" opacity=".85"/>
+
+  <g filter="url(#badgeShadow)">
+    <circle cx="782" cy="742" r="105" fill="#35C88A"/>
+    <circle cx="782" cy="742" r="84" fill="none" stroke="#FFFFFF" stroke-opacity=".22" stroke-width="8"/>
+    <path d="M725 742L765 781L838 704" fill="none" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

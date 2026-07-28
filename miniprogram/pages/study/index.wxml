@@ -1,0 +1,36 @@
+<view class="page study-page">
+  <view class="page-header">
+    <text class="eyebrow">个人学习库</text>
+    <text class="page-title">从模块开始学习</text>
+    <text class="page-subtitle">选择模块，再进入具体分类。每个分类按 20 条自动分组，随时可以重学。</text>
+  </view>
+
+  <view class="flow-note">
+    <text class="flow-number">01</text><text>选模块</text>
+    <text class="flow-line"></text>
+    <text class="flow-number">02</text><text>选分类与分组</text>
+    <text class="flow-line"></text>
+    <text class="flow-number">03</text><text>整屏卡片学习</text>
+  </view>
+
+  <view class="section-heading">
+    <text class="section-title">学习模块</text>
+    <text class="section-note">{{moduleCards.length}} 个模块</text>
+  </view>
+
+  <view class="module-list">
+    <button wx:for="{{moduleCards}}" wx:key="id" class="module-card card" style="width: 100%; min-height: 320rpx;" hover-class="module-card-hover" data-id="{{item.id}}" bindtap="onOpenModule">
+      <view class="module-top">
+        <view class="module-symbol"><text>{{item.symbol}}</text></view>
+        <view class="module-arrow"><text>›</text></view>
+      </view>
+      <text class="module-name">{{item.name}}</text>
+      <text class="module-description">{{item.description}}</text>
+      <view class="module-metrics">
+        <text>{{item.topicCount}} 个分类</text>
+        <text class="metric-dot"></text>
+        <text>{{item.knowledgeCount}} 条知识</text>
+      </view>
+    </button>
+  </view>
+</view>

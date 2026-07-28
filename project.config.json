@@ -1,0 +1,30 @@
+{
+  "description": "个人知识学习与客观题练习小程序",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "design-system"
+      },
+      {
+        "type": "folder",
+        "value": "assets"
+      }
+    ]
+  },
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true,
+    "ignoreUploadUnusedFiles": true,
+    "compileHotReLoad": false,
+    "minifyWXML": true
+  },
+  "compileType": "miniprogram",
+  "appid": "wx8cd28fbd80c4b941",
+  "projectname": "zhilian-study",
+  "miniprogramRoot": "miniprogram/",
+  "condition": {}
+}

@@ -1,0 +1,16 @@
+.study-page { padding: 40rpx 16rpx 72rpx; }
+.eyebrow { display:block; color:var(--color-primary); font-size:24rpx; font-weight:700; letter-spacing:2rpx; }
+.page-title { margin-top:8rpx; }
+.flow-note { display:flex; align-items:center; margin-top:30rpx; padding:24rpx 18rpx; border-radius:20rpx; background:var(--color-primary-soft); color:#3568b8; font-size:21rpx; white-space:nowrap; }
+.flow-number { display:flex; width:32rpx; height:32rpx; align-items:center; justify-content:center; margin-right:6rpx; border-radius:16rpx; background:var(--color-primary); color:#fff; font-size:19rpx; font-weight:700; }
+.flow-line { width:20rpx; height:2rpx; margin:0 9rpx; background:#9fc0f6; }
+.module-list { display:flex; width:100%; flex-direction:column; gap:22rpx; }
+.module-card { display:block; width:100%; min-height:320rpx; margin:0; padding:40rpx; text-align:left; line-height:1.35; }
+.module-card-hover { background:#f8fbff; transform:scale(.995); }
+.module-top { display:flex; align-items:center; justify-content:space-between; }
+.module-symbol { display:flex; width:82rpx; height:82rpx; align-items:center; justify-content:center; border-radius:22rpx; background:var(--color-primary-soft); color:var(--color-primary); font-size:42rpx; font-weight:700; }
+.module-arrow { color:#8aa3cb; font-size:58rpx; line-height:1; }
+.module-name { display:block; margin-top:23rpx; color:var(--color-text); font-size:44rpx; font-weight:720; }
+.module-description { display:block; margin-top:12rpx; color:var(--color-text-secondary); font-size:29rpx; line-height:1.6; }
+.module-metrics { display:flex; align-items:center; margin-top:24rpx; color:#4774b8; font-size:26rpx; }
+.metric-dot { width:6rpx; height:6rpx; margin:0 14rpx; border-radius:50%; background:#8db3ed; }

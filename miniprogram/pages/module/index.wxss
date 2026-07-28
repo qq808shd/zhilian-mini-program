@@ -1,0 +1,12 @@
+.crumb { display:block; color:var(--color-primary); font-size:24rpx; font-weight:650; }
+.intro-row { display:flex; align-items:center; margin-top:18rpx; }
+.intro-symbol { display:flex; width:92rpx; height:92rpx; align-items:center; justify-content:center; margin-right:20rpx; border-radius:26rpx; background:var(--color-primary); color:#fff; font-size:46rpx; font-weight:700; }
+.page-title { font-size:44rpx; }
+.topic-list { display:flex; flex-direction:column; gap:18rpx; }
+.topic-card { width:100%; min-height:216rpx; padding:32rpx 34rpx; text-align:left; }
+.topic-hover { background:#f8fbff; }
+.topic-head { display:flex; align-items:center; justify-content:space-between; }
+.topic-name { color:var(--color-text); font-size:39rpx; font-weight:700; }
+.topic-arrow { color:#8aa3cb; font-size:46rpx; line-height:1; }
+.topic-description { display:block; margin-top:10rpx; color:var(--color-text-secondary); font-size:28rpx; }
+.topic-meta { display:flex; gap:18rpx; margin-top:26rpx; color:#4774b8; font-size:24rpx; }

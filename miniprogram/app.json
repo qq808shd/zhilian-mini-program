@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/study/index",
+    "pages/module/index",
+    "pages/group/index",
+    "pages/learn/index",
+    "pages/exam/index",
+    "pages/review/index",
+    "pages/review-topic/index",
+    "pages/review-detail/index",
+    "pages/detail/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F4F8FF",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "知练",
+    "backgroundColor": "#F4F8FF",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#64748B",
+    "selectedColor": "#2563EB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/study/index",
+        "text": "学习"
+      },
+      {
+        "pagePath": "pages/exam/index",
+        "text": "考试"
+      },
+      {
+        "pagePath": "pages/review/index",
+        "text": "复习"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

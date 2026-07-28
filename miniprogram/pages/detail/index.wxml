@@ -1,0 +1,50 @@
+<view wx:if="{{item}}" class="page detail-page">
+  <view class="detail-header">
+      <text class="detail-category">{{item.moduleName}} / {{item.topicName}}</text>
+    <text class="detail-title">{{item.title}}</text>
+    <view class="tag-row">
+      <text wx:for="{{item.tags}}" wx:key="*this" class="detail-tag">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="memory-card card">
+    <view class="memory-card-top">
+      <text class="memory-label">先回忆，再查看</text>
+      <text class="memory-mark">?</text>
+    </view>
+    <text class="memory-prompt">{{item.title}}是什么意思？</text>
+    <button class="toggle-button" hover-class="toggle-button-hover" bindtap="onToggleAnswer">
+      {{answerVisible ? '收起答案' : '查看答案'}}
+    </button>
+    <view wx:if="{{answerVisible}}" class="answer-panel">
+      <text class="answer-summary">{{item.summary}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-heading">
+      <text class="section-title">详细解析</text>
+    </view>
+    <view class="detail-section card">
+      <text class="detail-text">{{item.detail}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-heading">
+      <text class="section-title">记忆提示</text>
+    </view>
+    <view class="memory-tip">
+      <view class="memory-tip-line"></view>
+      <text class="memory-tip-text">{{item.memory}}</text>
+    </view>
+  </view>
+
+  <button
+    class="primary-button related-button"
+    disabled="{{relatedCount === 0}}"
+    bindtap="onStartRelatedExam"
+  >
+    练习关联题目（{{relatedCount}}）
+  </button>
+</view>
