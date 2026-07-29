@@ -75,14 +75,18 @@
 }
 
 .toggle-button {
-  min-height: 82rpx;
+  display: flex;
+  min-height: 88rpx;
+  align-items: center;
+  justify-content: center;
   margin-top: 34rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   background: #ffffff;
   color: var(--color-primary-dark);
   font-size: 27rpx;
   font-weight: 650;
-  line-height: 82rpx;
+  line-height: 1.2;
 }
 
 .toggle-button-hover {

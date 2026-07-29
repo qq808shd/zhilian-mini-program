@@ -7,12 +7,14 @@
   <swiper class="learning-swiper" current="{{swiperCurrent}}" bindchange="onSwiperChange" duration="260">
     <swiper-item wx:for="{{learningItems}}" wx:key="id">
       <scroll-view class="card-scroll" scroll-y>
-        <view class="learning-card">
+        <view class="learning-card {{item.revealed ? 'is-revealed' : 'is-prompt'}}">
           <text class="card-index">{{index + 1}} / {{total}}</text>
-          <text class="knowledge-title">{{item.title}}</text>
-          <text class="knowledge-summary">{{item.summary}}</text>
-          <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="reveal-hover" data-index="{{index}}" bindtap="onReveal">点击查看解析</button>
-          <view wx:else class="answer-area">
+          <view class="prompt-area">
+            <text class="knowledge-title">{{item.title}}</text>
+            <text class="knowledge-summary">{{item.summary}}</text>
+            <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="reveal-hover" data-index="{{index}}" bindtap="onReveal">点击查看解析</button>
+          </view>
+          <view wx:if="{{item.revealed}}" class="answer-area">
             <view class="answer-divider"></view>
             <text class="answer-label">解析</text>
             <text class="answer-detail">{{item.detail}}</text>
@@ -23,8 +25,13 @@
     </swiper-item>
   </swiper>
   <view class="learn-footer">
-    <text wx:if="{{currentIndex < total - 1}}" class="swipe-hint">左右滑动，继续下一条</text>
-    <view wx:else class="finish-actions"><text class="finish-text">这一组已经学完</text><button class="secondary-small" bindtap="onRestart">重新学习</button><button class="primary-small" bindtap="onBackGroups">返回分组</button></view>
-    <view class="nav-actions"><button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="nav-button" disabled="{{currentIndex === total - 1}}" bindtap="onNext">下一条</button></view>
+    <block wx:if="{{currentIndex < total - 1}}">
+      <text class="swipe-hint">左右滑动，继续下一条</text>
+      <view class="nav-actions"><button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="nav-button" bindtap="onNext">下一条</button></view>
+    </block>
+    <view wx:else class="finish-panel">
+      <text class="finish-text">这一组已经学完</text>
+      <view class="finish-actions"><button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="secondary-small" bindtap="onRestart">重新学习</button><button class="primary-small" bindtap="onBackGroups">返回分组</button></view>
+    </view>
   </view>
 </view>
