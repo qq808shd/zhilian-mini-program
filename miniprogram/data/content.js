@@ -1,8 +1,11 @@
+const { idiomKnowledge, idiomQuestions } = require("./materials/idioms");
+const { connectiveKnowledge, connectiveQuestions } = require("./materials/connectives");
+
 const modules = [
   {
     id: "verbal",
     name: "言语模块",
-    description: "成语、诗词与实词辨析",
+    description: "成语、关联词、诗词与实词辨析",
     symbol: "言"
   },
   {
@@ -37,6 +40,14 @@ const topics = [
     groupSize: 20
   },
   {
+    id: "connective",
+    moduleId: "verbal",
+    name: "关联词",
+    description: "逻辑关系、指代词与文段标志",
+    symbol: "联",
+    groupSize: 20
+  },
+  {
     id: "word",
     moduleId: "verbal",
     name: "实词",
@@ -62,7 +73,7 @@ const topics = [
   }
 ];
 
-const knowledge = [
+const baseKnowledge = [
   {
     id: "k-idiom-001",
     moduleId: "verbal",
@@ -78,10 +89,11 @@ const knowledge = [
     moduleId: "verbal",
     topicId: "idiom",
     title: "首当其冲",
-    summary: "最先受到攻击或遭遇灾难。",
-    detail: "“冲”指要冲、交通要道。使用时强调最先受到冲击，不表示“第一个冲在前面”。",
-    memory: "站在要冲，所以最先受冲击。",
-    tags: ["易望文生义", "中性"]
+    summary: "先回想它的含义，再点击查看材料释义。",
+    detail: "首先受到冲击、攻击或首先遭受灾难",
+    memory: "",
+    source: "成语.pptx 备注",
+    tags: ["材料导入", "PPT备注"]
   },
   {
     id: "k-idiom-003",
@@ -175,7 +187,7 @@ const knowledge = [
   }
 ];
 
-const questions = [
+const baseQuestions = [
   {
     id: "q-idiom-001",
     moduleId: "verbal",
@@ -196,15 +208,15 @@ const questions = [
     moduleId: "verbal",
     topicId: "idiom",
     knowledgeId: "k-idiom-002",
-    stem: "“首当其冲”最恰当的含义是：",
+    stem: "按照材料备注，“首当其冲”最恰当的含义是：",
     options: [
       { id: "A", text: "第一个向前冲锋" },
       { id: "B", text: "首先获得成功" },
-      { id: "C", text: "最先受到冲击或灾难" },
+      { id: "C", text: "首先受到冲击、攻击或首先遭受灾难" },
       { id: "D", text: "处在队伍最前方" }
     ],
     answer: "C",
-    explanation: "“首当其冲”强调最先受到攻击、压力或灾害，不能理解为第一个冲在前面。"
+    explanation: "材料备注释义：首先受到冲击、攻击或首先遭受灾难"
   },
   {
     id: "q-idiom-003",
@@ -343,6 +355,28 @@ const questions = [
   }
 ];
 
+const existingIdiomTitles = new Set(
+  baseKnowledge
+    .filter((item) => item.topicId === "idiom")
+    .map((item) => item.title)
+);
+const importedIdioms = idiomKnowledge.filter(
+  (item) => !existingIdiomTitles.has(item.title)
+);
+const importedIdiomIds = new Set(importedIdioms.map((item) => item.id));
+
+const knowledge = [
+  ...baseKnowledge,
+  ...importedIdioms,
+  ...connectiveKnowledge
+];
+
+const questions = [
+  ...baseQuestions,
+  ...idiomQuestions.filter((item) => importedIdiomIds.has(item.knowledgeId)),
+  ...connectiveQuestions
+];
+
 function getModuleById(id) {
   return modules.find((item) => item.id === id);
 }
@@ -403,7 +437,7 @@ function getSetsForTopic(topicId) {
 function getKnowledgeSet(topicId, setIndex) {
   const sets = getSetsForTopic(topicId);
   const selectedSet = sets[Number(setIndex)];
-  return selectedSet ? selectedSet.items : [];
+  return selectedSet || null;
 }
 
 module.exports = {

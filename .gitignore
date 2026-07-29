@@ -2,4 +2,6 @@
 node_modules/
 miniprogram_npm/
 project.private.config.json
+材料/言语/成语/
+材料/言语/关联词-完整版/
 *.log
