@@ -29,6 +29,7 @@ const topics = [
     name: "成语",
     description: "四字成语的释义、语境与易错用法",
     symbol: "成",
+    knowledgeUnit: "个成语",
     groupSize: 20
   },
   {
@@ -37,15 +38,18 @@ const topics = [
     name: "诗词",
     description: "名句、作者与篇目对应",
     symbol: "诗",
+    knowledgeUnit: "条诗词",
     groupSize: 20
   },
   {
     id: "connective",
     moduleId: "verbal",
     name: "关联词",
-    description: "逻辑关系、指代词与文段标志",
+    description: "因果、转折、递进等逻辑关系与文段标志",
     symbol: "联",
-    groupSize: 20
+    knowledgeUnit: "类关系",
+    groupSize: 5,
+    groupNames: ["核心逻辑关系", "补充文段标志"]
   },
   {
     id: "word",
@@ -53,6 +57,7 @@ const topics = [
     name: "实词",
     description: "古汉语常见词义与语境辨析",
     symbol: "词",
+    knowledgeUnit: "个实词",
     groupSize: 20
   },
   {
@@ -61,6 +66,7 @@ const topics = [
     name: "公式",
     description: "工程、行程等数量关系基础公式",
     symbol: "式",
+    knowledgeUnit: "个公式",
     groupSize: 20
   },
   {
@@ -69,6 +75,7 @@ const topics = [
     name: "理论",
     description: "政治理论与哲学基础概念",
     symbol: "理",
+    knowledgeUnit: "个知识点",
     groupSize: 20
   }
 ];
@@ -425,7 +432,9 @@ function getSetsForTopic(topicId) {
     const end = Math.min(start + groupSize, items.length);
     return {
       index,
-      name: `第${index + 1}组`,
+      name: topic && topic.groupNames && topic.groupNames[index]
+        ? topic.groupNames[index]
+        : `第${index + 1}组`,
       start: start + 1,
       end,
       count: end - start,

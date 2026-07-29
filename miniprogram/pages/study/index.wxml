@@ -2,7 +2,7 @@
   <view class="page-header">
     <text class="eyebrow">个人学习库</text>
     <text class="page-title">从模块开始学习</text>
-    <text class="page-subtitle">选择模块，再进入具体分类。每个分类按 20 条自动分组，随时可以重学。</text>
+    <text class="page-subtitle">选择模块，再进入具体分类。内容较多时自动分组，随时可以重学。</text>
   </view>
 
   <view class="flow-note">
