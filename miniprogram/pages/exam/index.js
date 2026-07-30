@@ -3,8 +3,25 @@ const { recordQuestionResult, getActiveWrongQuestionIds, consumeExamRequest } = 
 
 function shuffle(items) { const copied = items.slice(); for (let i = copied.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [copied[i], copied[j]] = [copied[j], copied[i]]; } return copied; }
 
+function getQuestionCountOptions(availableCount) {
+  const options = [];
+  if (availableCount > 10) options.push({ value:10, label:"10 题" });
+  if (availableCount > 20) options.push({ value:20, label:"20 题" });
+  options.push({ value:0, label:`全部 ${availableCount} 题` });
+  return options;
+}
+
+function getQuestionSetup(selectedTopic) {
+  const availableCount = questions.filter((q) => q.topicId === selectedTopic.id).length;
+  return {
+    availableCount,
+    questionCountOptions:getQuestionCountOptions(availableCount),
+    questionCount:availableCount>10?10:0
+  };
+}
+
 Page({
-  data: { state: "module", modules, topics: [], selectedModule: null, selectedTopic: null, questionCountOptions: [{value:10,label:"10 题"},{value:20,label:"20 题"},{value:0,label:"全部"}], questionCount: 10, availableCount: 0, examQuestions: [], currentIndex: 0, currentQuestion: null, answers: {}, selectedAnswer: "", resultSummary: null, resultItems: [] },
+  data: { state: "module", modules, topics: [], selectedModule: null, selectedTopic: null, questionCountOptions: [], questionCount: 0, availableCount: 0, examQuestions: [], currentIndex: 0, currentQuestion: null, answers: {}, selectedAnswer: "", resultSummary: null, resultItems: [] },
   onShow() {
     const request = consumeExamRequest();
     if (!request) return;
@@ -12,7 +29,7 @@ Page({
     if (request.mode === "questionIds") this.startWithQuestions(request.questionIds.map((id) => questions.find((q) => q.id === id)).filter(Boolean));
   },
   onModuleTap(event) { const selectedModule = getModuleById(event.currentTarget.dataset.id); this.setData({ state:"topic", selectedModule, topics:getTopicsByModule(selectedModule.id) }); },
-  onTopicTap(event) { const selectedTopic = getTopicById(event.currentTarget.dataset.id); this.setData({ state:"setup", selectedTopic, availableCount:questions.filter((q) => q.topicId === selectedTopic.id).length }); },
+  onTopicTap(event) { const selectedTopic = getTopicById(event.currentTarget.dataset.id); this.setData({ state:"setup", selectedTopic, ...getQuestionSetup(selectedTopic) }); },
   onBackModules() { this.setData({ state:"module", topics:[], selectedModule:null, selectedTopic:null }); },
   onBackTopics() { this.setData({ state:"topic", selectedTopic:null }); },
   onCountTap(event) { this.setData({ questionCount:Number(event.currentTarget.dataset.value) }); },
@@ -39,6 +56,6 @@ Page({
     const correctCount=resultItems.filter((item)=>item.isCorrect).length; const totalCount=resultItems.length; this.setData({state:"result",resultItems,resultSummary:{correctCount,wrongCount:totalCount-correctCount,totalCount,accuracy:Math.round(correctCount/totalCount*100)}});
   },
   onRetryWrong() { this.startWithQuestions(this.data.resultItems.filter((item)=>!item.isCorrect)); },
-  onBackToSetup() { this.setData({ state:this.data.selectedModule ? "setup" : "module", examQuestions:[],currentQuestion:null,answers:{},selectedAnswer:"",resultSummary:null,resultItems:[] }); },
+  onBackToSetup() { const selectedTopic=this.data.selectedTopic; this.setData({ state:this.data.selectedModule&&selectedTopic?"setup":"module", ...(selectedTopic?getQuestionSetup(selectedTopic):{}), examQuestions:[],currentQuestion:null,answers:{},selectedAnswer:"",resultSummary:null,resultItems:[] }); },
   onOpenKnowledge(event) { wx.navigateTo({url:`/pages/detail/index?id=${event.currentTarget.dataset.id}`}); }
 });
