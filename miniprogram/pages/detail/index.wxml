@@ -40,6 +40,15 @@
     </view>
   </view>
 
+  <view wx:if="{{item.source}}" class="section source-section">
+    <view class="section-heading">
+      <text class="section-title">资料口径</text>
+    </view>
+    <view class="detail-source card">
+      <text>{{item.source}}</text>
+    </view>
+  </view>
+
   <button
     class="primary-button related-button"
     disabled="{{relatedCount === 0}}"

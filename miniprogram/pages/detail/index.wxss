@@ -112,6 +112,8 @@
   color: #475569;
   font-size: 28rpx;
   line-height: 1.85;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .memory-tip {
@@ -137,4 +139,11 @@
 
 .related-button {
   margin-top: 40rpx;
+}
+
+.detail-source {
+  padding: 24rpx 28rpx;
+  color: #64748b;
+  font-size: 25rpx;
+  line-height: 1.7;
 }

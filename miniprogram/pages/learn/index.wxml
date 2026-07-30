@@ -19,6 +19,7 @@
             <text class="answer-label">解析</text>
             <text class="answer-detail">{{item.detail}}</text>
             <view wx:if="{{item.memory}}" class="memory-box"><text class="memory-label">记忆提示</text><text class="memory-text">{{item.memory}}</text></view>
+            <view wx:if="{{item.source}}" class="source-box"><text class="source-label">资料口径</text><text class="source-text">{{item.source}}</text></view>
           </view>
         </view>
       </scroll-view>

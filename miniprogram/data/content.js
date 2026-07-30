@@ -1,5 +1,9 @@
 const { idiomKnowledge, idiomQuestions } = require("./materials/idioms");
 const { connectiveKnowledge, connectiveQuestions } = require("./materials/connectives");
+const {
+  dataAnalysisKnowledge,
+  dataAnalysisQuestions
+} = require("./materials/dataAnalysis");
 
 const modules = [
   {
@@ -13,6 +17,12 @@ const modules = [
     name: "数量关系",
     description: "公式、方法与题型要点",
     symbol: "数"
+  },
+  {
+    id: "analysis",
+    name: "资料分析",
+    description: "增长率、比重、混合增长等核心公式与推导",
+    symbol: "资"
   },
   {
     id: "common",
@@ -68,6 +78,69 @@ const topics = [
     symbol: "式",
     knowledgeUnit: "个公式",
     groupSize: 20
+  },
+  {
+    id: "analysis-growth-rate",
+    moduleId: "analysis",
+    name: "增长率",
+    description: "现期与基期、间隔增长和年均增长",
+    symbol: "率",
+    knowledgeUnit: "个公式",
+    groupSize: 6
+  },
+  {
+    id: "analysis-growth-amount",
+    moduleId: "analysis",
+    name: "增长量",
+    description: "增长量、减少量与年均增长量",
+    symbol: "增",
+    knowledgeUnit: "个公式",
+    groupSize: 5
+  },
+  {
+    id: "analysis-proportion",
+    moduleId: "analysis",
+    name: "比重",
+    description: "现期比重、基期比重与比重变化",
+    symbol: "比",
+    knowledgeUnit: "个公式",
+    groupSize: 5
+  },
+  {
+    id: "analysis-average",
+    moduleId: "analysis",
+    name: "平均数",
+    description: "基期平均数、增长率与变化量",
+    symbol: "均",
+    knowledgeUnit: "个公式",
+    groupSize: 5
+  },
+  {
+    id: "analysis-multiple",
+    moduleId: "analysis",
+    name: "倍数与比值",
+    description: "倍数、基期倍数与比值型指标",
+    symbol: "倍",
+    knowledgeUnit: "个公式",
+    groupSize: 5
+  },
+  {
+    id: "analysis-mixed",
+    moduleId: "analysis",
+    name: "混合增长",
+    description: "混合增长率、十字交叉与量之比",
+    symbol: "混",
+    knowledgeUnit: "个公式",
+    groupSize: 5
+  },
+  {
+    id: "analysis-contribution",
+    moduleId: "analysis",
+    name: "贡献与拉动",
+    description: "增长贡献率与拉动增长百分点",
+    symbol: "贡",
+    knowledgeUnit: "个公式",
+    groupSize: 5
   },
   {
     id: "theory",
@@ -375,13 +448,15 @@ const importedIdiomIds = new Set(importedIdioms.map((item) => item.id));
 const knowledge = [
   ...baseKnowledge,
   ...importedIdioms,
-  ...connectiveKnowledge
+  ...connectiveKnowledge,
+  ...dataAnalysisKnowledge
 ];
 
 const questions = [
   ...baseQuestions,
   ...idiomQuestions.filter((item) => importedIdiomIds.has(item.knowledgeId)),
-  ...connectiveQuestions
+  ...connectiveQuestions,
+  ...dataAnalysisQuestions
 ];
 
 function getModuleById(id) {
