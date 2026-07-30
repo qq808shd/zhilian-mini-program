@@ -17,7 +17,14 @@
       {{answerVisible ? '收起答案' : '查看答案'}}
     </button>
     <view wx:if="{{answerVisible}}" class="answer-panel">
-      <text class="answer-summary">{{item.summary}}</text>
+      <math-formula
+        wx:if="{{item.formulaLines && item.formulaLines.length}}"
+        lines="{{item.formulaLines}}"
+        note="{{item.formulaNote}}"
+        spoken="{{item.summary}}"
+        size="{{item.formulaSize}}"
+      />
+      <text wx:else class="answer-summary">{{item.summary}}</text>
     </view>
   </view>
 

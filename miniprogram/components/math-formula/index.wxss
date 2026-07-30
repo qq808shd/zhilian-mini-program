@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.formula-card {
+  width: 100%;
+  margin-top: 30rpx;
+  padding: 24rpx 22rpx 22rpx;
+  border: 1rpx solid #d7e5fb;
+  border-radius: 22rpx;
+  background: linear-gradient(145deg, #f7fbff 0%, #edf5ff 100%);
+  color: #15345f;
+  box-sizing: border-box;
+}
+
+.formula-label {
+  display: block;
+  color: #5a7baa;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.formula-stage {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 17rpx;
+  margin-top: 20rpx;
+}
+
+.formula-line {
+  display: flex;
+  width: 100%;
+  min-height: 52rpx;
+  align-items: center;
+  justify-content: center;
+  gap: 7rpx;
+  color: #102a50;
+  font-family: Georgia, "Times New Roman", "Songti SC", serif;
+  font-size: 33rpx;
+  font-weight: 600;
+  line-height: 1.22;
+}
+
+.formula-text,
+.fraction-numerator,
+.fraction-denominator,
+.power-base,
+.power-exponent,
+.root-index,
+.root-symbol {
+  white-space: nowrap;
+}
+
+.formula-fraction {
+  display: inline-flex;
+  min-width: 58rpx;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  margin: 0 3rpx;
+  vertical-align: middle;
+}
+
+.fraction-numerator,
+.fraction-denominator {
+  display: block;
+  padding-right: 10rpx;
+  padding-left: 10rpx;
+  text-align: center;
+}
+
+.fraction-numerator {
+  padding-bottom: 6rpx;
+  border-bottom: 2rpx solid currentColor;
+}
+
+.fraction-denominator {
+  padding-top: 6rpx;
+}
+
+.formula-power {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.power-exponent {
+  margin: -7rpx 0 0 3rpx;
+  font-size: 21rpx;
+  line-height: 1;
+}
+
+.formula-root {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  padding-top: 5rpx;
+}
+
+.root-index {
+  width: 18rpx;
+  margin: -2rpx -5rpx 0 0;
+  align-self: flex-start;
+  font-size: 19rpx;
+  line-height: 1;
+  text-align: right;
+}
+
+.root-symbol {
+  align-self: stretch;
+  margin-top: 4rpx;
+  font-size: 55rpx;
+  font-weight: 400;
+  line-height: 1;
+  transform: scaleX(.88);
+  transform-origin: right center;
+}
+
+.root-radicand {
+  display: flex;
+  min-height: 58rpx;
+  align-items: center;
+  padding: 5rpx 7rpx 0 5rpx;
+  border-top: 2rpx solid currentColor;
+}
+
+.root-fraction {
+  font-size: 27rpx;
+}
+
+.formula-note {
+  display: block;
+  margin-top: 20rpx;
+  color: #637b9d;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 22rpx;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.formula-card--small .formula-line {
+  gap: 5rpx;
+  font-size: 29rpx;
+}
+
+.formula-card--small .root-fraction {
+  font-size: 25rpx;
+}

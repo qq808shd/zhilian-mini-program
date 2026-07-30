@@ -11,7 +11,14 @@
           <text class="card-index">{{index + 1}} / {{total}}</text>
           <view class="prompt-area">
             <text class="knowledge-title">{{item.title}}</text>
-            <text class="knowledge-summary">{{item.summary}}</text>
+            <math-formula
+              wx:if="{{item.formulaLines && item.formulaLines.length}}"
+              lines="{{item.formulaLines}}"
+              note="{{item.formulaNote}}"
+              spoken="{{item.summary}}"
+              size="{{item.formulaSize}}"
+            />
+            <text class="knowledge-summary">{{item.formulaLines && item.formulaLines.length ? '先看懂公式结构，再点击查看推导、例题和易错点。' : item.summary}}</text>
             <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="reveal-hover" data-index="{{index}}" bindtap="onReveal">点击查看解析</button>
           </view>
           <view wx:if="{{item.revealed}}" class="answer-area">

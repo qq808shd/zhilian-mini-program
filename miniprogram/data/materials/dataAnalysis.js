@@ -1,7 +1,203 @@
 const GENERAL_SOURCE = "国家统计局统计口径；衍生公式由增长速度定义代数推导";
 const CONTRIBUTION_SOURCE = "国家统计局《什么是经济增长贡献率和拉动点》";
 
+const textPart = (value) => ({ type: "text", value });
+const fractionPart = (numerator, denominator) => ({
+  type: "fraction",
+  numerator,
+  denominator
+});
+const powerPart = (base, exponent) => ({ type: "power", base, exponent });
+const rootPart = (index, numerator, denominator) => ({
+  type: "root",
+  index,
+  numerator,
+  denominator
+});
+const formulaLine = (...parts) => parts;
+
+const DATA_ANALYSIS_FORMULAS = {
+  "k-analysis-growth-basic": {
+    lines: [
+      formulaLine(textPart("r ＝"), fractionPart("A－B", "B"), textPart("＝"), fractionPart("Δ", "B"))
+    ],
+    note: "A：现期量　B：基期量　Δ：增长量"
+  },
+  "k-analysis-growth-current-base": {
+    lines: [
+      formulaLine(textPart("A ＝ B×（1＋r）")),
+      formulaLine(textPart("B ＝"), fractionPart("A", "1＋r")),
+      formulaLine(textPart("下降 d 时　B ＝"), fractionPart("A", "1－d"))
+    ],
+    note: "r：增长率　d：按正数表示的下降率"
+  },
+  "k-analysis-growth-point": {
+    lines: [
+      formulaLine(textPart("百分点变化 ＝ 新比例－原比例")),
+      formulaLine(textPart("相对增幅 ＝"), fractionPart("新比例－原比例", "原比例"))
+    ],
+    size: "small"
+  },
+  "k-analysis-growth-interval": {
+    lines: [
+      formulaLine(textPart("R ＝（1＋r₁）（1＋r₂）－1")),
+      formulaLine(textPart("R ＝ r₁＋r₂＋r₁r₂"))
+    ],
+    note: "R：两期间隔增长率"
+  },
+  "k-analysis-growth-multi": {
+    lines: [
+      formulaLine(textPart("1＋R ＝（1＋r₁）（1＋r₂）…（1＋rₙ）")),
+      formulaLine(textPart("每期相同时　R ＝"), powerPart("（1＋r）", "n"), textPart("－1"))
+    ],
+    size: "small"
+  },
+  "k-analysis-growth-annual": {
+    lines: [
+      formulaLine(textPart("g ＝"), rootPart("n", "A", "B"), textPart("－1")),
+      formulaLine(textPart("A ＝ B"), powerPart("（1＋g）", "n"))
+    ],
+    note: "n：从基期到现期的增长间隔数"
+  },
+  "k-analysis-amount-current": {
+    lines: [
+      formulaLine(textPart("Δ ＝ A－B ＝ Br")),
+      formulaLine(textPart("Δ ＝"), fractionPart("A×r", "1＋r"))
+    ],
+    note: "已知现期量 A 和增长率 r 时使用第二式"
+  },
+  "k-analysis-amount-delta-rate": {
+    lines: [
+      formulaLine(textPart("B ＝"), fractionPart("Δ", "r")),
+      formulaLine(textPart("A ＝"), fractionPart("Δ×（1＋r）", "r"))
+    ]
+  },
+  "k-analysis-amount-decrease": {
+    lines: [
+      formulaLine(textPart("B ＝"), fractionPart("A", "1－d")),
+      formulaLine(textPart("减少量 ＝"), fractionPart("A×d", "1－d"))
+    ],
+    note: "d：按正数表示的下降率"
+  },
+  "k-analysis-amount-annual": {
+    lines: [
+      formulaLine(textPart("年均增长量 ＝"), fractionPart("A－B", "n")),
+      formulaLine(textPart("n ＝ 末期年份－初期年份"))
+    ],
+    size: "small"
+  },
+  "k-analysis-proportion-current": {
+    lines: [
+      formulaLine(textPart("s ＝"), fractionPart("P", "T")),
+      formulaLine(textPart("P ＝ sT"))
+    ],
+    note: "P：部分量　T：整体量　s：比重"
+  },
+  "k-analysis-proportion-base": {
+    lines: [
+      formulaLine(textPart("s₀ ＝"), fractionPart("P₀", "T₀")),
+      formulaLine(textPart("s₀ ＝ s₁×"), fractionPart("1＋b", "1＋a"))
+    ],
+    note: "a：部分增速　b：整体增速"
+  },
+  "k-analysis-proportion-change": {
+    lines: [
+      formulaLine(textPart("Δs ＝ s₁×"), fractionPart("a－b", "1＋a")),
+      formulaLine(textPart("Δs ＝ s₀×"), fractionPart("a－b", "1＋b")),
+      formulaLine(textPart("a＞b 比重上升　a＜b 比重下降"))
+    ],
+    note: "用现期比重 s₁ 时，分母是 1＋a",
+    size: "small"
+  },
+  "k-analysis-average-base": {
+    lines: [
+      formulaLine(textPart("M ＝"), fractionPart("X", "Y")),
+      formulaLine(textPart("M₀ ＝ M₁×"), fractionPart("1＋b", "1＋a"))
+    ],
+    note: "a：分子 X 的增速　b：分母 Y 的增速"
+  },
+  "k-analysis-average-rate": {
+    lines: [
+      formulaLine(textPart("rᴹ ＝"), fractionPart("1＋a", "1＋b"), textPart("－1")),
+      formulaLine(textPart("rᴹ ＝"), fractionPart("a－b", "1＋b"))
+    ],
+    note: "a：分子增速　b：分母增速"
+  },
+  "k-analysis-average-change": {
+    lines: [
+      formulaLine(textPart("ΔM ＝ M₁×"), fractionPart("a－b", "1＋a")),
+      formulaLine(textPart("ΔM ＝ M₀×"), fractionPart("a－b", "1＋b"))
+    ],
+    note: "两式分别适用于已知现期平均数或基期平均数"
+  },
+  "k-analysis-multiple-basic": {
+    lines: [
+      formulaLine(textPart("A 是 B 的倍数 ＝"), fractionPart("A", "B")),
+      formulaLine(textPart("A 比 B 多的倍数 ＝"), fractionPart("A", "B"), textPart("－1")),
+      formulaLine(textPart("翻 n 番 ＝"), powerPart("2", "n"), textPart("倍"))
+    ],
+    size: "small"
+  },
+  "k-analysis-multiple-base": {
+    lines: [
+      formulaLine(textPart("k₀ ＝ k₁×"), fractionPart("1＋b", "1＋a"))
+    ],
+    note: "a：分子增速　b：分母增速"
+  },
+  "k-analysis-multiple-rate": {
+    lines: [
+      formulaLine(textPart("rᵏ ＝"), fractionPart("1＋a", "1＋b"), textPart("－1")),
+      formulaLine(textPart("rᵏ ＝"), fractionPart("a－b", "1＋b"))
+    ],
+    note: "倍数本质上也是两数之比"
+  },
+  "k-analysis-ratio-model": {
+    lines: [
+      formulaLine(textPart("Q₀ ＝ Q₁×"), fractionPart("1＋b", "1＋a")),
+      formulaLine(textPart("rQ ＝"), fractionPart("a－b", "1＋b")),
+      formulaLine(textPart("ΔQ ＝ Q₁×"), fractionPart("a－b", "1＋a"))
+    ],
+    note: "Q＝X÷Y，a 为分子增速，b 为分母增速"
+  },
+  "k-analysis-mixed-weighted": {
+    lines: [
+      formulaLine(textPart("ΔT ＝ B₁r₁＋B₂r₂")),
+      formulaLine(textPart("r混 ＝"), fractionPart("B₁r₁＋B₂r₂", "B₁＋B₂"))
+    ],
+    note: "B₁、B₂ 是两组基期量"
+  },
+  "k-analysis-mixed-cross": {
+    lines: [
+      formulaLine(fractionPart("B高", "B低"), textPart("＝"), fractionPart("r混－r低", "r高－r混"))
+    ],
+    note: "十字交叉得到的是高、低两组基期量之比",
+    size: "small"
+  },
+  "k-analysis-mixed-ratio": {
+    lines: [
+      formulaLine(fractionPart("A₁", "A₂"), textPart("＝"), fractionPart("B₁", "B₂")),
+      formulaLine(textPart("×"), fractionPart("1＋r₁", "1＋r₂"))
+    ],
+    note: "A：现期量　B：基期量"
+  },
+  "k-analysis-contribution-rate": {
+    lines: [
+      formulaLine(textPart("c ＝"), fractionPart("ΔP", "ΔT"), textPart("×100%"))
+    ],
+    note: "ΔP：部分增长量　ΔT：整体增长量"
+  },
+  "k-analysis-contribution-pull": {
+    lines: [
+      formulaLine(textPart("拉动百分点 p ＝"), fractionPart("ΔP", "T₀")),
+      formulaLine(textPart("p ＝ c×rT"))
+    ],
+    note: "T₀：整体基期量　c：贡献率　rT：整体增长率",
+    size: "small"
+  }
+};
+
 function createKnowledge(id, topicId, title, summary, detail, memory, tags, source) {
+  const formula = DATA_ANALYSIS_FORMULAS[id] || {};
   return {
     id,
     moduleId: "analysis",
@@ -11,7 +207,10 @@ function createKnowledge(id, topicId, title, summary, detail, memory, tags, sour
     detail,
     memory,
     source: source || GENERAL_SOURCE,
-    tags
+    tags,
+    formulaLines: formula.lines || [],
+    formulaNote: formula.note || "",
+    formulaSize: formula.size || "normal"
   };
 }
 

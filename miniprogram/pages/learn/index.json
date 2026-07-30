@@ -1,1 +1,6 @@
-{"navigationBarTitleText":"卡片学习"}
+{
+  "navigationBarTitleText": "卡片学习",
+  "usingComponents": {
+    "math-formula": "/components/math-formula/index"
+  }
+}

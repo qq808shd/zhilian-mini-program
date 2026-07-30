@@ -1,0 +1,33 @@
+<view class="formula-card formula-card--{{size}}">
+  <text class="formula-label">核心公式</text>
+  <view class="formula-stage" role="text" aria-label="{{spoken}}">
+    <view wx:for="{{displayLines}}" wx:key="id" wx:for-item="formulaLine" class="formula-line">
+      <block wx:for="{{formulaLine.parts}}" wx:key="id" wx:for-item="part">
+        <text wx:if="{{part.type === 'text'}}" class="formula-text">{{part.value}}</text>
+
+        <view wx:elif="{{part.type === 'fraction'}}" class="formula-fraction">
+          <text class="fraction-numerator">{{part.numerator}}</text>
+          <text class="fraction-denominator">{{part.denominator}}</text>
+        </view>
+
+        <view wx:elif="{{part.type === 'power'}}" class="formula-power">
+          <text class="power-base">{{part.base}}</text>
+          <text class="power-exponent">{{part.exponent}}</text>
+        </view>
+
+        <view wx:elif="{{part.type === 'root'}}" class="formula-root">
+          <text class="root-index">{{part.index}}</text>
+          <text class="root-symbol">√</text>
+          <view class="root-radicand">
+            <view wx:if="{{part.numerator}}" class="formula-fraction root-fraction">
+              <text class="fraction-numerator">{{part.numerator}}</text>
+              <text class="fraction-denominator">{{part.denominator}}</text>
+            </view>
+            <text wx:else class="formula-text">{{part.radicand}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+  <text wx:if="{{note}}" class="formula-note">{{note}}</text>
+</view>
