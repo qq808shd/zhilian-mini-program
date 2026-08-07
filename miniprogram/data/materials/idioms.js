@@ -74,7 +74,7 @@ const idiomKnowledge = rawIdioms.map((item, index) => ({
   moduleId: "verbal",
   topicId: "idiom",
   title: item[0],
-  summary: "先回想它的含义，再点击查看材料释义。",
+  summary: item[1],
   detail: item[1],
   memory: "",
   source: "成语.pptx 备注",

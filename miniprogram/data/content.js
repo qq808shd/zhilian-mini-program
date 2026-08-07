@@ -169,7 +169,7 @@ const baseKnowledge = [
     moduleId: "verbal",
     topicId: "idiom",
     title: "首当其冲",
-    summary: "先回想它的含义，再点击查看材料释义。",
+    summary: "首先受到冲击、攻击或首先遭受灾难。",
     detail: "首先受到冲击、攻击或首先遭受灾难",
     memory: "",
     source: "成语.pptx 备注",

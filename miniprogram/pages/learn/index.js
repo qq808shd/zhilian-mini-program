@@ -1,8 +1,12 @@
 const { getTopicById, getModuleById, getKnowledgeSet } = require("../../data/content");
 const { markGroupProgress } = require("../../utils/storage");
 
+function normalizeLearningText(value) {
+  return String(value || "").trim().replace(/[，。；！？,.!?;]+$/g, "");
+}
+
 Page({
-  data: { topic: null, module: null, setName: "", setIndex: 0, learningItems: [], currentIndex: 0, swiperCurrent: 0, total: 0, progressPercent: 0 },
+  data: { topic: null, module: null, setName: "", setIndex: 0, learningItems: [], currentIndex: 0, swiperCurrent: 0, total: 0, progressPercent: 0, hideDefinitionBeforeReveal: false },
   onLoad(options) {
     const setIndex = Number(options.setIndex || 0);
     const topic = getTopicById(options.topicId);
@@ -11,7 +15,7 @@ Page({
     const set = getKnowledgeSet(topic.id, setIndex);
     if (!set) return;
     wx.setNavigationBarTitle({ title: `${topic.name}学习` });
-    this.setData({ topic, module, setName: set.name, setIndex, learningItems: set.items.map((item) => ({ ...item, revealed: false })), total: set.count, progressPercent: Number((100 / set.count).toFixed(1)) });
+    this.setData({ topic, module, setName: set.name, setIndex, learningItems: set.items.map((item) => ({ ...item, revealed: false, hasSeparateDetail: normalizeLearningText(item.detail) !== normalizeLearningText(item.summary) })), total: set.count, progressPercent: Number((100 / set.count).toFixed(1)), hideDefinitionBeforeReveal: ["idiom", "word"].includes(topic.id) });
     markGroupProgress(topic.id, setIndex, 0, set.count);
   },
   onReveal(event) {

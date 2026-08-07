@@ -18,13 +18,25 @@
               spoken="{{item.summary}}"
               size="{{item.formulaSize}}"
             />
-            <text class="knowledge-summary">{{item.formulaLines && item.formulaLines.length ? '先看懂公式结构，再点击查看推导、例题和易错点。' : item.summary}}</text>
+            <text wx:if="{{!hideDefinitionBeforeReveal}}" class="knowledge-summary">{{item.formulaLines && item.formulaLines.length ? '先看懂公式结构，再点击查看推导、例题和易错点。' : item.summary}}</text>
+            <text wx:elif="{{!item.revealed}}" class="recall-hint">先在心里回想它的含义，再点击查看解析。</text>
             <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="reveal-hover" data-index="{{index}}" bindtap="onReveal">点击查看解析</button>
           </view>
           <view wx:if="{{item.revealed}}" class="answer-area">
             <view class="answer-divider"></view>
-            <text class="answer-label">解析</text>
-            <text class="answer-detail">{{item.detail}}</text>
+            <block wx:if="{{hideDefinitionBeforeReveal}}">
+              <text class="answer-label">释义</text>
+              <text class="definition-text">{{item.summary}}</text>
+              <block wx:if="{{item.hasSeparateDetail}}">
+                <view class="answer-section-divider"></view>
+                <text class="answer-label">详细解析</text>
+                <text class="answer-detail">{{item.detail}}</text>
+              </block>
+            </block>
+            <block wx:else>
+              <text class="answer-label">解析</text>
+              <text class="answer-detail">{{item.detail}}</text>
+            </block>
             <view wx:if="{{item.memory}}" class="memory-box"><text class="memory-label">记忆提示</text><text class="memory-text">{{item.memory}}</text></view>
             <view wx:if="{{item.source}}" class="source-box"><text class="source-label">资料口径</text><text class="source-text">{{item.source}}</text></view>
           </view>
