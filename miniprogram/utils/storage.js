@@ -1,7 +1,9 @@
+const { idiomQuestionAliases } = require("../data/materials/idioms");
+
 const STATS_KEY = "zhilian_question_stats_v3";
 const STUDY_PROGRESS_KEY = "zhilian_study_progress_v1";
 const CONNECTIVE_MIGRATION_KEY = "zhilian_connective_relation_cards_v1";
-const IDIOM_EXCEL_MIGRATION_KEY = "zhilian_idiom_excel_20260808_v1";
+const IDIOM_ID_MIGRATION_KEY = "zhilian_idiom_incremental_merge_20260808_v2";
 
 function migrateConnectiveRecords() {
   if (wx.getStorageSync(CONNECTIVE_MIGRATION_KEY)) return;
@@ -30,30 +32,42 @@ function migrateConnectiveRecords() {
 }
 
 function migrateIdiomRecords() {
-  if (wx.getStorageSync(IDIOM_EXCEL_MIGRATION_KEY)) return;
+  if (wx.getStorageSync(IDIOM_ID_MIGRATION_KEY)) return;
 
   const stats = wx.getStorageSync(STATS_KEY) || {};
   let statsChanged = false;
-  Object.keys(stats).forEach((questionId) => {
-    const record = stats[questionId];
-    if ((record && record.topicId === "idiom") || questionId.indexOf("q-idiom-") === 0 || questionId.indexOf("q-mat-idiom-") === 0) {
-      delete stats[questionId];
-      statsChanged = true;
+  Object.keys(idiomQuestionAliases).forEach((sourceId) => {
+    const source = stats[sourceId];
+    if (!source) return;
+
+    const targetId = idiomQuestionAliases[sourceId];
+    const target = stats[targetId];
+    if (target) {
+      const attempts = (target.attempts || 0) + (source.attempts || 0);
+      const wrong = (target.wrong || 0) + (source.wrong || 0);
+      stats[targetId] = {
+        ...source,
+        ...target,
+        questionId: targetId,
+        moduleId: "verbal",
+        topicId: "idiom",
+        attempts,
+        correct: (target.correct || 0) + (source.correct || 0),
+        wrong,
+        consecutiveCorrect: target.consecutiveCorrect || 0,
+        activeWrong: Boolean(target.activeWrong),
+        lastWrongAt: Math.max(target.lastWrongAt || 0, source.lastWrongAt || 0),
+        errorRate: attempts ? Number(((wrong / attempts) * 100).toFixed(1)) : 0
+      };
+    } else {
+      stats[targetId] = { ...source, questionId: targetId, moduleId: "verbal", topicId: "idiom" };
     }
+    delete stats[sourceId];
+    statsChanged = true;
   });
   if (statsChanged) wx.setStorageSync(STATS_KEY, stats);
 
-  const progress = wx.getStorageSync(STUDY_PROGRESS_KEY) || {};
-  let progressChanged = false;
-  Object.keys(progress).forEach((key) => {
-    if (key.indexOf("idiom_") === 0) {
-      delete progress[key];
-      progressChanged = true;
-    }
-  });
-  if (progressChanged) wx.setStorageSync(STUDY_PROGRESS_KEY, progress);
-
-  wx.setStorageSync(IDIOM_EXCEL_MIGRATION_KEY, Date.now());
+  wx.setStorageSync(IDIOM_ID_MIGRATION_KEY, Date.now());
 }
 
 function migrateContentRecords() {

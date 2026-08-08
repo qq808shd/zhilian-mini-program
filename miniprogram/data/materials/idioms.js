@@ -1,4 +1,102 @@
-const rawIdioms = [
+const legacyBaseIdioms = [
+  {
+    knowledgeId: "k-idiom-001",
+    questionId: "q-idiom-001",
+    title: "不刊之论",
+    summary: "不能改动或不可磨灭的言论，形容正确而不可推翻的言论。",
+    detail: "“刊”在这里是削除、修改的意思。这个成语通常用来评价观点或文章正确、精当，不表示“不能刊登”。",
+    source: "原有词库"
+  },
+  {
+    knowledgeId: "k-idiom-002",
+    questionId: "q-idiom-002",
+    title: "首当其冲",
+    summary: "首先受到冲击、攻击或首先遭受灾难。",
+    detail: "首先受到冲击、攻击或首先遭受灾难。",
+    source: "成语.pptx 备注"
+  },
+  {
+    knowledgeId: "k-idiom-003",
+    questionId: "q-idiom-003",
+    title: "差强人意",
+    summary: "大体上还能使人满意。",
+    detail: "“差”是稍微、大体的意思；“强”是振奋。它表达的是尚可、基本满意，不是“让人很不满意”。",
+    source: "原有词库"
+  }
+];
+
+const legacyMaterialIdioms = [
+  ["无与伦比", "没有能够与之相比的"],
+  ["无出其右", "没有能超过的"],
+  ["叹为观止", "赞叹所见事物好到极点。搭配“令人”、“让人”"],
+  ["独占鳌头", "占领首位，取得第一"],
+  ["登峰造极", "学问、技艺达到最高境界"],
+  ["人云亦云", "没有主见，只会随声附和（别人说啥，他说啥）"],
+  ["随波逐流", "自己没有立场和主见，只是随着潮流走（别人干啥，他干啥）"],
+  ["一劳永逸", "辛苦一次，以后就不再费力了"],
+  ["一蹴而就", "做事轻而易举就成功"],
+  ["立竿见影", "见效快"],
+  ["杀鸡取卵", "只顾眼前利益，不顾长远发展"],
+  ["竭泽而渔", "只顾眼前利益，不顾长远发展"],
+  ["寅吃卯粮", "入不敷出，预先借支（花呗、信用卡）"],
+  ["缘木求鱼", "方式方法错误，达不到目的"],
+  ["升山采珠", "方式方法错误，达不到目的"],
+  ["饮鸩止渴", "用有害的方法解决问题，反而害了自己"],
+  ["正本清源", "从根本上解决问题"],
+  ["釜底抽薪", "从根本上解决问题"],
+  ["汗牛充栋", "藏书多"],
+  ["浩如烟海", "书籍、信息、资料多（文字类）"],
+  ["相形见绌", "相比之下，显出不足"],
+  ["黯然失色", "相比之下，远远不足"],
+  ["另辟蹊径", "另创一种风格或方法"],
+  ["剑走偏锋", "用新方法解决问题，褒义词"],
+  ["走马观花", "粗略地观察事物。搭配具象事物、正在进行时。"],
+  ["浮光掠影", "印象不深。搭配抽象事物、完成时。"],
+  ["蜻蜓点水", "做事肤浅不深入，搭配普适性的对象。"],
+  ["浅尝辄止", "做事肤浅不深入，搭配学术性、专业性的对象。"],
+  ["蔚为大观", "美好事物繁多，形成盛大的景象。"],
+  ["蔚然成风", "某一事物流行，逐渐形成一种风气。褒义词"],
+  ["大行其道", "某一事物流行，逐渐形成一种风气。贬义词"],
+  ["脱胎换骨", "彻底改变，坏人重新做人"],
+  ["改头换面", "只改形式，不变内容"],
+  ["粉墨登场", "坏人经过一番打扮，登上政治舞台"],
+  ["泥沙俱下", "好坏掺杂在一起"],
+  ["良莠不齐", "好坏掺杂在一起"],
+  ["鱼龙混杂", "好坏掺杂在一起（一般搭配人）"],
+  ["鱼目混珠", "以次充好，以假乱真"],
+  ["循规蹈矩", "遵守规矩，不敢稍作变动"],
+  ["墨守成规", "思想保守，守着老规矩不肯改变。"],
+  ["历久弥新", "经历了长久的时间，反而更鲜活、更有生命力。（老来俏，岁数越大越有味道）"],
+  ["推陈出新", "去掉旧事物的糟粕，取其精华，并使它向新的方向发展（换赛道，没有任何新事物产生）"],
+  ["革故鼎新", "去除旧的，建立新的"],
+  ["等量齐观", "用单一标准看待有差异的事物。（贬义词）"],
+  ["同日而语", "不同时间的状态，放在同一时间来讨论（只搭配一个主体，如：以前的我你爱答不理，现在的我你高攀不起）"],
+  ["望其项背", "赶得上"],
+  ["捉襟见肘", "顾此失彼，陷入窘境（或者难题不易解决）"],
+  ["左支右绌", "顾此失彼"],
+  ["罄竹难书", "罪行多的写不完"],
+  ["势在必行", "按照形势的发展，必须采取行动"],
+  ["激浊扬清", "去除坏的，发扬好的"],
+  ["不置可否", "不明确表态"],
+  ["独树一帜", "与众不同"],
+  ["休戚与共", "关系密切，利害相同"],
+  ["经天纬地", "治理天下的才能，只能搭配人"],
+  ["因地制宜", "根据各地的情况，采取适宜的措施。（文段中的地点要大于等于2，不可搭配单一地点）"],
+  ["方兴未艾", "新生事物正在发展，尚未停止"],
+  ["望洋兴叹", "因实力不足或条件不够，而感到无奈"],
+  ["大相径庭", "差别很大，区别明显（无好坏之分）"],
+  ["奉为圭臬", "某些事物、言论信奉为行事的准则。（奉为圣旨）"],
+  ["首当其冲", "首先受到冲击、攻击或首先遭受灾难"],
+  ["瓜田李下", "容易引起嫌疑之处"],
+  ["筚路蓝缕", "创业的艰辛（不能搭配个体户，可以搭配大企业、国家）"],
+  ["薪火相传", "比喻学问和技艺代代相传，或者文化精神的传承。"],
+  ["鳞次栉比", "建筑、船密而整齐"],
+  ["俯拾即是", "多"],
+  ["讳莫如深", "对事情隐瞒得很紧"],
+  ["炙手可热", "权势大，气焰盛，让人难以接近。贬义词"]
+];
+
+const excelIdioms = [
   ["胸无城府", "为人坦率真诚，不用心机（褒义词）。"],
   ["天花乱坠", "说得极为动听，多指夸大或不切实际。本词只能用来形容说话。"],
   ["不刊之论", "不可删改或修订的言论。形容文章或言论精当、无懈可击，易误用为贬义。"],
@@ -110,15 +208,65 @@ function createStableSuffix(value) {
   return (hash >>> 0).toString(36);
 }
 
-const idiomKnowledge = rawIdioms.map((item) => ({
-  id: `k-idiom-${createStableSuffix(item[0])}`,
-  moduleId: "verbal",
-  topicId: "idiom",
+const idiomRecords = [];
+const idiomByTitle = new Map();
+const idiomQuestionAliases = {};
+
+function appendIdiom(record) {
+  if (idiomByTitle.has(record.title)) return;
+  const suffix = createStableSuffix(record.title);
+  const normalized = {
+    ...record,
+    knowledgeId: `k-idiom-${suffix}`,
+    questionId: `q-idiom-${suffix}`
+  };
+  idiomByTitle.set(normalized.title, normalized);
+  idiomRecords.push(normalized);
+}
+
+// 保持当前 Excel 的 100 条顺序不变，再在末尾追加旧词库独有内容。
+excelIdioms.forEach((item) => appendIdiom({
   title: item[0],
   summary: item[1],
   detail: item[1],
+  source: "言语成语.xlsx"
+}));
+
+legacyBaseIdioms.forEach((item) => {
+  idiomQuestionAliases[item.questionId] = `q-idiom-${createStableSuffix(item.title)}`;
+  appendIdiom({
+    title: item.title,
+    summary: item.summary,
+    detail: item.detail,
+    source: item.source
+  });
+});
+
+// 这是旧版 68 条材料及其历史顺序快照；顺序用于迁移旧 q-mat-idiom-NNN 统计，禁止重排。
+legacyMaterialIdioms.forEach((item, index) => {
+  const sequence = String(index + 1).padStart(3, "0");
+  idiomQuestionAliases[`q-mat-idiom-${sequence}`] = `q-idiom-${createStableSuffix(item[0])}`;
+  appendIdiom({
+    title: item[0],
+    summary: item[1],
+    detail: item[1],
+    source: "成语.pptx 备注"
+  });
+});
+
+const questionIdByKnowledgeId = new Map(
+  idiomRecords.map((item) => [item.knowledgeId, item.questionId])
+);
+
+const idiomKnowledge = idiomRecords.map((item) => ({
+  id: item.knowledgeId,
+  moduleId: "verbal",
+  topicId: "idiom",
+  title: item.title,
+  summary: item.summary,
+  detail: item.detail,
   memory: "",
-  source: "言语成语.xlsx",
+  source: item.source,
   tags: ["成语"]
 }));
 
@@ -142,7 +290,7 @@ function buildIdiomQuestions(items) {
     const optionTexts = getDistractors(items, index, item.summary);
     optionTexts.splice(answerIndex, 0, item.summary);
     return {
-      id: `q-idiom-${createStableSuffix(item.title)}`,
+      id: questionIdByKnowledgeId.get(item.id),
       moduleId: "verbal",
       topicId: "idiom",
       knowledgeId: item.id,
@@ -161,5 +309,6 @@ const idiomQuestions = buildIdiomQuestions(idiomKnowledge);
 
 module.exports = {
   idiomKnowledge,
-  idiomQuestions
+  idiomQuestions,
+  idiomQuestionAliases
 };

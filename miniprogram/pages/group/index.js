@@ -12,10 +12,11 @@ Page({
     const sets = getSetsForTopic(topicId).map((set) => {
       const progress = getGroupProgress(topicId, set.index);
       const learnedCount = progress ? Math.min((progress.maxIndex || 0) + 1, set.count) : 0;
+      const completed = Boolean(progress && progress.total === set.count && progress.maxIndex >= set.count - 1);
       return {
         ...set,
         learnedCount,
-        status: progress && progress.completed ? "已学完 · 可重新学习" : learnedCount ? `已学习 ${learnedCount} 条 · 继续学习` : "开始学习"
+        status: completed ? "已学完 · 可重新学习" : learnedCount ? `已学习 ${learnedCount} 条 · 继续学习` : "开始学习"
       };
     });
     wx.setNavigationBarTitle({ title: topic.name });
