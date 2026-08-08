@@ -24,5 +24,8 @@ Page({
   onOpenSet(event) {
     const { index } = event.currentTarget.dataset;
     wx.navigateTo({ url: `/pages/learn/index?topicId=${this.data.topic.id}&setIndex=${index}` });
+  },
+  onOpenCatalog() {
+    wx.navigateTo({ url: `/pages/catalog/index?topicId=${this.data.topic.id}` });
   }
 });

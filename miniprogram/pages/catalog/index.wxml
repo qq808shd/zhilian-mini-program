@@ -1,0 +1,56 @@
+<view wx:if="{{topic}}" class="page catalog-page">
+  <text class="crumb">学习 / {{module.name}} / {{topic.name}} / 全部</text>
+  <text class="page-title catalog-title">{{topic.name}}词库</text>
+  <text class="page-subtitle">集中浏览全部内容，可按词语或释义快速搜索。</text>
+
+  <view class="search-panel">
+    <text class="search-label">搜索</text>
+    <input
+      class="search-input"
+      value="{{query}}"
+      placeholder="搜索{{topic.name}}或释义"
+      placeholder-class="search-placeholder"
+      confirm-type="search"
+      bindinput="onSearchInput"
+    />
+    <button wx:if="{{query}}" class="clear-button" hover-class="clear-hover" bindtap="onClearSearch">清空</button>
+  </view>
+
+  <view class="result-heading">
+    <text class="result-label">{{resultLabel}}</text>
+    <text class="result-total">{{query ? '共 ' + resultCount + ' / ' + total + ' 条' : '共 ' + total + ' 条'}}</text>
+  </view>
+
+  <view wx:if="{{items.length}}" class="result-list">
+    <view wx:for="{{items}}" wx:key="id" class="result-card card">
+      <view class="result-card-head">
+        <view class="word-heading">
+          <text class="word-order">{{item.order}}</text>
+          <text class="word-title">{{item.title}}</text>
+        </view>
+        <text wx:if="{{item.category}}" class="word-category">{{item.category}}</text>
+      </view>
+      <text class="meaning-label">释义</text>
+      <text class="meaning-text">{{item.summary}}</text>
+      <button
+        wx:if="{{item.hasSeparateDetail}}"
+        class="detail-toggle"
+        hover-class="detail-toggle-hover"
+        data-id="{{item.id}}"
+        bindtap="onToggleDetail"
+      >
+        {{item.detailExpanded ? '收起详细解析' : '查看详细解析'}}
+      </button>
+      <view wx:if="{{item.detailExpanded}}" class="detail-panel">
+        <text class="detail-label">详细解析</text>
+        <text class="detail-text">{{item.detail}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-state card">
+    <text class="empty-title">没有找到“{{query}}”</text>
+    <text class="empty-description">可以缩短关键词，或搜索释义中的关键字。</text>
+    <button class="empty-clear" hover-class="empty-clear-hover" bindtap="onClearSearch">清空搜索，查看全部</button>
+  </view>
+</view>

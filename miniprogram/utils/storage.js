@@ -1,6 +1,7 @@
 const STATS_KEY = "zhilian_question_stats_v3";
 const STUDY_PROGRESS_KEY = "zhilian_study_progress_v1";
 const CONNECTIVE_MIGRATION_KEY = "zhilian_connective_relation_cards_v1";
+const IDIOM_EXCEL_MIGRATION_KEY = "zhilian_idiom_excel_20260808_v1";
 
 function migrateConnectiveRecords() {
   if (wx.getStorageSync(CONNECTIVE_MIGRATION_KEY)) return;
@@ -28,8 +29,40 @@ function migrateConnectiveRecords() {
   wx.setStorageSync(CONNECTIVE_MIGRATION_KEY, Date.now());
 }
 
-function getQuestionStats() {
+function migrateIdiomRecords() {
+  if (wx.getStorageSync(IDIOM_EXCEL_MIGRATION_KEY)) return;
+
+  const stats = wx.getStorageSync(STATS_KEY) || {};
+  let statsChanged = false;
+  Object.keys(stats).forEach((questionId) => {
+    const record = stats[questionId];
+    if ((record && record.topicId === "idiom") || questionId.indexOf("q-idiom-") === 0 || questionId.indexOf("q-mat-idiom-") === 0) {
+      delete stats[questionId];
+      statsChanged = true;
+    }
+  });
+  if (statsChanged) wx.setStorageSync(STATS_KEY, stats);
+
+  const progress = wx.getStorageSync(STUDY_PROGRESS_KEY) || {};
+  let progressChanged = false;
+  Object.keys(progress).forEach((key) => {
+    if (key.indexOf("idiom_") === 0) {
+      delete progress[key];
+      progressChanged = true;
+    }
+  });
+  if (progressChanged) wx.setStorageSync(STUDY_PROGRESS_KEY, progress);
+
+  wx.setStorageSync(IDIOM_EXCEL_MIGRATION_KEY, Date.now());
+}
+
+function migrateContentRecords() {
   migrateConnectiveRecords();
+  migrateIdiomRecords();
+}
+
+function getQuestionStats() {
+  migrateContentRecords();
   return wx.getStorageSync(STATS_KEY) || {};
 }
 
@@ -76,7 +109,7 @@ function getActiveWrongQuestionIds(filters = {}) {
 }
 
 function getStudyProgress() {
-  migrateConnectiveRecords();
+  migrateContentRecords();
   return wx.getStorageSync(STUDY_PROGRESS_KEY) || {};
 }
 

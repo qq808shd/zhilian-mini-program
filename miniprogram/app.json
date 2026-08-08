@@ -3,6 +3,7 @@
     "pages/study/index",
     "pages/module/index",
     "pages/group/index",
+    "pages/catalog/index",
     "pages/learn/index",
     "pages/exam/index",
     "pages/review/index",

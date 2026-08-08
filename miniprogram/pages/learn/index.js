@@ -15,7 +15,7 @@ Page({
     const set = getKnowledgeSet(topic.id, setIndex);
     if (!set) return;
     wx.setNavigationBarTitle({ title: `${topic.name}学习` });
-    this.setData({ topic, module, setName: set.name, setIndex, learningItems: set.items.map((item) => ({ ...item, revealed: false, hasSeparateDetail: normalizeLearningText(item.detail) !== normalizeLearningText(item.summary) })), total: set.count, progressPercent: Number((100 / set.count).toFixed(1)), hideDefinitionBeforeReveal: ["idiom", "word"].includes(topic.id) });
+    this.setData({ topic, module, setName: set.name, setIndex, learningItems: set.items.map((item) => ({ ...item, revealed: false, hasSeparateDetail: normalizeLearningText(item.detail) !== normalizeLearningText(item.summary) })), total: set.count, progressPercent: Number((100 / set.count).toFixed(1)), hideDefinitionBeforeReveal: ["idiom", "word", "three-character-word"].includes(topic.id) });
     markGroupProgress(topic.id, setIndex, 0, set.count);
   },
   onReveal(event) {

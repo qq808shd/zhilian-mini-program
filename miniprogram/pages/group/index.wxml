@@ -2,7 +2,17 @@
   <text class="crumb">学习 / {{module.name}} / {{topic.name}}</text>
   <text class="page-title group-title">{{topic.name}}分组</text>
   <text class="page-subtitle">共 {{total}} {{topic.knowledgeUnit}}，每组最多 {{topic.groupSize}} {{topic.knowledgeUnit}}。完成后也可以随时重新学习。</text>
-  <view class="section-heading"><text class="section-title">选择一组开始</text><text class="section-note">{{sets.length}} 组</text></view>
+  <button wx:if="{{topic.catalogEnabled}}" class="catalog-card" style="width: 100%; min-height: 180rpx;" hover-class="catalog-hover" bindtap="onOpenCatalog">
+    <view class="catalog-main">
+      <view class="catalog-badge">全</view>
+      <view class="catalog-copy">
+        <text class="catalog-title">全部查看与搜索</text>
+        <text class="catalog-description">浏览全部 {{total}} {{topic.knowledgeUnit}}，快速查找并查看释义</text>
+      </view>
+    </view>
+    <text class="catalog-arrow">›</text>
+  </button>
+  <view class="section-heading group-section-heading"><text class="section-title">选择一组开始</text><text class="section-note">{{sets.length}} 组</text></view>
   <view class="set-list">
     <button wx:for="{{sets}}" wx:key="index" class="set-card card" style="width: 100%; min-height: 230rpx;" hover-class="set-hover" data-index="{{item.index}}" bindtap="onOpenSet">
       <view class="set-head"><text class="set-name">{{item.name}}</text><text class="set-arrow">›</text></view>

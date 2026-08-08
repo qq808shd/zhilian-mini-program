@@ -1,4 +1,8 @@
 const { idiomKnowledge, idiomQuestions } = require("./materials/idioms");
+const {
+  threeCharacterWordKnowledge,
+  threeCharacterWordQuestions
+} = require("./materials/threeCharacterWords");
 const { connectiveKnowledge, connectiveQuestions } = require("./materials/connectives");
 const {
   dataAnalysisKnowledge,
@@ -9,7 +13,7 @@ const modules = [
   {
     id: "verbal",
     name: "言语模块",
-    description: "成语、关联词、诗词与实词辨析",
+    description: "成语、三字词、关联词、诗词与实词辨析",
     symbol: "言"
   },
   {
@@ -40,7 +44,18 @@ const topics = [
     description: "四字成语的释义、语境与易错用法",
     symbol: "成",
     knowledgeUnit: "个成语",
-    groupSize: 20
+    groupSize: 20,
+    catalogEnabled: true
+  },
+  {
+    id: "three-character-word",
+    moduleId: "verbal",
+    name: "三字词",
+    description: "常用比喻词、政策表达及语境例句",
+    symbol: "三",
+    knowledgeUnit: "个词语",
+    groupSize: 20,
+    catalogEnabled: true
   },
   {
     id: "poetry",
@@ -68,7 +83,8 @@ const topics = [
     description: "古汉语常见词义与语境辨析",
     symbol: "词",
     knowledgeUnit: "个实词",
-    groupSize: 20
+    groupSize: 20,
+    catalogEnabled: true
   },
   {
     id: "formula",
@@ -435,26 +451,18 @@ const baseQuestions = [
   }
 ];
 
-const existingIdiomTitles = new Set(
-  baseKnowledge
-    .filter((item) => item.topicId === "idiom")
-    .map((item) => item.title)
-);
-const importedIdioms = idiomKnowledge.filter(
-  (item) => !existingIdiomTitles.has(item.title)
-);
-const importedIdiomIds = new Set(importedIdioms.map((item) => item.id));
-
 const knowledge = [
-  ...baseKnowledge,
-  ...importedIdioms,
+  ...baseKnowledge.filter((item) => item.topicId !== "idiom"),
+  ...idiomKnowledge,
+  ...threeCharacterWordKnowledge,
   ...connectiveKnowledge,
   ...dataAnalysisKnowledge
 ];
 
 const questions = [
-  ...baseQuestions,
-  ...idiomQuestions.filter((item) => importedIdiomIds.has(item.knowledgeId)),
+  ...baseQuestions.filter((item) => item.topicId !== "idiom"),
+  ...idiomQuestions,
+  ...threeCharacterWordQuestions,
   ...connectiveQuestions,
   ...dataAnalysisQuestions
 ];
