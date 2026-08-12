@@ -4,6 +4,8 @@ const {
   getKnowledgeByTopic
 } = require("../../data/content");
 
+const PAGE_SIZE = 40;
+
 function normalizeText(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -32,7 +34,9 @@ Page({
     total: 0,
     resultCount: 0,
     resultLabel: "",
-    items: []
+    items: [],
+    hasMore: false,
+    visibleCount: 0
   },
 
   onLoad(options) {
@@ -55,6 +59,8 @@ Page({
         normalizeLearningText(item.detail) !== normalizeLearningText(item.summary)
     }));
     this.expandedIds = new Set();
+    this.collapsedIds = new Set();
+    this.filteredItems = [];
     wx.setNavigationBarTitle({ title: `${topic.name}词库` });
     this.setData({ topic, module, total: this.allItems.length });
     this.applyFilter("");
@@ -71,9 +77,21 @@ Page({
 
   onToggleDetail(event) {
     const id = event.currentTarget.dataset.id;
-    if (this.expandedIds.has(id)) this.expandedIds.delete(id);
-    else this.expandedIds.add(id);
-    this.applyFilter(this.data.query);
+    const item = this.filteredItems.find((entry) => entry.id === id);
+    const isExpanded = this.expandedIds.has(id)
+      || Boolean(item && item.matchedInDetail && !this.collapsedIds.has(id));
+    if (isExpanded) {
+      this.expandedIds.delete(id);
+      this.collapsedIds.add(id);
+    } else {
+      this.collapsedIds.delete(id);
+      this.expandedIds.add(id);
+    }
+    this.renderVisible(this.data.visibleCount);
+  },
+
+  onLoadMore() {
+    this.renderVisible(this.data.visibleCount + PAGE_SIZE);
   },
 
   applyFilter(rawQuery) {
@@ -85,17 +103,31 @@ Page({
         .sort((a, b) => a.score - b.score || a.item.order - b.item.order)
       : this.allItems.map((item) => ({ item, score: -1 }));
 
-    const displayItems = entries.map((entry) => ({
+    this.filteredItems = entries.map((entry) => ({
       ...entry.item,
-      detailExpanded: this.expandedIds.has(entry.item.id) || entry.score === 4
+      matchedInDetail: entry.score === 4
     }));
     this.setData({
       query: rawQuery,
-      items: displayItems,
-      resultCount: displayItems.length,
+      resultCount: this.filteredItems.length,
       resultLabel: query
-        ? `找到 ${displayItems.length} 条相关内容`
+        ? `找到 ${this.filteredItems.length} 条相关内容`
         : "全部内容"
+    });
+    this.renderVisible(PAGE_SIZE);
+  },
+
+  renderVisible(requestedCount) {
+    const visibleCount = Math.min(Math.max(requestedCount, PAGE_SIZE), this.filteredItems.length);
+    const items = this.filteredItems.slice(0, visibleCount).map((item) => ({
+      ...item,
+      detailExpanded: this.expandedIds.has(item.id)
+        || (item.matchedInDetail && !this.collapsedIds.has(item.id))
+    }));
+    this.setData({
+      items,
+      visibleCount,
+      hasMore: visibleCount < this.filteredItems.length
     });
   }
 });

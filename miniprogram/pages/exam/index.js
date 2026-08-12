@@ -1,13 +1,15 @@
 const { modules, questions, getTopicsByModule, getModuleById, getTopicById, getModuleName, getTopicName } = require("../../data/content");
 const { recordQuestionResult, getActiveWrongQuestionIds, consumeExamRequest } = require("../../utils/storage");
 
+const MAX_WRONG_EXAM_COUNT = 20;
+
 function shuffle(items) { const copied = items.slice(); for (let i = copied.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [copied[i], copied[j]] = [copied[j], copied[i]]; } return copied; }
 
 function getQuestionCountOptions(availableCount) {
   const options = [];
   if (availableCount > 10) options.push({ value:10, label:"10 题" });
   if (availableCount > 20) options.push({ value:20, label:"20 题" });
-  options.push({ value:0, label:`全部 ${availableCount} 题` });
+  if (availableCount <= 100) options.push({ value:0, label:`全部 ${availableCount} 题` });
   return options;
 }
 
@@ -45,7 +47,7 @@ Page({
     if (!source.length) { wx.showToast({title:"目前没有待复习错题",icon:"none"}); this.setData({state:"module"}); return; }
     const selectedTopic = topicId ? getTopicById(topicId) : null;
     this.setData({ selectedTopic, selectedModule:selectedTopic ? getModuleById(selectedTopic.moduleId) : null });
-    this.startWithQuestions(shuffle(source));
+    this.startWithQuestions(shuffle(source).slice(0, MAX_WRONG_EXAM_COUNT));
   },
   onChooseOption(event) { const optionId=event.currentTarget.dataset.id; this.setData({answers:{...this.data.answers,[this.data.currentQuestion.id]:optionId},selectedAnswer:optionId}); },
   goToQuestion(index) { const currentQuestion=this.data.examQuestions[index]; this.setData({currentIndex:index,currentQuestion,selectedAnswer:this.data.answers[currentQuestion.id] || ""}); },

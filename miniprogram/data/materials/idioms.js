@@ -1,3 +1,5 @@
+const { photoIdioms } = require("./idioms800");
+
 const legacyBaseIdioms = [
   {
     knowledgeId: "k-idiom-001",
@@ -253,6 +255,15 @@ legacyMaterialIdioms.forEach((item, index) => {
     source: "成语.pptx 备注"
   });
 });
+
+// 照片词库属于增量数据：必须排在现有词库之后，避免改变旧分组顺序，
+// 同名条目由 appendIdiom 自动跳过，因此也不会覆盖既有释义与统计 ID。
+photoIdioms.forEach((item) => appendIdiom({
+  title: item[0],
+  summary: item[1],
+  detail: item[1],
+  source: `成语800词.zip / ${item[3]}.jpg / 第${item[2]}条`
+}));
 
 const questionIdByKnowledgeId = new Map(
   idiomRecords.map((item) => [item.knowledgeId, item.questionId])

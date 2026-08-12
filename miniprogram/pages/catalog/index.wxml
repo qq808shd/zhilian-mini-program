@@ -46,6 +46,15 @@
         <text class="detail-text">{{item.detail}}</text>
       </view>
     </view>
+    <button
+      wx:if="{{hasMore}}"
+      class="load-more"
+      hover-class="load-more-hover"
+      bindtap="onLoadMore"
+    >
+      继续加载（已显示 {{visibleCount}} / {{resultCount}} 条）
+    </button>
+    <text wx:else class="list-end">已显示全部 {{resultCount}} 条</text>
   </view>
 
   <view wx:else class="empty-state card">
