@@ -45,6 +45,10 @@ const topics = [
     symbol: "成",
     knowledgeUnit: "个成语",
     groupSize: 20,
+    groupBatches: [
+      { id: "original", label: "原有高频词库" },
+      { id: "photo800", label: "800词补充" }
+    ],
     catalogEnabled: true
   },
   {
@@ -509,21 +513,46 @@ function getSetsForTopic(topicId) {
   const topic = getTopicById(topicId);
   const items = getKnowledgeByTopic(topicId);
   const groupSize = topic ? topic.groupSize : 20;
-  const count = Math.ceil(items.length / groupSize);
-  return Array.from({ length: count }, (_, index) => {
-    const start = index * groupSize;
-    const end = Math.min(start + groupSize, items.length);
-    return {
-      index,
-      name: topic && topic.groupNames && topic.groupNames[index]
-        ? topic.groupNames[index]
-        : `第${index + 1}组`,
-      start: start + 1,
-      end,
-      count: end - start,
-      items: items.slice(start, end)
-    };
+  const configuredBatches = topic && topic.groupBatches
+    ? topic.groupBatches.map((batch) => ({
+      ...batch,
+      items: items.filter((item) => item.batchId === batch.id)
+    }))
+    : [{ id: "default", label: "", items }];
+  const configuredIds = new Set(configuredBatches.map((batch) => batch.id));
+  const ungroupedItems = topic && topic.groupBatches
+    ? items.filter((item) => !configuredIds.has(item.batchId))
+    : [];
+  const batches = ungroupedItems.length
+    ? configuredBatches.concat([{ id: "other", label: "其他内容", items: ungroupedItems }])
+    : configuredBatches;
+  const sets = [];
+  let itemOffset = 0;
+
+  batches.forEach((batch) => {
+    const batchSetCount = Math.ceil(batch.items.length / groupSize);
+    for (let batchIndex = 0; batchIndex < batchSetCount; batchIndex += 1) {
+      const localStart = batchIndex * groupSize;
+      const localEnd = Math.min(localStart + groupSize, batch.items.length);
+      const index = sets.length;
+      sets.push({
+        index,
+        name: topic && topic.groupNames && topic.groupNames[index]
+          ? topic.groupNames[index]
+          : `第${index + 1}组`,
+        batchId: batch.id,
+        batchLabel: batch.label,
+        batchGroupIndex: batchIndex + 1,
+        start: itemOffset + localStart + 1,
+        end: itemOffset + localEnd,
+        count: localEnd - localStart,
+        items: batch.items.slice(localStart, localEnd)
+      });
+    }
+    itemOffset += batch.items.length;
   });
+
+  return sets;
 }
 
 function getKnowledgeSet(topicId, setIndex) {

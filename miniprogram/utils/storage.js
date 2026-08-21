@@ -4,6 +4,7 @@ const STATS_KEY = "zhilian_question_stats_v3";
 const STUDY_PROGRESS_KEY = "zhilian_study_progress_v1";
 const CONNECTIVE_MIGRATION_KEY = "zhilian_connective_relation_cards_v1";
 const IDIOM_ID_MIGRATION_KEY = "zhilian_idiom_incremental_merge_20260808_v2";
+const IDIOM_GROUPING_MIGRATION_KEY = "zhilian_idiom_batch_grouping_20260821_v1";
 
 function migrateConnectiveRecords() {
   if (wx.getStorageSync(CONNECTIVE_MIGRATION_KEY)) return;
@@ -70,9 +71,30 @@ function migrateIdiomRecords() {
   wx.setStorageSync(IDIOM_ID_MIGRATION_KEY, Date.now());
 }
 
+function migrateIdiomGroupingProgress() {
+  if (wx.getStorageSync(IDIOM_GROUPING_MIGRATION_KEY)) return;
+
+  const progress = wx.getStorageSync(STUDY_PROGRESS_KEY) || {};
+  let progressChanged = false;
+  Object.keys(progress).forEach((key) => {
+    if (key.indexOf("idiom_") !== 0) return;
+    const setIndex = Number(key.slice("idiom_".length));
+    const item = progress[key];
+    const keepLegacyLastGroup = setIndex === 7 && item && item.total === 13;
+    if (setIndex >= 7 && !keepLegacyLastGroup) {
+      delete progress[key];
+      progressChanged = true;
+    }
+  });
+  if (progressChanged) wx.setStorageSync(STUDY_PROGRESS_KEY, progress);
+
+  wx.setStorageSync(IDIOM_GROUPING_MIGRATION_KEY, Date.now());
+}
+
 function migrateContentRecords() {
   migrateConnectiveRecords();
   migrateIdiomRecords();
+  migrateIdiomGroupingProgress();
 }
 
 function getQuestionStats() {

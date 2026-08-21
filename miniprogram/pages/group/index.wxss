@@ -15,7 +15,9 @@
 .set-head { display:flex; align-items:center; justify-content:space-between; }
 .set-name { color:var(--color-text); font-size:39rpx; font-weight:720; }
 .set-arrow { color:#8aa3cb; font-size:46rpx; line-height:1; }
-.set-range { display:block; margin-top:9rpx; color:var(--color-text-secondary); font-size:26rpx; }
+.set-meta { display:flex; flex-wrap:wrap; align-items:center; gap:12rpx; margin-top:9rpx; }
+.set-range { color:var(--color-text-secondary); font-size:26rpx; }
+.set-batch { padding:7rpx 13rpx; border:1rpx solid #cbdcf7; border-radius:12rpx; background:#f3f7fe; color:#426aa7; font-size:21rpx; font-weight:650; line-height:1.3; }
 .set-footer { display:flex; align-items:center; justify-content:space-between; margin-top:24rpx; }
 .set-status { color:var(--color-primary); font-size:23rpx; font-weight:650; }
 .set-status.has-progress { color:var(--color-accent); }

@@ -218,6 +218,7 @@ function appendIdiom(record) {
   if (idiomByTitle.has(record.title)) return;
   const suffix = createStableSuffix(record.title);
   const normalized = {
+    batchId: "original",
     ...record,
     knowledgeId: `k-idiom-${suffix}`,
     questionId: `q-idiom-${suffix}`
@@ -262,6 +263,7 @@ photoIdioms.forEach((item) => appendIdiom({
   title: item[0],
   summary: item[1],
   detail: item[1],
+  batchId: "photo800",
   source: `成语800词.zip / ${item[3]}.jpg / 第${item[2]}条`
 }));
 
@@ -278,6 +280,7 @@ const idiomKnowledge = idiomRecords.map((item) => ({
   detail: item.detail,
   memory: "",
   source: item.source,
+  batchId: item.batchId,
   tags: ["成语"]
 }));
 
