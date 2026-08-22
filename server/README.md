@@ -52,9 +52,9 @@ curl http://127.0.0.1:8787/health
 3. 将 `deploy/nginx.conf.example` 复制到 Nginx 配置目录，把 `api.example.com` 和证书路径替换成真实值。
 4. Node 端口 8787 不对公网开放，由 Nginx 反向代理。
 
-### 2. 准备运行用户和数据目录
+### 2. 准备独立运行时、运行用户和数据目录
 
-建议把仓库部署到 `/opt/zhilian-mini-program`，数据库放在 `/var/lib/zhilian-api`。创建专用的低权限系统用户 `zhilian`，确保该用户拥有数据库目录写权限。
+建议把仓库部署到 `/opt/zhilian-mini-program`，并把 Node.js 24 放在 `/opt/zhilian-mini-program/runtime/node`。systemd 模板使用该隔离运行时，不替换服务器的系统 Node.js，也不影响同机现有服务。数据库放在 `/var/lib/zhilian-api`。创建专用的低权限系统用户 `zhilian`，确保该用户拥有数据库目录写权限。
 
 ### 3. 配置服务端密钥
 
@@ -69,7 +69,7 @@ curl http://127.0.0.1:8787/health
 
 ### 4. 注册 systemd 服务
 
-将 `deploy/zhilian-api.service` 复制到 `/etc/systemd/system/`，确认 Node 路径和工作目录正确，然后重新加载 systemd、启用并启动服务。日志通过 `journalctl -u zhilian-api` 查看。
+将 `deploy/zhilian-api.service` 复制到 `/etc/systemd/system/`，确认隔离 Node 路径和工作目录正确，然后重新加载 systemd、启用并启动服务。日志通过 `journalctl -u zhilian-api` 查看。
 
 ### 5. 开启小程序连接
 
