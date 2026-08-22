@@ -1,0 +1,22 @@
+[Unit]
+Description=Zhilian WeChat Mini Program Sync API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zhilian
+Group=zhilian
+WorkingDirectory=/opt/zhilian-mini-program/server
+EnvironmentFile=/etc/zhilian-api.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zhilian-api
+
+[Install]
+WantedBy=multi-user.target
