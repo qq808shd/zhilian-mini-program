@@ -1,6 +1,6 @@
 # 知练项目协作说明（AGENTS.md）
 
-> 最后更新：2026-08-22
+> 最后更新：2026-08-25
 > 适用范围：整个仓库  
 > 项目仓库：`https://github.com/qq808shd/zhilian-mini-program.git`
 
@@ -36,11 +36,11 @@
 - 云端只保存微信用户标识、学习进度、答题统计、错题状态和同步元数据；不搬迁 888 条成语等静态题库。
 - 小程序通过 `wx.login` 获取一次性 code；服务端用 AppID、AppSecret 换取 OpenID，并返回自己的签名会话。不得自建用户名/密码，也不主动收集昵称、头像、手机号。
 - 自建服务端位于 `server/`：Node.js 24、内置 HTTP/加密/SQLite，无第三方运行依赖，默认监听 `127.0.0.1:8787`，由 Nginx 提供公网 HTTPS。
-- 腾讯云服务器已通过本机 SSH 固定别名 `cloud` 接入。知练部署目录为 `/opt/zhilian-mini-program`，运行用户为 `zhilian`，数据库目录为 `/var/lib/zhilian-api`；使用项目内隔离 Node.js 24，不替换系统 Node，也不得影响同机 CPA、Tailscale Funnel 和库存监控服务。
+- 当前生产目标为阿里云北京地域轻量应用服务器（Ubuntu 24.04），已通过本机 SSH 固定别名 `zhilian-aliyun` 接入。知练部署目录为 `/opt/zhilian-mini-program`，运行用户为 `zhilian`，数据库目录为 `/var/lib/zhilian-api`；使用项目内隔离 Node.js 24.19，不替换系统 Node。Nginx 与 `zhilian-api` 已安装/注册但保持禁用和停止，等待备案域名、HTTPS 证书和 AppSecret。
 - 服务端同步按唯一答题事件幂等处理，网络重试不重复累计；首次连接时把已有本机记录作为基线导入。
 - 云端不可用时不能阻断学习；待同步事件必须持久保留在本地，恢复网络后自动重试。
 - **生产连接当前默认关闭**：`miniprogram/config/cloud.js` 中 `enabled: false`。只有服务器部署、备案 HTTPS 域名、微信 `request` 合法域名和 AppSecret 全部配置并验证后才能启用。
-- 不使用 `wx.cloud`。启用后由 `wx.request` 访问自建腾讯云服务器。
+- 不使用 `wx.cloud`。启用后由 `wx.request` 访问自建阿里云服务器。
 - AppSecret、`SESSION_SECRET`、生产 `.env`、SQLite 数据库和备份只能存在服务器，禁止进入小程序代码或 GitHub。
 - `project.private.config.json` 是每台电脑的私有配置，已被 `.gitignore` 忽略；换电脑后由微信开发者工具重新生成。
 - 小程序根目录没有 `package.json`；服务端有独立的 `server/package.json`，测试使用 Node 内置测试器。
@@ -148,7 +148,7 @@
 - `miniprogram/pages/review*`：模块、分类和高频错题复习。
 - `miniprogram/components/math-formula`：数学分式等结构化公式显示。
 - `project.config.json`：微信开发者工具项目配置和 AppID。
-- `server/src`：自建腾讯云同步 API、微信 code 换 OpenID、会话签名和 SQLite 数据访问。
+- `server/src`：自建云端同步 API、微信 code 换 OpenID、会话签名和 SQLite 数据访问。
 - `server/deploy`：Nginx 与 systemd 部署模板。
 - `server/README.md`：服务器、域名、证书、环境变量和微信后台配置说明。
 
@@ -218,13 +218,14 @@
 8. 成语和三字词支持“全部查看与搜索”；大词库使用渐进加载。
 9. 用户提供的新资料默认视为增量。后传的 800 词图片不能替换前面的原有成语。
 10. 成语学习顺序按资料优先级固定：原有 153 条高频词在前，图片净新增 735 条在后，而且分组不得跨批次混合。
-11. 为支持本人和身边朋友使用，采用腾讯云自建服务器同步用户学习数据；题库继续留在小程序，不让低配服务器承担静态资料请求。
+11. 为支持本人和身边朋友使用，采用阿里云北京地域轻量应用服务器同步用户学习数据；题库继续留在小程序，不让低配服务器承担静态资料请求。
 12. 云同步坚持本地优先、离线可用、批量上传和事件幂等；不因服务器故障中断学习。
 13. 用户身份使用微信 OpenID，不建设密码账号体系，不收集非必要个人资料。
 14. GitHub 只保存项目文件，不自动保存聊天记忆；因此用本文件维护可审查、可版本化的长期上下文。
 
 ## 11. 变更记录
 
+- **2026-08-25**：生产目标由境外腾讯云服务器迁移为阿里云北京地域轻量应用服务器；建立 SSH 别名 `zhilian-aliyun`，完成 Ubuntu 24.04、隔离 Node.js 24.19、Nginx、低权限运行账户、私密环境文件、数据目录和 systemd 前置部署，远端后端测试 2/2 通过。生产服务仍等待备案 HTTPS 域名与 AppSecret，当前保持禁用和停止。
 - **2026-08-22**：复用既有 SSH 别名 `cloud` 接入腾讯云并完成知练隔离 Node.js 24、低权限服务用户、部署目录和云端接口测试；明确不得修改同机 CPA 的 Tailscale Funnel，生产启动仍等待 AppSecret 与备案 HTTPS 域名。
 - **2026-08-22**：加入腾讯云自建服务器同步方案。新增 Node.js 24 + SQLite 轻量 API、微信登录、签名会话、用户隔离、首次本机基线导入、答题事件幂等同步、学习进度同步、云端清空、离线重试、Nginx/systemd 模板和测试。题库仍保留本地，生产连接等待 HTTPS 域名与服务器部署后启用。
 - **2026-08-21**：新增仓库级 `AGENTS.md`，汇总产品、数据、视觉、架构、验证及跨电脑协作规则；确定今后每次项目提交和推送都必须同步更新本文件。

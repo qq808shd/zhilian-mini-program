@@ -2,7 +2,7 @@
 
 该目录是“知练”微信小程序的轻量云端。题库和公式仍打包在小程序内，服务器只负责微信登录、学习进度、答题统计和错题状态同步。
 
-服务只依赖 Node.js 24 自带的 HTTP、加密、`fetch` 和 SQLite，`package.json` 没有第三方运行依赖，适合低配置腾讯云服务器。
+服务只依赖 Node.js 24 自带的 HTTP、加密、`fetch` 和 SQLite，`package.json` 没有第三方运行依赖，适合低配置的中国大陆轻量应用服务器或云服务器。
 
 ## 数据流
 
@@ -16,9 +16,9 @@
 ## 运行要求
 
 - Node.js 24 或以上。
-- 一个已经解析到腾讯云服务器的 HTTPS 子域名，例如 `api.example.com`。
+- 一个已经解析到中国大陆服务器的 HTTPS 子域名，例如 `api.example.com`。
 - 微信公众平台中的小程序 AppSecret。
-- 腾讯云安全组只需对外开放 80、443；Node 服务默认只监听 `127.0.0.1:8787`。
+- 云平台防火墙只需对外开放 80、443；Node 服务默认只监听 `127.0.0.1:8787`。
 
 正式小程序不能把公网 IP 或 HTTP 地址作为请求域名。域名需要完成相应备案、配置有效 HTTPS 证书，并在微信公众平台“开发管理 → 开发设置 → 服务器域名”中加入 `request` 合法域名。
 
@@ -43,12 +43,14 @@ npm run start:env
 curl http://127.0.0.1:8787/health
 ```
 
-## 腾讯云部署步骤
+## 阿里云轻量应用服务器部署步骤
+
+当前生产目标是阿里云北京地域的 Ubuntu 24.04 轻量应用服务器。本机使用 SSH 别名 `zhilian-aliyun`，服务器安装隔离 Node.js 24.19，代码目录为 `/opt/zhilian-mini-program`，数据库目录为 `/var/lib/zhilian-api`。在备案域名、HTTPS 证书和 AppSecret 就绪前，Nginx 与 `zhilian-api` 均保持禁用和停止状态。
 
 ### 1. 准备域名与证书
 
-1. 给域名增加 A 记录，指向腾讯云服务器公网 IP。
-2. 完成备案并申请 HTTPS 证书，可使用腾讯云证书服务或 Certbot。
+1. 给域名增加 A 记录，指向阿里云轻量应用服务器公网 IP。
+2. 通过阿里云完成备案并申请 HTTPS 证书，可使用阿里云数字证书管理服务或 Certbot。
 3. 将 `deploy/nginx.conf.example` 复制到 Nginx 配置目录，把 `api.example.com` 和证书路径替换成真实值。
 4. Node 端口 8787 不对公网开放，由 Nginx 反向代理。
 
