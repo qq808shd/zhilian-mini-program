@@ -45,14 +45,16 @@ curl http://127.0.0.1:8787/health
 
 ## 阿里云轻量应用服务器部署步骤
 
-当前生产目标是阿里云北京地域的 Ubuntu 24.04 轻量应用服务器。本机使用 SSH 别名 `zhilian-aliyun`，服务器安装隔离 Node.js 24.19，代码目录为 `/opt/zhilian-mini-program`，数据库目录为 `/var/lib/zhilian-api`。在备案域名、HTTPS 证书和 AppSecret 就绪前，Nginx 与 `zhilian-api` 均保持禁用和停止状态。
+当前生产环境是阿里云北京地域的 Ubuntu 24.04 轻量应用服务器。本机使用 SSH 别名 `zhilian-aliyun`，服务器安装隔离 Node.js 24.19，代码目录为 `/opt/zhilian-mini-program`，数据库目录为 `/var/lib/zhilian-api`。备案域名 `api.dabaommz.cloud`、HTTPS 证书和 AppSecret 已配置，Nginx 与 `zhilian-api` 均已启用并运行。
 
 ### 1. 准备域名与证书
 
-1. 给域名增加 A 记录，指向阿里云轻量应用服务器公网 IP。
+1. 给域名增加 A 记录，指向阿里云轻量应用服务器公网 IP。当前生产记录为 `api.dabaommz.cloud`。
 2. 通过阿里云完成备案并申请 HTTPS 证书，可使用阿里云数字证书管理服务或 Certbot。
-3. 将 `deploy/nginx.conf.example` 复制到 Nginx 配置目录，把 `api.example.com` 和证书路径替换成真实值。
+3. 将 `deploy/nginx.conf.example` 复制到 Nginx 配置目录，把示例域名和证书路径替换成真实值。
 4. Node 端口 8787 不对公网开放，由 Nginx 反向代理。
+
+当前个人测试证书有效期截至 2026-12-01 23:59:59 UTC（北京时间 2026-12-02 07:59:59）。到期前应在阿里云重新申请证书，替换 `/etc/nginx/ssl/api.dabaommz.cloud/` 中的 `.pem` 与 `.key` 文件，执行 `nginx -t` 验证后平滑重载 Nginx；证书过期会导致微信小程序拒绝连接。
 
 ### 2. 准备独立运行时、运行用户和数据目录
 
@@ -81,7 +83,7 @@ curl http://127.0.0.1:8787/health
 // miniprogram/config/cloud.js
 module.exports = {
   enabled: true,
-  baseUrl: "https://api.example.com",
+  baseUrl: "https://api.dabaommz.cloud",
   requestTimeout: 10000,
   syncDebounceMs: 1800,
   maxEventBatch: 200

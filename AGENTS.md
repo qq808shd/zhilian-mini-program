@@ -36,10 +36,11 @@
 - 云端只保存微信用户标识、学习进度、答题统计、错题状态和同步元数据；不搬迁 888 条成语等静态题库。
 - 小程序通过 `wx.login` 获取一次性 code；服务端用 AppID、AppSecret 换取 OpenID，并返回自己的签名会话。不得自建用户名/密码，也不主动收集昵称、头像、手机号。
 - 自建服务端位于 `server/`：Node.js 24、内置 HTTP/加密/SQLite，无第三方运行依赖，默认监听 `127.0.0.1:8787`，由 Nginx 提供公网 HTTPS。
-- 当前生产目标为阿里云北京地域轻量应用服务器（Ubuntu 24.04），已通过本机 SSH 固定别名 `zhilian-aliyun` 接入。知练部署目录为 `/opt/zhilian-mini-program`，运行用户为 `zhilian`，数据库目录为 `/var/lib/zhilian-api`；使用项目内隔离 Node.js 24.19，不替换系统 Node。Nginx 与 `zhilian-api` 已安装/注册但保持禁用和停止，等待备案域名、HTTPS 证书和 AppSecret。
+- 当前生产环境为阿里云北京地域轻量应用服务器（Ubuntu 24.04），已通过本机 SSH 固定别名 `zhilian-aliyun` 接入。知练部署目录为 `/opt/zhilian-mini-program`，运行用户为 `zhilian`，数据库目录为 `/var/lib/zhilian-api`；使用项目内隔离 Node.js 24.19，不替换系统 Node。Nginx 与 `zhilian-api` 已启用并运行，公网入口为 `https://api.dabaommz.cloud`。
 - 服务端同步按唯一答题事件幂等处理，网络重试不重复累计；首次连接时把已有本机记录作为基线导入。
 - 云端不可用时不能阻断学习；待同步事件必须持久保留在本地，恢复网络后自动重试。
-- **生产连接当前默认关闭**：`miniprogram/config/cloud.js` 中 `enabled: false`。只有服务器部署、备案 HTTPS 域名、微信 `request` 合法域名和 AppSecret 全部配置并验证后才能启用。
+- **生产连接已启用**：`miniprogram/config/cloud.js` 中 `enabled: true`，`baseUrl` 为 `https://api.dabaommz.cloud`。域名已备案并配置 HTTPS，且已加入微信 `request` 合法域名。
+- 当前阿里云个人测试证书有效期截至 2026-12-01 23:59:59 UTC（北京时间 2026-12-02 07:59:59），到期前必须重新申请、替换证书并平滑重载 Nginx。
 - 不使用 `wx.cloud`。启用后由 `wx.request` 访问自建阿里云服务器。
 - AppSecret、`SESSION_SECRET`、生产 `.env`、SQLite 数据库和备份只能存在服务器，禁止进入小程序代码或 GitHub。
 - `project.private.config.json` 是每台电脑的私有配置，已被 `.gitignore` 忽略；换电脑后由微信开发者工具重新生成。
@@ -226,6 +227,7 @@
 
 ## 11. 变更记录
 
+- **2026-09-03**：正式名称确认为“知练个人笔记”；备案域名 `api.dabaommz.cloud`、AppSecret、HTTPS 证书和微信 `request` 合法域名已配置，Nginx 与 `zhilian-api` 已启用，生产云同步开关已打开。真实微信登录首次同步验证通过：10 次作答（1 对、9 错）、9 道当前错题和 5 条学习进度成功入云；重复编译后计数保持不变，事件幂等有效。当前 90 天证书截至北京时间 2026-12-02 07:59:59，需在到期前换新。
 - **2026-09-03**：项目切换至新注册的小程序 AppID `wx01e13d3df486356c`，同步更新微信开发者工具配置、服务端环境示例、阿里云后端 AppID 和长期文档；旧 AppID 的本地记录明确不迁移，生产云同步仍等待新 AppSecret、备案 HTTPS 域名和微信合法域名。
 - **2026-08-25**：生产目标由境外腾讯云服务器迁移为阿里云北京地域轻量应用服务器；建立 SSH 别名 `zhilian-aliyun`，完成 Ubuntu 24.04、隔离 Node.js 24.19、Nginx、低权限运行账户、私密环境文件、数据目录和 systemd 前置部署，远端后端测试 2/2 通过。生产服务仍等待备案 HTTPS 域名与 AppSecret，当前保持禁用和停止。
 - **2026-08-22**：复用既有 SSH 别名 `cloud` 接入腾讯云并完成知练隔离 Node.js 24、低权限服务用户、部署目录和云端接口测试；明确不得修改同机 CPA 的 Tailscale Funnel，生产启动仍等待 AppSecret 与备案 HTTPS 域名。
