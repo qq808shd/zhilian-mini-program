@@ -62,7 +62,7 @@ curl http://127.0.0.1:8787/health
 
 从 `.env.example` 创建 `/etc/zhilian-api.env`。其中：
 
-- `WECHAT_APP_ID` 使用当前 AppID `wx8cd28fbd80c4b941`；
+- `WECHAT_APP_ID` 使用当前 AppID `wx01e13d3df486356c`；
 - `WECHAT_APP_SECRET` 只在服务器上填写，不提交 Git；
 - `SESSION_SECRET` 可通过 `openssl rand -hex 32` 生成；
 - `DB_PATH` 建议保持 `/var/lib/zhilian-api/zhilian.sqlite`。
