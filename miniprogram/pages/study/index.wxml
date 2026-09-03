@@ -1,16 +1,15 @@
 <view class="page study-page">
-  <view class="page-header">
+  <view class="study-hero">
     <text class="eyebrow">个人学习库</text>
-    <text class="page-title">从模块开始学习</text>
-    <text class="page-subtitle">选择模块，再进入具体分类。内容较多时自动分组，随时可以重学。</text>
-  </view>
-
-  <view class="flow-note">
-    <text class="flow-number">01</text><text>选模块</text>
-    <text class="flow-line"></text>
-    <text class="flow-number">02</text><text>选分类与分组</text>
-    <text class="flow-line"></text>
-    <text class="flow-number">03</text><text>整屏卡片学习</text>
+    <text class="page-title hero-title">选择一个模块，开始学习</text>
+    <text class="page-subtitle hero-subtitle">按模块、分类和分组循序学习，每组完成后也可以随时重学。</text>
+    <view class="flow-note">
+      <view class="flow-step"><text class="flow-number">1</text><text>选模块</text></view>
+      <text class="flow-line"></text>
+      <view class="flow-step"><text class="flow-number">2</text><text>选分类与分组</text></view>
+      <text class="flow-line"></text>
+      <view class="flow-step"><text class="flow-number">3</text><text>逐条学习</text></view>
+    </view>
   </view>
 
   <view class="section-heading">
@@ -19,17 +18,16 @@
   </view>
 
   <view class="module-list">
-    <button wx:for="{{moduleCards}}" wx:key="id" class="module-card card" style="width: 100%; min-height: 320rpx;" hover-class="module-card-hover" data-id="{{item.id}}" bindtap="onOpenModule">
-      <view class="module-top">
-        <view class="module-symbol"><text>{{item.symbol}}</text></view>
-        <view class="module-arrow"><text>›</text></view>
-      </view>
-      <text class="module-name">{{item.name}}</text>
-      <text class="module-description">{{item.description}}</text>
-      <view class="module-metrics">
-        <text>{{item.topicCount}} 个分类</text>
-        <text class="metric-dot"></text>
-        <text>{{item.knowledgeCount}} 条知识</text>
+    <button wx:for="{{moduleCards}}" wx:key="id" class="module-card card interactive-card" hover-class="interactive-card-hover" data-id="{{item.id}}" bindtap="onOpenModule">
+      <view class="module-symbol"><text>{{item.symbol}}</text></view>
+      <view class="module-content">
+        <view class="module-title-row"><text class="module-name">{{item.name}}</text><text class="module-arrow">›</text></view>
+        <text class="module-description">{{item.description}}</text>
+        <view class="module-metrics">
+          <text>{{item.topicCount}} 个分类</text>
+          <text class="metric-dot"></text>
+          <text>{{item.knowledgeCount}} 条知识</text>
+        </view>
       </view>
     </button>
   </view>

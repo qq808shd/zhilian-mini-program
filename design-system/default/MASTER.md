@@ -1,227 +1,157 @@
-# Design System Master File
+# 知练视觉系统：Calm Focus
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+> 更新时间：2026-09-03  
+> 适用范围：原生微信小程序全部页面与公共组件。页面级规则仅可在不破坏本文件一致性的前提下扩展。
 
----
+## 1. 设计目标
 
-**Project:** 知练
-**Generated:** 2026-07-28 14:09:34
-**Category:** Knowledge Base/Documentation
-**Design Dials:** Variance 3/10 (Centered / Minimal) | Motion 2/10 (Subtle) | Density 6/10 (Standard)
+知练是供用户长期学习、刷题和复习的工具。视觉必须安静、专业、轻量、清晰，核心顺序固定为：内容可读性、学习效率、状态辨识、视觉装饰。
 
----
+- 冷白背景、白色内容面、克制蓝色主色，青绿色仅作辅助。
+- 卡片只表达明确的信息分组，不把每段文字都装进卡片。
+- 不使用大面积渐变、玻璃拟态、发光、厚重阴影、过度圆角和装饰插画。
+- 不使用 emoji 作为结构图标；TabBar 使用同一套 2px 视觉重量的线性图标。
+- 375px 手机为主要校验尺寸，并适配小屏、安全区、长题干和长选项。
 
-## Global Rules
+## 2. Design Tokens
 
-### Color Palette
+全局变量定义在 `miniprogram/app.wxss`，页面样式应优先复用，不重复创造近似颜色。
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#475569` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#64748B` | `--color-secondary` |
-| Accent/CTA | `#2563EB` | `--color-accent` |
-| Background | `#F8FAFC` | `--color-background` |
-| Foreground | `#1E293B` | `--color-foreground` |
-| Muted | `#EAEFF3` | `--color-muted` |
-| Border | `#E2E8F0` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#475569` | `--color-ring` |
+### 颜色
 
-**Color Notes:** Neutral grey + link blue
+| 角色 | 值 | 用途 |
+| --- | --- | --- |
+| Primary | `#2457D6` | 主按钮、进度、选中、核心链接 |
+| Primary Dark | `#1D46B8` | 按下态、高强调文字 |
+| Primary Soft | `#EEF4FF` | 选中背景、轻提示 |
+| Secondary | `#0F8F83` | 学习完成、积极进度 |
+| Secondary Soft | `#EAF8F5` | 辅助积极背景 |
+| Background | `#F6F8FC` | 页面背景 |
+| Surface | `#FFFFFF` | 内容面、卡片、输入框 |
+| Surface Muted | `#F8FAFD` | 解析、答案、禁用背景 |
+| Text Primary | `#172033` | 标题、题干、重要正文 |
+| Text Secondary | `#5B667A` | 正文说明 |
+| Text Tertiary | `#8490A5` | 辅助信息、计数 |
+| Border | `#E2E8F2` | 卡片、控件边框 |
+| Divider | `#ECF0F6` | 内容分隔 |
+| Success | `#138A62` | 正确状态 |
+| Success Soft | `#E9F7F1` | 正确状态背景 |
+| Error | `#C8464C` | 错误状态、危险操作 |
+| Error Soft | `#FFF0F1` | 错误状态背景 |
+| Warning | `#B7791F` | 提醒、需继续学习 |
+| Warning Soft | `#FFF8E8` | 记忆提示背景 |
 
-### Typography
+正确、错误、选中等状态不能只依赖颜色，必须同时提供文字、符号、边框或形状变化。
 
-- **Heading Font:** Cormorant Garamond
-- **Body Font:** Crimson Pro
-- **Mood:** academia, library, mahogany, parchment, brass, scholarly, prestige, antique, victorian, leather
-- **Google Fonts:** [Cormorant Garamond + Crimson Pro](https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500|Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400)
+### 字体层级
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
-```
+| 层级 | 建议字号 | 规则 |
+| --- | ---: | --- |
+| 页面主标题 | `46rpx` | 700 左右字重，行高 1.28 |
+| 知识标题 | `48–54rpx` | 卡片主体，居中或左对齐取决于场景 |
+| 题目正文 | `34rpx` | 650 字重，行高不低于 1.65 |
+| 模块标题 | `31–35rpx` | 700 字重 |
+| 普通正文 | `27–29rpx` | 行高 1.65–1.85 |
+| 辅助文字 | `23–25rpx` | 保持足够对比度 |
+| 状态/标签 | `21–23rpx` | 600–700 字重 |
+| 数据数字 | `36–88rpx` | 等级随所在信息层级变化 |
 
-### Spacing Variables
+字体使用系统无衬线字体，不加载网络字体，不为“高级感”缩小正文或降低对比度。
 
-*Density: 6/10 — Standard*
+### 间距与圆角
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+- 间距以 `8rpx` 为基础：`8 / 16 / 24 / 32 / 40 / 48 / 64rpx`。
+- 小标签 `12rpx`，常规控件 `20rpx`，内容卡片 `28rpx`，核心学习卡最大 `36rpx`。
+- 同一组件在不同页面必须使用相同圆角语义，不使用任意值。
 
-### Shadow Depths
+### 边框与阴影
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+- 常规卡片：`1rpx solid #E2E8F2`。
+- 默认阴影：`0 8rpx 24rpx rgba(35,55,91,.055)`，只用于帮助白色内容面与背景分层。
+- 核心学习卡可使用较高一级阴影，其余卡片不叠加阴影层级。
 
----
+## 3. 组件规则
 
-## Component Specs
+### 按钮
 
-### Buttons
+- 主按钮：蓝底白字，每个页面或阶段只保留一个主要动作。
+- 次按钮：白底蓝字、淡蓝边框。
+- 危险操作：柔和红色，只用于清除等不可逆意图。
+- 高度不低于 `88rpx`，推荐 `96rpx`；按下态 100–160ms，不能改变布局。
+- 禁用态同时降低颜色和阴影，不能只改透明度。
 
-```css
-/* Primary Button */
-.btn-primary {
-  background: #2563EB;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+### 卡片和列表
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
+- 列表卡片接近容器全宽，标题、描述、统计和箭头有稳定位置。
+- 模块与分类使用一致的图标容器、标题层级和箭头样式。
+- 仅可点击的卡片使用轻微背景、边框和缩放反馈。
 
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #475569;
-  border: 2px solid #475569;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
+### 搜索和输入
 
-### Cards
+- 搜索框高度约 `98rpx`，边框清楚，placeholder 使用三级文字色。
+- 清空操作至少有 `88rpx` 的触控宽高。
 
-```css
-.card {
-  background: #F8FAFC;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+### 题目选项
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
+- 点击区域不低于 `96rpx`，长选项自然换行。
+- 未选：白底、灰蓝边框；已选：淡蓝底、品牌蓝边框，并显示“已选”。
+- 结果态：正确和错误分别使用符号、状态文字、边框和柔和底色，不只用绿/红颜色。
 
-### Inputs
+### 进度和统计
 
-```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 200ms ease;
-}
+- 进度条使用 8–10rpx 高度，主流程用品牌蓝，已完成学习可用青绿色。
+- 数据卡只显示能帮助下一步学习的数字，不为“高级感”堆图表。
 
-.input:focus {
-  border-color: #475569;
-  outline: none;
-  box-shadow: 0 0 0 3px #47556920;
-}
-```
+### 空状态、加载和错误
 
-### Modals
+- 空状态由简洁线性标记、明确标题和下一步说明组成。
+- Loading 不覆盖核心导航；Error 应给出恢复动作并保留当前学习数据。
+- Toast、弹窗沿用微信原生交互时，不改动原有业务确认流程。
 
-```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
+## 4. 核心页面规则
 
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-}
-```
+### 学习首页
 
----
+- 首屏先回答“从哪里开始学习”，模块选择是主行为。
+- 学习路径只作轻提示，不能抢过模块列表。
+- 不增加打卡、连续天数、社交、会员或无业务来源的统计。
 
-## Style Guidelines
+### 卡片学习
 
-**Style:** Exaggerated Minimalism
+- 知识标题是视觉主体，卡片占页面主要区域。
+- 未展开时提示先回忆；展开后按释义、详细解析、记忆提示、资料口径排列。
+- 保留左右滑动和上一条/下一条两种操作，不依赖单一手势。
 
-**Keywords:** Bold minimalism, oversized typography, high contrast, negative space, loud minimal, statement design
+### 考试刷题
 
-**Best For:** Fashion, architecture, portfolios, agency landing pages, luxury brands, editorial
+- 题干拥有最高视觉优先级，题型和进度是辅助层。
+- 选项触控面积足够，选中反馈必须即时、明确。
+- 底部操作避开 Home Indicator；上一题为次操作，下一题/交卷为主操作。
 
-**Key Effects:** font-size: clamp(3rem 10vw 12rem), font-weight: 900, letter-spacing: -0.05em, massive whitespace
+### 结果与解析
 
-### Page Pattern
+- 先显示总成绩，再逐题显示结果、我的答案、正确答案、解析和知识点入口。
+- 正确绿色、错误柔和红色，不使用刺眼的大色块。
 
-**Pattern Name:** Newsletter / Content First
+### 复习
 
-- **Conversion Strategy:** Single field form (Email only). Show 'Join X, 000 readers'. Read sample link.
-- **CTA Placement:** Hero inline form + Sticky header form
-- **Section Order:** 1. Hero (Value Prop + Form), 2. Recent Issues/Archives, 3. Social Proof (Subscriber count), 4. About Author
+- 先模块概览，再进入分类和高频错题。
+- 正确率、累计作答、待复习错题保持一致的数据视觉顺序。
 
----
+## 5. 动效与适配
 
-## Motion
+- 按下反馈 100–160ms；进度变化约 220ms；学习卡滑动沿用原 260ms。
+- 动效只解释状态变化，不加入循环装饰或延迟学习动作。
+- 页面底部统一增加 `env(safe-area-inset-bottom)`。
+- 固定或高屏内容必须验证不会覆盖按钮；长标题、长题干、长选项允许自然换行。
+- 颜色对比目标不低于 WCAG AA；所有主要触控目标至少约 44pt。
 
-**Scroll Reveal** (Subtle) — Trigger: scroll (viewport enter) | Duration: 300-400ms | Easing: `power1.out`
+## 6. 发布前视觉检查
 
-```js
-gsap.from(el, { opacity: 0, y: 12, duration: 0.35, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' } });
-```
-
-**Framework notes:** Requires the ScrollTrigger plugin registered once via gsap.registerPlugin(ScrollTrigger)
-
-- ✅ Keep the y offset small (8-16px) so it reads as a fade, not a slide
-- ❌ Don't reveal below-the-fold content needed for SEO/crawlers as invisible-by-default without a no-JS fallback
-- ⚡ toggleActions 'play none none reverse' avoids re-triggering on every scroll direction change
-
----
-
-## Anti-Patterns (Do NOT Use)
-
-- ❌ Poor navigation
-- ❌ No search
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
-
----
-
-## Pre-Delivery Checklist
-
-Before delivering any UI code, verify:
-
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+- [ ] 三个 TabBar 图标视觉重量和激活色一致。
+- [ ] 首页、下级分类、分组、目录、学习、考试、结果、复习和详情均使用同一变量体系。
+- [ ] 同级卡片的边框、圆角、内边距和箭头一致。
+- [ ] 所有题目状态不只依赖颜色。
+- [ ] 没有旧渐变、过重阴影、emoji 结构图标或低对比度小字。
+- [ ] 375px 及更窄手机上无水平溢出。
+- [ ] 长题干、长选项、解析展开和底部安全区均通过真机尺寸检查。

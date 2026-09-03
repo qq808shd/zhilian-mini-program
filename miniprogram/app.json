@@ -12,28 +12,34 @@
     "pages/detail/index"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#F4F8FF",
+    "navigationBarBackgroundColor": "#F6F8FC",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "知练",
-    "backgroundColor": "#F4F8FF",
+    "backgroundColor": "#F6F8FC",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#64748B",
-    "selectedColor": "#2563EB",
+    "color": "#768196",
+    "selectedColor": "#2457D6",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/study/index",
+        "iconPath": "assets/tabbar/study.png",
+        "selectedIconPath": "assets/tabbar/study-active.png",
         "text": "学习"
       },
       {
         "pagePath": "pages/exam/index",
+        "iconPath": "assets/tabbar/exam.png",
+        "selectedIconPath": "assets/tabbar/exam-active.png",
         "text": "考试"
       },
       {
         "pagePath": "pages/review/index",
+        "iconPath": "assets/tabbar/review.png",
+        "selectedIconPath": "assets/tabbar/review-active.png",
         "text": "复习"
       }
     ]

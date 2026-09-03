@@ -10,10 +10,10 @@
   <view class="memory-card card">
     <view class="memory-card-top">
       <text class="memory-label">先回忆，再查看</text>
-      <text class="memory-mark">?</text>
+      <text class="memory-mark">回</text>
     </view>
     <text class="memory-prompt">{{item.title}}是什么意思？</text>
-    <button class="toggle-button" hover-class="toggle-button-hover" bindtap="onToggleAnswer">
+    <button class="toggle-button" hover-class="button-pressed" bindtap="onToggleAnswer">
       {{answerVisible ? '收起答案' : '查看答案'}}
     </button>
     <view wx:if="{{answerVisible}}" class="answer-panel">
@@ -58,6 +58,7 @@
 
   <button
     class="primary-button related-button"
+    hover-class="button-pressed"
     disabled="{{relatedCount === 0}}"
     bindtap="onStartRelatedExam"
   >

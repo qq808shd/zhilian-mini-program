@@ -1,14 +1,14 @@
 <view class="learn-page" wx:if="{{topic}}">
   <view class="learn-header">
-    <view><text class="learn-crumb">{{module.name}} / {{topic.name}}</text><text class="learn-set">{{setName}} · {{currentIndex + 1}} / {{total}}</text></view>
-    <text class="learn-percent">{{progressPercent}}%</text>
+    <view class="learn-heading"><text class="learn-crumb">{{module.name}} / {{topic.name}}</text><text class="learn-set">{{setName}}</text></view>
+    <view class="learn-counter"><text class="learn-position">{{currentIndex + 1}} / {{total}}</text><text class="learn-percent">{{progressPercent}}%</text></view>
   </view>
   <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%"></view></view>
   <swiper class="learning-swiper" current="{{swiperCurrent}}" bindchange="onSwiperChange" duration="260">
     <swiper-item wx:for="{{learningItems}}" wx:key="id">
       <scroll-view class="card-scroll" scroll-y>
         <view class="learning-card {{item.revealed ? 'is-revealed' : 'is-prompt'}}">
-          <text class="card-index">{{index + 1}} / {{total}}</text>
+          <view class="card-meta"><text class="card-index">学习卡片 {{index + 1}}</text><text class="card-state">{{item.revealed ? '已展开解析' : '先回忆'}}</text></view>
           <view class="prompt-area">
             <text class="knowledge-title">{{item.title}}</text>
             <math-formula
@@ -47,11 +47,11 @@
   <view class="learn-footer">
     <block wx:if="{{currentIndex < total - 1}}">
       <text class="swipe-hint">左右滑动，继续下一条</text>
-      <view class="nav-actions"><button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="nav-button" bindtap="onNext">下一条</button></view>
+      <view class="nav-actions"><button class="nav-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="nav-button nav-button-primary" hover-class="button-pressed" bindtap="onNext">下一条</button></view>
     </block>
     <view wx:else class="finish-panel">
       <text class="finish-text">这一组已经学完</text>
-      <view class="finish-actions"><button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="secondary-small" bindtap="onRestart">重新学习</button><button class="primary-small" bindtap="onBackGroups">返回分组</button></view>
+      <view class="finish-actions"><button class="nav-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="secondary-small" hover-class="button-pressed" bindtap="onRestart">重新学习</button><button class="primary-small" hover-class="button-pressed" bindtap="onBackGroups">返回分组</button></view>
     </view>
   </view>
 </view>

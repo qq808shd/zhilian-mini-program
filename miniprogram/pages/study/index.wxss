@@ -1,16 +1,144 @@
-.study-page { padding: 40rpx 16rpx 72rpx; }
-.eyebrow { display:block; color:var(--color-primary); font-size:24rpx; font-weight:700; letter-spacing:2rpx; }
-.page-title { margin-top:8rpx; }
-.flow-note { display:flex; align-items:center; margin-top:30rpx; padding:24rpx 18rpx; border-radius:20rpx; background:var(--color-primary-soft); color:#3568b8; font-size:21rpx; white-space:nowrap; }
-.flow-number { display:flex; width:32rpx; height:32rpx; align-items:center; justify-content:center; margin-right:6rpx; border-radius:16rpx; background:var(--color-primary); color:#fff; font-size:19rpx; font-weight:700; }
-.flow-line { width:20rpx; height:2rpx; margin:0 9rpx; background:#9fc0f6; }
-.module-list { display:flex; width:100%; flex-direction:column; gap:22rpx; }
-.module-card { display:block; width:100%; min-height:320rpx; margin:0; padding:40rpx; text-align:left; line-height:1.35; }
-.module-card-hover { background:#f8fbff; transform:scale(.995); }
-.module-top { display:flex; align-items:center; justify-content:space-between; }
-.module-symbol { display:flex; width:82rpx; height:82rpx; align-items:center; justify-content:center; border-radius:22rpx; background:var(--color-primary-soft); color:var(--color-primary); font-size:42rpx; font-weight:700; }
-.module-arrow { color:#8aa3cb; font-size:58rpx; line-height:1; }
-.module-name { display:block; margin-top:23rpx; color:var(--color-text); font-size:44rpx; font-weight:720; }
-.module-description { display:block; margin-top:12rpx; color:var(--color-text-secondary); font-size:29rpx; line-height:1.6; }
-.module-metrics { display:flex; align-items:center; margin-top:24rpx; color:#4774b8; font-size:26rpx; }
-.metric-dot { width:6rpx; height:6rpx; margin:0 14rpx; border-radius:50%; background:#8db3ed; }
+.study-page {
+  padding: 28rpx 20rpx calc(72rpx + env(safe-area-inset-bottom));
+}
+
+.study-hero {
+  margin-bottom: 36rpx;
+  padding: 26rpx 16rpx 0;
+}
+
+.hero-title {
+  max-width: 620rpx;
+  margin-top: 10rpx;
+}
+
+.hero-subtitle {
+  max-width: 650rpx;
+}
+
+.flow-note {
+  display: flex;
+  align-items: center;
+  margin-top: 30rpx;
+  padding: 22rpx 18rpx;
+  border: 1rpx solid #dbe6f8;
+  border-radius: var(--radius-md);
+  background: rgba(238, 244, 255, 0.72);
+  color: #496180;
+  font-size: 22rpx;
+}
+
+.flow-step {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.flow-number {
+  display: flex;
+  width: 34rpx;
+  height: 34rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8rpx;
+  border: 1rpx solid #b8cbed;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--color-primary);
+  font-size: 19rpx;
+  font-weight: 700;
+}
+
+.flow-line {
+  height: 1rpx;
+  flex: 1;
+  margin: 0 10rpx;
+  background: #cbd9ef;
+}
+
+.section-heading {
+  margin: 0 8rpx 20rpx;
+}
+
+.module-list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.module-card {
+  display: flex;
+  width: 100%;
+  min-height: 208rpx;
+  align-items: flex-start;
+  padding: 32rpx;
+  text-align: left;
+}
+
+.module-symbol {
+  display: flex;
+  width: 76rpx;
+  height: 76rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.module-content {
+  min-width: 0;
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.module-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.module-name {
+  color: var(--color-text);
+  font-size: 35rpx;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.module-arrow {
+  margin-left: 20rpx;
+  color: var(--color-text-tertiary);
+  font-size: 42rpx;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.module-description {
+  display: block;
+  margin-top: 10rpx;
+  color: var(--color-text-secondary);
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.module-metrics {
+  display: flex;
+  align-items: center;
+  margin-top: 18rpx;
+  color: #587096;
+  font-size: 23rpx;
+}
+
+.metric-dot {
+  width: 5rpx;
+  height: 5rpx;
+  margin: 0 14rpx;
+  border-radius: 50%;
+  background: #9aabc5;
+}

@@ -7,16 +7,16 @@
   width: 100%;
   margin-top: 30rpx;
   padding: 24rpx 22rpx 22rpx;
-  border: 1rpx solid #d7e5fb;
-  border-radius: 22rpx;
-  background: linear-gradient(145deg, #f7fbff 0%, #edf5ff 100%);
-  color: #15345f;
+  border: 1rpx solid #d8e2f1;
+  border-radius: 20rpx;
+  background: #f8fafd;
+  color: #172033;
   box-sizing: border-box;
 }
 
 .formula-label {
   display: block;
-  color: #5a7baa;
+  color: #2457d6;
   font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 1rpx;
@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   gap: 7rpx;
-  color: #102a50;
+  color: #1f2f48;
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
   font-size: 33rpx;
   font-weight: 600;
@@ -134,7 +134,7 @@
 .formula-note {
   display: block;
   margin-top: 20rpx;
-  color: #637b9d;
+  color: #5b667a;
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   font-size: 22rpx;
   line-height: 1.55;

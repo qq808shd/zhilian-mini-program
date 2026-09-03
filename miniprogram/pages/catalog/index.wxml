@@ -4,7 +4,7 @@
   <text class="page-subtitle">集中浏览全部内容，可按词语或释义快速搜索。</text>
 
   <view class="search-panel">
-    <text class="search-label">搜索</text>
+    <text class="search-mark">⌕</text>
     <input
       class="search-input"
       value="{{query}}"
@@ -58,6 +58,7 @@
   </view>
 
   <view wx:else class="empty-state card">
+    <text class="empty-mark">⌕</text>
     <text class="empty-title">没有找到“{{query}}”</text>
     <text class="empty-description">可以缩短关键词，或搜索释义中的关键字。</text>
     <button class="empty-clear" hover-class="empty-clear-hover" bindtap="onClearSearch">清空搜索，查看全部</button>

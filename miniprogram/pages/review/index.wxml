@@ -1,1 +1,26 @@
-<view class="page review-page"><view class="page-header"><text class="page-title">复习</text><text class="page-subtitle">先看模块概览，再找到具体分类里最常错的题。</text></view><view class="summary-card"><view><text class="summary-number">{{summary.accuracy}}%</text><text class="summary-label">总正确率</text></view><view class="summary-divider"></view><view><text class="summary-number">{{summary.activeWrongCount}}</text><text class="summary-label">待复习错题</text></view><view class="summary-divider"></view><view><text class="summary-number">{{summary.attempts}}</text><text class="summary-label">累计作答</text></view></view><view class="section-heading"><text class="section-title">按模块查看</text><text class="section-note">点击进入分类详情</text></view><view class="module-list"><button wx:for="{{moduleStats}}" wx:key="id" class="review-module card" style="width: 100%; min-height: 190rpx;" hover-class="review-hover" data-id="{{item.id}}" bindtap="onOpenModule"><view class="review-symbol">{{item.symbol}}</view><view class="review-content"><text class="review-name">{{item.name}}</text><text class="review-meta">正确率 {{item.accuracy}}% · 累计答错 {{item.wrong}} 次</text><text class="review-wrong">{{item.activeWrongCount}} 道待复习错题</text></view><text class="review-arrow">›</text></button></view><button class="clear-button" bindtap="onClearStats">清空答题记录</button></view>
+<view class="page review-page">
+  <view class="page-header">
+    <text class="eyebrow">学习反馈</text>
+    <text class="page-title review-title">复习</text>
+    <text class="page-subtitle">先看模块概览，再找到具体分类里最常错的题。</text>
+  </view>
+  <view class="summary-card card">
+    <view class="summary-item"><text class="summary-number primary-number">{{summary.accuracy}}%</text><text class="summary-label">总正确率</text></view>
+    <view class="summary-divider"></view>
+    <view class="summary-item"><text class="summary-number danger-number">{{summary.activeWrongCount}}</text><text class="summary-label">待复习错题</text></view>
+    <view class="summary-divider"></view>
+    <view class="summary-item"><text class="summary-number">{{summary.attempts}}</text><text class="summary-label">累计作答</text></view>
+  </view>
+  <view class="section-heading review-heading"><text class="section-title">按模块查看</text><text class="section-note">点击进入分类详情</text></view>
+  <view class="module-list">
+    <button wx:for="{{moduleStats}}" wx:key="id" class="review-module card interactive-card" hover-class="interactive-card-hover" data-id="{{item.id}}" bindtap="onOpenModule">
+      <view class="review-symbol">{{item.symbol}}</view>
+      <view class="review-content">
+        <view class="review-name-row"><text class="review-name">{{item.name}}</text><text class="review-arrow">›</text></view>
+        <text class="review-meta">正确率 {{item.accuracy}}% · 累计答错 {{item.wrong}} 次</text>
+        <text class="review-wrong">{{item.activeWrongCount}} 道待复习错题</text>
+      </view>
+    </button>
+  </view>
+  <button class="clear-button" hover-class="button-pressed" bindtap="onClearStats">清空答题记录</button>
+</view>
