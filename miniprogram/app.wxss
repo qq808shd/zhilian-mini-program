@@ -10,10 +10,10 @@ page {
   --color-surface-muted: #f8fafd;
   --color-text: #172033;
   --color-text-secondary: #5b667a;
-  --color-text-tertiary: #8490a5;
+  --color-text-tertiary: #6b7588;
   --color-border: #e2e8f2;
   --color-divider: #ecf0f6;
-  --color-success: #138a62;
+  --color-success: #0b7654;
   --color-success-soft: #e9f7f1;
   --color-danger: #c8464c;
   --color-danger-soft: #fff0f1;

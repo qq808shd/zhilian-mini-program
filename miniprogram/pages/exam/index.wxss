@@ -179,6 +179,7 @@
 .progress-count {
   flex: 0 0 auto;
   color: var(--color-primary);
+  font-weight: 700;
 }
 
 .progress-track,
@@ -399,14 +400,14 @@
 
 .score-stat-number {
   color: var(--color-text);
-  font-size: 32rpx;
-  font-weight: 720;
+  font-size: 34rpx;
+  font-weight: 750;
 }
 
 .score-stat-label {
   margin-top: 5rpx;
-  color: var(--color-text-tertiary);
-  font-size: 21rpx;
+  color: var(--color-text-secondary);
+  font-size: 22rpx;
 }
 
 .score-divider {

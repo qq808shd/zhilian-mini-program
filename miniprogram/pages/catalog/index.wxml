@@ -4,7 +4,7 @@
   <text class="page-subtitle">集中浏览全部内容，可按词语或释义快速搜索。</text>
 
   <view class="search-panel">
-    <text class="search-mark">⌕</text>
+    <view class="search-mark"><view class="search-mark-ring"></view><view class="search-mark-handle"></view></view>
     <input
       class="search-input"
       value="{{query}}"
