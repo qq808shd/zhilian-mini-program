@@ -42,6 +42,8 @@
 
 .topic-list {
   display: flex;
+  width: 100%;
+  align-items: stretch;
   flex-direction: column;
   gap: 18rpx;
 }

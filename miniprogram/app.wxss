@@ -132,6 +132,15 @@ button::after {
   box-shadow: var(--shadow-card);
 }
 
+/* 微信会给普通 button 注入固定宽度；列表与目录卡片统一覆盖为容器全宽。 */
+.page button.card,
+.page button.catalog-card {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .primary-button,
 .secondary-button,
 .danger-button {
