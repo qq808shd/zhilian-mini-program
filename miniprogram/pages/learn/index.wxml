@@ -3,7 +3,9 @@
     <view class="learn-heading"><text class="learn-crumb">{{module.name}} / {{topic.name}}</text><text class="learn-set">{{setName}}</text></view>
     <view class="learn-counter"><text class="learn-position">{{currentIndex + 1}} / {{total}}</text><text class="learn-percent">{{progressPercent}}%</text></view>
   </view>
-  <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%;"></view></view>
+  <view class="progress-track">
+    <view wx:for="{{learningItems}}" wx:key="id" class="progress-segment {{index <= currentIndex ? 'is-active' : ''}}"></view>
+  </view>
   <swiper class="learning-swiper" current="{{swiperCurrent}}" bindchange="onSwiperChange" duration="260">
     <swiper-item wx:for="{{learningItems}}" wx:key="id">
       <scroll-view class="card-scroll" scroll-y>

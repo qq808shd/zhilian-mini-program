@@ -62,18 +62,26 @@
 }
 
 .progress-track {
+  display: flex;
   height: 8rpx;
+  gap: 3rpx;
   margin-top: 18rpx;
   overflow: hidden;
   border-radius: 5rpx;
-  background: #dfe6f0;
+  background: transparent;
 }
 
-.progress-fill {
+.progress-segment {
   height: 100%;
+  min-width: 2rpx;
+  flex: 1;
   border-radius: 5rpx;
+  background: #dfe6f0;
+  transition: background-color 220ms ease;
+}
+
+.progress-segment.is-active {
   background: var(--color-primary);
-  transition: width 220ms ease;
 }
 
 .learning-swiper {
