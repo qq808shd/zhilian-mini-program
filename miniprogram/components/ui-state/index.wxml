@@ -1,0 +1,6 @@
+<view class="state">
+  <text class="mark" aria-hidden="true">{{mark}}</text>
+  <text class="title">{{title}}</text>
+  <text class="description">{{description}}</text>
+  <button class="action" wx:if="{{action}}" bindtap="onAction" hover-class="pressed">{{action}}</button>
+</view>

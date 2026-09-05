@@ -1,0 +1,20 @@
+.account-page { padding-top:32rpx; }
+.list-card { margin-top:24rpx; border:1rpx solid var(--color-border); border-radius:var(--radius-lg); overflow:hidden; background:var(--color-surface); }
+.group-label { display:block; margin:40rpx 0 16rpx; font-size:27rpx; color:var(--color-text-secondary); }
+.group-label:first-child { margin-top:0; }
+.group-label + .list-card { margin-top:0; }
+button.profile-header { display:flex; align-items:center; gap:24rpx; width:100%!important; padding:40rpx 0; background:transparent; text-align:left; }
+.account-avatar { width:128rpx; height:128rpx; border-radius:50%; flex-shrink:0; background:var(--color-primary-soft); }
+.profile-heading { min-width:0; flex:1; }
+.profile-name { display:block; font-size:38rpx; font-weight:650; line-height:1.4; word-break:break-all; }
+.profile-caption { display:block; margin-top:12rpx; font-size:25rpx; color:var(--color-text-secondary); line-height:1.5; }
+button.sync-card { display:flex; align-items:center; gap:20rpx; width:100%!important; margin:32rpx 0; padding:28rpx; border:1rpx solid var(--color-primary-border); border-radius:var(--radius-lg); background:var(--color-primary-soft); text-align:left; }
+.row-icon { width:42rpx; height:42rpx; flex-shrink:0; }
+.row-copy { min-width:0; flex:1; }
+.row-title { display:block; font-size:28rpx; font-weight:600; line-height:1.5; color:var(--color-text); }
+.row-description { display:block; margin-top:8rpx; font-size:24rpx; color:var(--color-text-secondary); line-height:1.6; }
+.row-arrow { font-size:36rpx; color:var(--color-primary); }
+button.filing-footer { width:100%!important; min-height:96rpx; margin-top:32rpx; padding:24rpx; background:transparent; color:var(--color-text-secondary); font-size:24rpx; line-height:1.6; word-break:break-all; }
+button.centered-action { margin:16rpx auto; }
+.draft-note { display:block; padding:20rpx 24rpx; border-radius:var(--radius-sm); color:var(--color-warning); background:var(--color-warning-soft); font-size:23rpx; line-height:1.65; }
+.form-error { display:block; margin:20rpx 0; color:var(--color-danger); font-size:26rpx; line-height:1.6; }

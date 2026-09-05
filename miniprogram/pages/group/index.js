@@ -1,5 +1,5 @@
 const { getTopicById, getModuleById, getSetsForTopic } = require("../../data/content");
-const { getGroupProgress } = require("../../utils/storage");
+const { getGroupProgress, setExamRequest } = require("../../utils/storage");
 
 Page({
   data: { topic: null, module: null, sets: [], total: 0 },
@@ -17,7 +17,8 @@ Page({
       return {
         ...setSummary,
         learnedCount,
-        status: completed ? "已学完 · 可重新学习" : learnedCount ? `已学习 ${learnedCount} 条 · 继续学习` : "开始学习"
+        progress: Math.round(learnedCount / set.count * 100),
+        status: completed ? "已浏览 · 可重新学习" : learnedCount ? `已浏览 ${learnedCount} 条 · 继续学习` : "开始学习"
       };
     });
     wx.setNavigationBarTitle({ title: topic.name });
@@ -26,6 +27,10 @@ Page({
   onOpenSet(event) {
     const { index } = event.currentTarget.dataset;
     wx.navigateTo({ url: `/pages/learn/index?topicId=${this.data.topic.id}&setIndex=${index}` });
+  },
+  onPractice() {
+    setExamRequest({ mode: "topic", topicId: this.data.topic.id });
+    wx.switchTab({ url: "/pages/exam/index" });
   },
   onOpenCatalog() {
     wx.navigateTo({ url: `/pages/catalog/index?topicId=${this.data.topic.id}` });

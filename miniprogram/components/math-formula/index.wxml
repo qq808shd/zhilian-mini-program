@@ -1,6 +1,6 @@
 <view class="formula-card formula-card--{{size}}">
   <text class="formula-label">核心公式</text>
-  <view class="formula-stage" role="text" aria-label="{{spoken}}">
+  <scroll-view scroll-x class="formula-scroll" aria-label="{{spoken}}"><view class="formula-stage" role="text">
     <view wx:for="{{displayLines}}" wx:key="id" wx:for-item="formulaLine" class="formula-line">
       <block wx:for="{{formulaLine.parts}}" wx:key="id" wx:for-item="part">
         <text wx:if="{{part.type === 'text'}}" class="formula-text">{{part.value}}</text>
@@ -29,5 +29,6 @@
       </block>
     </view>
   </view>
+  </scroll-view>
   <text wx:if="{{note}}" class="formula-note">{{note}}</text>
 </view>

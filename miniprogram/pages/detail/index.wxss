@@ -40,7 +40,7 @@
 
 .memory-card {
   padding: 30rpx;
-  border-color: #cfdcf2;
+  border-color: var(--color-primary-border);
   background: var(--color-primary-soft);
 }
 
@@ -51,7 +51,7 @@
 }
 
 .memory-label {
-  color: #52698d;
+  color: var(--color-text-secondary);
   font-size: 23rpx;
   font-weight: 650;
 }
@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 16rpx;
-  background: #ffffff;
+  background: var(--color-surface);
   color: var(--color-primary);
   font-size: 23rpx;
   font-weight: 700;
@@ -87,21 +87,21 @@
   padding: 0 24rpx;
   border-radius: var(--radius-md);
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-surface);
   font-size: 28rpx;
   font-weight: 650;
   line-height: 1.2;
-  box-shadow: 0 8rpx 18rpx rgba(36, 87, 214, 0.15);
+  box-shadow: 0 8rpx 18rpx transparent;
 }
 
 .answer-panel {
   margin-top: 26rpx;
   padding-top: 26rpx;
-  border-top: 1rpx solid #cad8ef;
+  border-top: 1rpx solid var(--color-primary-border);
 }
 
 .answer-summary {
-  color: #344054;
+  color: var(--color-text);
   font-size: 29rpx;
   line-height: 1.78;
 }
@@ -111,7 +111,7 @@
 }
 
 .detail-text {
-  color: #344054;
+  color: var(--color-text);
   font-size: 28rpx;
   line-height: 1.85;
   white-space: pre-wrap;
@@ -121,7 +121,7 @@
 .memory-tip {
   display: flex;
   padding: 26rpx 28rpx;
-  border: 1rpx solid #eedfb8;
+  border: 1rpx solid var(--color-warning-border);
   border-radius: var(--radius-md);
   background: var(--color-warning-soft);
 }
@@ -130,12 +130,12 @@
   width: 6rpx;
   flex: 0 0 auto;
   border-radius: 4rpx;
-  background: #d39a35;
+  background: var(--color-warning);
 }
 
 .memory-tip-text {
   margin-left: 20rpx;
-  color: #73551f;
+  color: var(--color-warning);
   font-size: 28rpx;
   line-height: 1.68;
 }

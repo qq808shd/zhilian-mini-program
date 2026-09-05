@@ -1,0 +1,6 @@
+<view class="page account-page">
+  <view class="brand-block"><image class="brand-mark" src="/assets/account/book.svg" /><text class="brand-name">知练</text><text class="page-subtitle">每一次积累都有意义</text><text class="brand-description">陪你分类学习、专项练习与错题巩固。</text></view>
+  <view class="list-card about-facts"><view class="fact-row"><text>版本信息</text><text>{{version}}</text></view><view class="fact-row"><text>运营主体</text><text>{{product.operator || '待补齐'}}</text></view><view class="fact-row"><text>小程序备案号</text><text user-select="{{true}}">{{product.filingNumber || '待补齐'}}</text></view><account-row title="备案查询" bind:activate="onFiling" /></view>
+  <view class="list-card"><account-row title="隐私政策" data-kind="privacy" bind:activate="onLegal" /><account-row title="用户协议" data-kind="terms" bind:activate="onLegal" /><account-row title="联系我们" detail="{{product.contactEmail ? '复制邮箱' : '待补齐'}}" bind:activate="onContact" /></view>
+  <text wx:if="{{draft}}" class="draft-note section">开发预览：备案信息、运营主体及对外联系方式将在上线前补齐。当前协议为草稿。</text>
+</view>

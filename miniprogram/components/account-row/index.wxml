@@ -1,0 +1,1 @@
+<button class="row {{danger ? 'danger' : ''}}" bindtap="onActivate" hover-class="pressed"><image wx:if="{{icon}}" class="icon" src="/assets/account/{{icon}}.svg" /><text class="title">{{title}}</text><text wx:if="{{detail}}" class="detail">{{detail}}</text><text class="arrow">›</text></button>

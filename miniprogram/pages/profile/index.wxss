@@ -1,0 +1,8 @@
+.profile-form { padding:32rpx; }
+.field-label { display:block; font-size:27rpx; font-weight:600; }
+button.avatar-picker { display:flex; align-items:center; gap:28rpx; width:100%!important; background:transparent; margin:24rpx 0 36rpx; text-align:left; }
+.profile-avatar { width:128rpx; height:128rpx; border-radius:50%; background:var(--color-primary-soft); flex-shrink:0; }
+.avatar-caption { color:var(--color-primary); font-size:27rpx; }
+.nickname-label { margin-top:24rpx; }
+.nickname-input { height:100rpx; min-height:100rpx; width:100%; border-bottom:1rpx solid var(--color-border); font-size:30rpx; margin-bottom:16rpx; }
+.profile-note { margin:28rpx 0; }

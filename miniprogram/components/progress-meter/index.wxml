@@ -1,0 +1,3 @@
+<view class="meter" aria-label="{{label}}">
+  <progress percent="{{value}}" stroke-width="3" activeColor="#456F59" backgroundColor="#DFE7DD" border-radius="3" />
+</view>

@@ -22,7 +22,7 @@
   margin-right: 24rpx;
   border-radius: 24rpx;
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-surface);
   font-size: 42rpx;
   font-weight: 700;
 }
@@ -38,62 +38,4 @@
 
 .intro-copy .page-subtitle {
   margin-top: 6rpx;
-}
-
-.topic-list {
-  display: flex;
-  width: 100%;
-  align-items: stretch;
-  flex-direction: column;
-  gap: 18rpx;
-}
-
-.topic-card {
-  width: 100%;
-  min-height: 204rpx;
-  padding: 30rpx 32rpx;
-  text-align: left;
-}
-
-.topic-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topic-name {
-  color: var(--color-text);
-  font-size: 35rpx;
-  font-weight: 700;
-}
-
-.topic-arrow {
-  color: var(--color-text-tertiary);
-  font-size: 42rpx;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.topic-description {
-  display: block;
-  margin-top: 10rpx;
-  color: var(--color-text-secondary);
-  font-size: 26rpx;
-  line-height: 1.55;
-}
-
-.topic-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 22rpx;
-  color: #587096;
-  font-size: 23rpx;
-}
-
-.meta-divider {
-  width: 1rpx;
-  height: 22rpx;
-  margin: 0 14rpx;
-  background: var(--color-border);
 }

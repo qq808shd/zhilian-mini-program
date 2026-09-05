@@ -1,25 +1,35 @@
+@import "styles/account.wxss";
+
 page {
-  /* 知练 Design System · Calm Focus */
-  --color-primary: #2457d6;
-  --color-primary-dark: #1d46b8;
-  --color-primary-soft: #eef4ff;
-  --color-secondary: #0f8f83;
-  --color-secondary-soft: #eaf8f5;
-  --color-background: #f6f8fc;
+  /* 知练 Design System · Quiet Growth */
+  --color-primary: #456f59;
+  --color-primary-dark: #315440;
+  --color-primary-soft: #edf3e9;
+  --color-secondary: #526e4b;
+  --color-secondary-soft: #edf3e9;
+  --color-background: #f7f8f2;
   --color-surface: #ffffff;
-  --color-surface-muted: #f8fafd;
-  --color-text: #172033;
-  --color-text-secondary: #5b667a;
-  --color-text-tertiary: #6b7588;
-  --color-border: #e2e8f2;
-  --color-divider: #ecf0f6;
-  --color-success: #0b7654;
-  --color-success-soft: #e9f7f1;
-  --color-danger: #c8464c;
-  --color-danger-soft: #fff0f1;
-  --color-warning: #b7791f;
-  --color-warning-soft: #fff8e8;
-  --color-disabled: #c7cfdb;
+  --color-surface-muted: #f3f5ef;
+  --color-text: #28352c;
+  --color-text-secondary: #59665d;
+  --color-text-tertiary: #68736a;
+  --color-border: #dde4d9;
+  --color-divider: #e7ebe2;
+  --color-success: #356b4f;
+  --color-success-soft: #ecf5ed;
+  --color-danger: #ad5146;
+  --color-danger-soft: #fcf0eb;
+  --color-warning: #86662f;
+  --color-warning-soft: #faf4e7;
+  --color-disabled: #7b897d;
+  --color-on-primary: #ffffff;
+  --color-primary-border: #bbcdb7;
+  --color-danger-border: #e6bfb6;
+  --color-warning-border: #e3d3ae;
+  --color-track: #dfe7dd;
+  --color-pressed: #e5edde;
+  --color-disabled-background: #dce5d9;
+  --shadow-button: 0 4rpx 10rpx rgba(40, 53, 44, .06);
   --space-1: 8rpx;
   --space-2: 16rpx;
   --space-3: 24rpx;
@@ -28,11 +38,11 @@ page {
   --space-6: 48rpx;
   --space-8: 64rpx;
   --radius-sm: 12rpx;
-  --radius-md: 20rpx;
-  --radius-lg: 28rpx;
-  --radius-xl: 36rpx;
-  --shadow-card: 0 8rpx 24rpx rgba(35, 55, 91, 0.055);
-  --shadow-raised: 0 14rpx 36rpx rgba(35, 55, 91, 0.09);
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 28rpx;
+  --shadow-card: 0 8rpx 24rpx rgba(40, 53, 44, 0.025);
+  --shadow-raised: 0 14rpx 36rpx rgba(40, 53, 44, 0.045);
   min-height: 100%;
   background: var(--color-background);
   color: var(--color-text);
@@ -64,8 +74,8 @@ button::after {
 }
 
 .page {
-  min-height: 100vh;
-  padding: 36rpx 28rpx calc(72rpx + env(safe-area-inset-bottom));
+  min-height: 100%;
+  padding: 32rpx 32rpx calc(72rpx + env(safe-area-inset-bottom));
 }
 
 .page-header {
@@ -76,7 +86,7 @@ button::after {
   display: block;
   color: var(--color-text);
   font-size: 46rpx;
-  font-weight: 720;
+  font-weight: 700;
   letter-spacing: -1rpx;
   line-height: 1.28;
 }
@@ -158,24 +168,24 @@ button::after {
 
 .primary-button {
   background: var(--color-primary);
-  color: #ffffff;
-  box-shadow: 0 8rpx 18rpx rgba(36, 87, 214, 0.18);
+  color: var(--color-on-primary);
+  box-shadow: 0 8rpx 18rpx rgba(40, 53, 44, .06);
 }
 
 .primary-button[disabled] {
-  background: #aec2ee;
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--color-disabled-background);
+  color: var(--color-text-secondary);
   box-shadow: none;
 }
 
 .secondary-button {
-  border: 2rpx solid #bfd0f2;
-  background: #ffffff;
+  border: 2rpx solid var(--color-primary-border);
+  background: var(--color-surface);
   color: var(--color-primary-dark);
 }
 
 .danger-button {
-  border: 2rpx solid #efc8cb;
+  border: 2rpx solid var(--color-danger-border);
   background: var(--color-danger-soft);
   color: var(--color-danger);
 }
@@ -219,7 +229,30 @@ button::after {
 }
 
 .interactive-card-hover {
-  border-color: #cbd9ef;
-  background: #fbfcff;
+  border-color: var(--color-primary-border);
+  background: var(--color-pressed);
   transform: scale(0.992);
 }
+
+/* Reusable layout primitives. Keep primary actions full width under WeChat style v2. */
+button.primary-button, button.secondary-button, button.danger-button { width: 100%; min-width: 0; }
+button.text-button { display: flex; min-height: 88rpx; width: auto !important; flex-shrink: 0; align-items: center; justify-content: center; padding: 0 12rpx; background: transparent; color: var(--color-primary); font-size: 26rpx; font-weight: 600; }
+button[disabled] { box-shadow: none; }
+.secondary-button[disabled] { background: var(--color-surface-muted); color: var(--color-disabled); border-color: var(--color-border); }
+.button-pressed { opacity: .82; }
+.stack { display: flex; flex-direction: column; gap: 16rpx; }
+.actions-row { display: flex; gap: 16rpx; margin-top: 24rpx; }
+.actions-row button { flex: 1; min-width: 0; }
+.kicker { display: block; color: var(--color-primary); font-size: 23rpx; font-weight: 600; letter-spacing: 3rpx; }
+.muted { color: var(--color-text-secondary); }
+.status-note { display: block; color: var(--color-text-secondary); font-size: 24rpx; line-height: 1.7; }
+.inset-note { padding: 24rpx; border-radius: var(--radius-md); background: var(--color-primary-soft); }
+.pill { display: inline-block; padding: 6rpx 14rpx; border-radius: var(--radius-sm); background: var(--color-primary-soft); color: var(--color-primary); font-size: 23rpx; line-height: 1.5; }
+.pill-warning { color: var(--color-warning); background: var(--color-warning-soft); }
+.metrics { display: flex; padding: 28rpx 8rpx; }
+.metric { flex: 1; min-width: 0; text-align: center; }
+.metric + .metric { border-left: 1rpx solid var(--color-border); }
+.metric-value { display: block; font-size: 38rpx; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric-label { display: block; margin-top: 8rpx; color: var(--color-text-secondary); font-size: 23rpx; }
+@media (prefers-reduced-motion: reduce) { button, view { transition: none !important; animation: none !important; } }
+@media (min-width: 600px) { .page { max-width: 1000rpx; margin: 0 auto; } }

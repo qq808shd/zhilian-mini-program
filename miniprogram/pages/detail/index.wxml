@@ -12,7 +12,7 @@
       <text class="memory-label">先回忆，再查看</text>
       <text class="memory-mark">回</text>
     </view>
-    <text class="memory-prompt">{{item.title}}是什么意思？</text>
+    <text class="memory-prompt">你还记得「{{item.title}}」的要点吗？</text>
     <button class="toggle-button" hover-class="button-pressed" bindtap="onToggleAnswer">
       {{answerVisible ? '收起答案' : '查看答案'}}
     </button>
@@ -28,7 +28,7 @@
     </view>
   </view>
 
-  <view class="section">
+  <view wx:if="{{answerVisible}}" class="section">
     <view class="section-heading">
       <text class="section-title">详细解析</text>
     </view>
@@ -37,7 +37,7 @@
     </view>
   </view>
 
-  <view class="section">
+  <view wx:if="{{answerVisible && item.memory}}" class="section">
     <view class="section-heading">
       <text class="section-title">记忆提示</text>
     </view>
@@ -47,7 +47,7 @@
     </view>
   </view>
 
-  <view wx:if="{{item.source}}" class="section source-section">
+  <view wx:if="{{answerVisible && item.source}}" class="section source-section">
     <view class="section-heading">
       <text class="section-title">资料口径</text>
     </view>

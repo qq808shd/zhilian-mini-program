@@ -1,9 +1,22 @@
 const { modules } = require("../../data/content");
-const { getQuestionStats, clearQuestionStats } = require("../../utils/storage");
+const { getQuestionStats, setExamRequest } = require("../../utils/storage");
+const { getLearningOverview, summarize } = require("../../utils/learningView");
 Page({
-  data:{summary:{attempts:0,accuracy:0,activeWrongCount:0},moduleStats:[]},
-  onShow(){this.refreshStats();},
-  refreshStats(){ const records=Object.values(getQuestionStats()); const attempts=records.reduce((s,i)=>s+i.attempts,0); const correct=records.reduce((s,i)=>s+i.correct,0); this.setData({ summary:{attempts,accuracy:attempts?Math.round(correct/attempts*100):0,activeWrongCount:records.filter((i)=>i.activeWrong).length}, moduleStats:modules.map((module)=>{const items=records.filter((i)=>i.moduleId===module.id);const itemAttempts=items.reduce((s,i)=>s+i.attempts,0);return {...module,attempts:itemAttempts,wrong:items.reduce((s,i)=>s+i.wrong,0),activeWrongCount:items.filter((i)=>i.activeWrong).length,accuracy:itemAttempts?Math.round(items.reduce((s,i)=>s+i.correct,0)/itemAttempts*100):0};}) }); },
-  onOpenModule(e){ wx.navigateTo({url:`/pages/review-topic/index?moduleId=${e.currentTarget.dataset.id}`}); },
-  onClearStats(){ if(!this.data.summary.attempts){wx.showToast({title:"目前没有答题记录",icon:"none"});return;} wx.showModal({title:"清空答题记录",content:"本机与云端的正确率、错题记录都会被清除，且无法恢复。",confirmText:"确认清空",confirmColor:"#C53F3F",success:(result)=>{if(result.confirm){clearQuestionStats();this.refreshStats();wx.showToast({title:"记录已清空",icon:"success"});}}}); }
+  data: { summary: {}, moduleStats: [], weakTopics: [] },
+  onShow() { this.refreshStats(); },
+  refreshStats() {
+    const records = Object.values(getQuestionStats());
+    const view = getLearningOverview();
+    this.setData({ summary: view.summary, weakTopics: view.weakTopics.slice(0, 3),
+      moduleStats: modules.map((module) => {
+        const stats = summarize(records.filter((record) => record.moduleId === module.id));
+        return { ...module, ...stats, meta: stats.attempts ? `累计正确率 ${stats.accuracy}% · 作答 ${stats.attempts} 次` : "尚未练习，从一个专项开始",
+          badge: stats.activeWrongCount ? `${stats.activeWrongCount} 道待复习` : stats.attempts ? "当前没有待复习错题" : "" };
+      }) });
+  },
+  onOpenModule(event) { wx.navigateTo({ url: `/pages/review-topic/index?moduleId=${event.currentTarget.dataset.id}` }); },
+  onOpenTopic(event) { wx.navigateTo({ url: `/pages/review-detail/index?topicId=${event.currentTarget.dataset.id}` }); },
+  onPractice() { wx.switchTab({ url: "/pages/exam/index" }); },
+  onStartWrong() { setExamRequest({ mode: "wrong" }); wx.switchTab({ url: "/pages/exam/index" }); },
+  onClearStats() { wx.navigateTo({ url: "/pages/settings/index" }); }
 });

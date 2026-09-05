@@ -1,15 +1,4 @@
 <view class="page" wx:if="{{module}}">
-  <text class="crumb">复习 / {{module.name}}</text>
-  <text class="page-title topic-title">{{module.name}}分类复习</text>
-  <text class="page-subtitle">进入分类后，查看错得最多的具体题目，并可进行专项考试。</text>
-  <view class="section-heading topic-heading"><text class="section-title">选择分类</text><text class="section-note">按错题情况查看</text></view>
-  <view class="topic-list">
-    <button wx:for="{{topics}}" wx:key="id" class="topic-card card interactive-card" hover-class="interactive-card-hover" data-id="{{item.id}}" bindtap="onOpenTopic">
-      <view class="topic-content">
-        <view class="topic-name-row"><text class="topic-name">{{item.name}}</text><text class="topic-arrow">›</text></view>
-        <text class="topic-meta">正确率 {{item.accuracy}}% · 已答 {{item.attempts}} 次</text>
-        <text class="topic-wrong">{{item.activeWrongCount}} 道待复习错题</text>
-      </view>
-    </button>
-  </view>
+  <view class="page-header"><text class="crumb">复习 / {{module.name}}</text><text class="page-title topic-title">找到需要巩固的专项</text><text class="page-subtitle">待复习较多的分类优先，按自己的节奏逐个巩固。</text></view>
+  <view class="stack"><ui-entry wx:for="{{topics}}" wx:key="id" title="{{item.name}}" meta="{{item.attempts ? '累计正确率 ' + item.accuracy + '% · 作答 ' + item.attempts + ' 次' : '尚未练习'}}" badge="{{item.activeWrongCount ? item.activeWrongCount + ' 道待复习' : item.masteredCount ? item.masteredCount + ' 道错题已巩固' : '当前没有错题'}}" warning="{{item.activeWrongCount > 0}}" data-id="{{item.id}}" bind:activate="onOpenTopic" /></view>
 </view>

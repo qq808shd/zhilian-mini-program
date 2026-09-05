@@ -1,0 +1,1 @@
+<web-view wx:if="{{url}}" src="{{url}}" binderror="onError" /><view wx:else class="page"><ui-state title="备案查询暂不可用" description="返回关于页，可复制备案查询网址。" action="返回关于" bind:action="onBack" /></view>

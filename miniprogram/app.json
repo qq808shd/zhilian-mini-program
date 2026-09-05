@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/welcome/index",
     "pages/study/index",
     "pages/module/index",
     "pages/group/index",
@@ -9,18 +10,27 @@
     "pages/review/index",
     "pages/review-topic/index",
     "pages/review-detail/index",
-    "pages/detail/index"
+    "pages/detail/index",
+    "pages/profile/index",
+    "pages/me/index",
+    "pages/settings/index",
+    "pages/sync-status/index",
+    "pages/about/index",
+    "pages/legal/index",
+    "pages/help/index",
+    "pages/history/index",
+    "pages/filing/index"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#F6F8FC",
+    "navigationBarBackgroundColor": "#F7F8F2",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "知练",
-    "backgroundColor": "#F6F8FC",
+    "backgroundColor": "#F7F8F2",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#768196",
-    "selectedColor": "#2457D6",
+    "color": "#68736A",
+    "selectedColor": "#456F59",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
@@ -34,17 +44,29 @@
         "pagePath": "pages/exam/index",
         "iconPath": "assets/tabbar/exam.png",
         "selectedIconPath": "assets/tabbar/exam-active.png",
-        "text": "考试"
+        "text": "练习"
       },
       {
         "pagePath": "pages/review/index",
         "iconPath": "assets/tabbar/review.png",
         "selectedIconPath": "assets/tabbar/review-active.png",
         "text": "复习"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "iconPath": "assets/tabbar/me.png",
+        "selectedIconPath": "assets/tabbar/me-active.png",
+        "text": "我的"
       }
     ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "ui-entry": "/components/ui-entry/index",
+    "progress-meter": "/components/progress-meter/index",
+    "ui-state": "/components/ui-state/index",
+    "account-row": "/components/account-row/index"
+  }
 }

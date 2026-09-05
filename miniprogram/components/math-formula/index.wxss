@@ -7,16 +7,16 @@
   width: 100%;
   margin-top: 30rpx;
   padding: 24rpx 22rpx 22rpx;
-  border: 1rpx solid #d8e2f1;
+  border: 1rpx solid var(--color-primary-border);
   border-radius: 20rpx;
-  background: #f8fafd;
-  color: #172033;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   box-sizing: border-box;
 }
 
 .formula-label {
   display: block;
-  color: #2457d6;
+  color: var(--color-primary);
   font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 1rpx;
@@ -24,21 +24,24 @@
 
 .formula-stage {
   display: flex;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   flex-direction: column;
   align-items: center;
   gap: 17rpx;
-  margin-top: 20rpx;
+  padding: 20rpx 4rpx 8rpx;
+  box-sizing: border-box;
 }
 
 .formula-line {
   display: flex;
-  width: 100%;
+  min-width: 100%;
+  width: max-content;
   min-height: 52rpx;
   align-items: center;
   justify-content: center;
   gap: 7rpx;
-  color: #1f2f48;
+  color: var(--color-text);
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
   font-size: 33rpx;
   font-weight: 600;
@@ -134,7 +137,7 @@
 .formula-note {
   display: block;
   margin-top: 20rpx;
-  color: #5b667a;
+  color: var(--color-text-secondary);
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   font-size: 22rpx;
   line-height: 1.55;
@@ -149,3 +152,5 @@
 .formula-card--small .root-fraction {
   font-size: 25rpx;
 }
+
+.formula-scroll { width: 100%; }

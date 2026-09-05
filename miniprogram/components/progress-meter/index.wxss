@@ -1,0 +1,2 @@
+:host { display: block; width: 100%; }
+.meter { width: 100%; padding: 8rpx 0; }

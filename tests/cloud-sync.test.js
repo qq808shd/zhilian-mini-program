@@ -7,6 +7,7 @@ let app = { globalData: { cloudSync: {} } };
 
 global.getApp = () => app;
 global.wx = {
+  getAccountInfoSync() { return { miniProgram: { envVersion: "develop" } }; },
   getStorageSync(key) { return store.get(key); },
   setStorageSync(key, value) { store.set(key, value); },
   removeStorageSync(key) { store.delete(key); },
@@ -47,6 +48,7 @@ test("首次登录会把本机历史作为基线导入云端并清理待同步�
   storage.markGroupProgress("idiom", 0, 4, 20);
   assert.equal(storage.getPendingAnswerEvents().length, 1);
 
+  require("../miniprogram/utils/account").acceptTerms();
   await cloudSync.initializeCloudSync();
 
   assert.deepEqual(requests.map((item) => `${item.method || "GET"} ${new URL(item.url).pathname}`), [

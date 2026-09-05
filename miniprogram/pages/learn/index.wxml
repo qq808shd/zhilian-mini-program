@@ -49,11 +49,13 @@
   <view class="learn-footer">
     <block wx:if="{{currentIndex < total - 1}}">
       <text class="swipe-hint">左右滑动，继续下一条</text>
-      <view class="nav-actions"><button class="nav-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="nav-button nav-button-primary" hover-class="button-pressed" bindtap="onNext">下一条</button></view>
+      <view class="nav-actions"><button class="secondary-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" hover-class="button-pressed" bindtap="onNext">下一条</button></view>
     </block>
     <view wx:else class="finish-panel">
-      <text class="finish-text">这一组已经学完</text>
-      <view class="finish-actions"><button class="nav-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="secondary-small" hover-class="button-pressed" bindtap="onRestart">重新学习</button><button class="primary-small" hover-class="button-pressed" bindtap="onBackGroups">返回分组</button></view>
+      <text class="finish-text">这一组已浏览完，用练习检验一下</text>
+      <view class="nav-actions"><button class="secondary-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" bindtap="onPracticeSet">练习这一组</button></view>
+      <view class="finish-links"><button class="text-button" bindtap="onRestart">重新学习</button><button class="text-button" bindtap="onBackGroups">返回分组</button></view>
     </view>
   </view>
 </view>
+<view wx:elif="{{error}}" class="page"><ui-state title="暂时找不到这组内容" description="返回学习页，重新选择一个分类。" action="返回学习" bind:action="onGoStudy" /></view>

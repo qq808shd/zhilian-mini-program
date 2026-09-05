@@ -1,25 +1,13 @@
 <view class="page" wx:if="{{topic}}">
-  <text class="crumb">复习 / {{module.name}} / {{topic.name}}</text>
-  <text class="page-title detail-title">{{topic.name}}错题复习</text>
-  <view class="topic-summary card">
-    <view class="summary-item"><text class="summary-number primary-number">{{summary.accuracy}}%</text><text class="summary-label">正确率</text></view>
-    <view class="summary-divider"></view>
-    <view class="summary-item"><text class="summary-number danger-number">{{summary.activeWrongCount}}</text><text class="summary-label">待复习错题</text></view>
-    <view class="summary-divider"></view>
-    <view class="summary-item"><text class="summary-number">{{summary.attempts}}</text><text class="summary-label">累计作答</text></view>
+  <view class="page-header"><text class="crumb">复习 / {{module.name}}</text><text class="page-title detail-title">{{topic.name}} · 逐个巩固</text></view>
+  <view class="card metrics"><view class="metric"><text class="metric-value">{{summary.attempts ? summary.accuracy + '%' : '—'}}</text><text class="metric-label">累计正确率</text></view><view class="metric"><text class="metric-value">{{summary.activeWrongCount}}</text><text class="metric-label">待复习</text></view><view class="metric"><text class="metric-value">{{summary.masteredCount}}</text><text class="metric-label">已巩固</text></view></view>
+  <text class="status-note rule-note">答错 → 复习知识 → 连续答对两次 → 移出待复习。浏览解析不会直接改变掌握状态。</text>
+  <button wx:if="{{summary.activeWrongCount}}" class="primary-button" bindtap="onStartWrongExam">开始错题练习 · 最多 20 题</button>
+  <view wx:if="{{ranked.length}}" class="section"><view class="section-heading"><text class="section-title">高频错点</text><text class="section-note">前 {{ranked.length}} 项</text></view><view class="ranked-topics"><button wx:for="{{ranked}}" wx:key="id" data-id="{{item.knowledgeId}}" bindtap="onOpenKnowledge"><text>{{index + 1}}. {{item.title}}</text><text class="muted">错 {{item.wrong}} 次 ›</text></button></view></view>
+  <view class="section"><view class="filter-row"><button class="filter-chip {{filter === 'active' ? 'active' : ''}}" data-value="active" bindtap="onFilter">待复习 {{summary.activeWrongCount}}</button><button class="filter-chip {{filter === 'mastered' ? 'active' : ''}}" data-value="mastered" bindtap="onFilter">已巩固 {{summary.masteredCount}}</button></view>
+    <view class="sort-row"><text class="status-note">{{total}} 道题</text><button class="text-button {{sort === 'frequent' ? 'sort-active' : ''}}" data-value="frequent" bindtap="onSort">常错优先</button><button class="text-button {{sort === 'recent' ? 'sort-active' : ''}}" data-value="recent" bindtap="onSort">最近错题</button></view>
+    <view wx:if="{{items.length}}" class="stack"><view wx:for="{{items}}" wx:key="id" class="wrong-card card"><view class="wrong-head"><text class="pill {{item.activeWrong ? 'pill-warning' : ''}}">{{item.status}}</text><text class="wrong-count">错 {{item.wrong}} 次</text></view><text class="wrong-stem">{{item.stem}}</text><text class="status-note">最近答错 {{item.date}}</text><view class="actions-row"><button class="secondary-button" data-id="{{item.knowledgeId}}" bindtap="onOpenKnowledge">复习知识点</button><button class="secondary-button" data-id="{{item.id}}" bindtap="onPracticeOne">再练这道题</button></view></view></view>
+    <ui-state wx:else mark="✓" title="{{filter === 'active' ? '当前没有待复习错题' : '还没有已巩固的错题'}}" description="{{filter === 'active' ? '可以继续学习，再用练习检验掌握情况。' : '错题连续答对两次后，将在这里保留巩固记录。'}}" action="继续专项学习" bind:action="onStudy" />
+    <button wx:if="{{hasMore}}" class="secondary-button more-button" bindtap="onMore">继续查看（{{items.length}} / {{total}}）</button>
   </view>
-  <view class="section-heading detail-heading"><text class="section-title">错得最多的知识点</text><text class="section-note">按错误次数排序</text></view>
-  <view wx:if="{{ranked.length}}" class="rank-list">
-    <button wx:for="{{ranked}}" wx:key="id" class="rank-card card interactive-card" hover-class="interactive-card-hover" data-id="{{item.knowledgeId}}" bindtap="onOpenKnowledge">
-      <view class="rank-number">{{index + 1}}</view>
-      <view class="rank-content"><text class="rank-title">{{item.title}}</text><text class="rank-meta">错 {{item.wrong}} 次 · 错误率 {{item.errorRate}}% · {{item.activeWrongCount}} 道待复习</text></view>
-      <text class="rank-arrow">›</text>
-    </button>
-  </view>
-  <view wx:else class="card empty-state">
-    <text class="empty-mark">✓</text>
-    <text class="empty-title">这里暂时没有待复习错题</text>
-    <text class="empty-description">完成这个分类的考试后，选错的知识点会出现在这里。</text>
-  </view>
-  <button wx:if="{{summary.activeWrongCount}}" class="primary-button targeted-button" hover-class="button-pressed" bindtap="onStartWrongExam">只考这些错题</button>
 </view>

@@ -1,0 +1,10 @@
+<button class="entry" hover-class="pressed" bindtap="onTap">
+  <view wx:if="{{symbol}}" class="symbol">{{symbol}}</view>
+  <view class="body">
+    <text class="title">{{title}}</text>
+    <text wx:if="{{description}}" class="description">{{description}}</text>
+    <text wx:if="{{meta}}" class="meta">{{meta}}</text>
+    <text wx:if="{{badge}}" class="badge {{warning ? 'warning' : ''}}">{{badge}}</text>
+  </view>
+  <text class="arrow" aria-hidden="true">›</text>
+</button>

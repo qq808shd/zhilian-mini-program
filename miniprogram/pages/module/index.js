@@ -1,14 +1,15 @@
-const { getModuleById, getTopicsByModule, getKnowledgeByTopic, getSetsForTopic } = require("../../data/content");
+const { getModuleById } = require("../../data/content");
+const { getLearningOverview } = require("../../utils/learningView");
 Page({
   data: { module: null, topics: [] },
   onLoad(options) {
     const module = getModuleById(options.id);
     if (!module) return;
-    const topics = getTopicsByModule(module.id).map((topic) => ({
-      ...topic, knowledgeCount: getKnowledgeByTopic(topic.id).length, setCount: getSetsForTopic(topic.id).length
-    }));
     wx.setNavigationBarTitle({ title: module.name });
-    this.setData({ module, topics });
+    this.setData({ module });
+  },
+  onShow() {
+    if (this.data.module) this.setData({ topics: getLearningOverview().topics.filter((topic) => topic.moduleId === this.data.module.id) });
   },
   onOpenTopic(event) { wx.navigateTo({ url: `/pages/group/index?topicId=${event.currentTarget.dataset.id}` }); }
 });

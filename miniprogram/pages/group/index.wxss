@@ -10,7 +10,7 @@
   justify-content: space-between;
   margin-top: 34rpx;
   padding: 28rpx 30rpx;
-  border: 1rpx solid #cddbf2;
+  border: 1rpx solid var(--color-primary-border);
   border-radius: var(--radius-lg);
   background: var(--color-primary-soft);
   text-align: left;
@@ -32,7 +32,7 @@
   justify-content: center;
   border-radius: var(--radius-md);
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-surface);
   font-size: 30rpx;
   font-weight: 700;
 }
@@ -52,7 +52,7 @@
 .catalog-description {
   display: block;
   margin-top: 9rpx;
-  color: #587096;
+  color: var(--color-text-secondary);
   font-size: 24rpx;
   line-height: 1.55;
 }
@@ -110,10 +110,10 @@
 
 .set-batch {
   padding: 6rpx 12rpx;
-  border: 1rpx solid #cbd8ec;
+  border: 1rpx solid var(--color-primary-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface-muted);
-  color: #587096;
+  color: var(--color-text-secondary);
   font-size: 21rpx;
   font-weight: 650;
   line-height: 1.3;
@@ -136,21 +136,8 @@
   color: var(--color-secondary);
 }
 
-.set-progress {
-  height: 8rpx;
-  flex: 1;
-  margin: 0 16rpx;
-  overflow: hidden;
-  border-radius: 5rpx;
-  background: #e7ecf3;
-}
-
-.set-progress-fill {
-  height: 100%;
-  border-radius: 5rpx;
-  background: var(--color-secondary);
-}
-
+.set-meter { flex: 1; min-width: 32rpx; margin: 0 16rpx; }
+.group-practice { margin-top: 16rpx; }
 .set-count {
   color: var(--color-text-tertiary);
   font-size: 22rpx;

@@ -1,7 +1,7 @@
 <view class="page" wx:if="{{topic}}">
   <text class="crumb">学习 / {{module.name}} / {{topic.name}}</text>
   <text class="page-title group-title">{{topic.name}}分组</text>
-  <text class="page-subtitle">共 {{total}} {{topic.knowledgeUnit}}，每组最多 {{topic.groupSize}} {{topic.knowledgeUnit}}。{{topic.groupBatches ? '已按资料批次排序，原有词库优先。' : ''}}完成后也可以随时重新学习。</text>
+  <text class="page-subtitle">共 {{total}} {{topic.knowledgeUnit}}，每组最多 {{topic.groupSize}} {{topic.knowledgeUnit}}。{{topic.groupBatches ? '已按资料批次排序，原有词库优先。' : ''}}浏览进度不代表掌握，学完后可练习检验。</text>
   <button wx:if="{{topic.catalogEnabled}}" class="catalog-card interactive-card" hover-class="interactive-card-hover" bindtap="onOpenCatalog">
     <view class="catalog-main">
       <view class="catalog-badge">全</view>
@@ -12,6 +12,7 @@
     </view>
     <text class="catalog-arrow">›</text>
   </button>
+  <button class="text-button group-practice" bindtap="onPractice">练习这个分类 →</button>
   <view class="section-heading group-section-heading"><text class="section-title">选择一组开始</text><text class="section-note">{{sets.length}} 组</text></view>
   <view class="set-list">
     <button wx:for="{{sets}}" wx:key="index" class="set-card card interactive-card" hover-class="interactive-card-hover" data-index="{{item.index}}" bindtap="onOpenSet">
@@ -22,7 +23,7 @@
       </view>
       <view class="set-footer">
         <text class="set-status {{item.learnedCount ? 'has-progress' : ''}}">{{item.status}}</text>
-        <view wx:if="{{item.learnedCount}}" class="set-progress"><view class="set-progress-fill" style="width: {{item.learnedCount / item.count * 100}}%;"></view></view>
+        <view wx:if="{{item.learnedCount}}" class="set-meter"><progress-meter value="{{item.progress}}" /></view>
         <text wx:if="{{item.learnedCount}}" class="set-count">{{item.learnedCount}} / {{item.count}}</text>
       </view>
     </button>

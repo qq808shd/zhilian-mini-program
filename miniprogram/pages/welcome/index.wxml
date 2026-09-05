@@ -1,0 +1,13 @@
+<view class="welcome-page">
+  <text class="welcome-brand">知练</text>
+  <image class="welcome-art" src="/assets/account/welcome.png" mode="aspectFit" aria-label="书页间长出的嫩芽" />
+  <view class="welcome-copy"><text class="welcome-title">每一次积累\n都算数。</text><text class="page-subtitle">学一点，练一练，把不会的慢慢变会。</text><view class="welcome-path"><text>分类学习</text><text>→</text><text>专项练习</text><text>→</text><text>错题巩固</text></view></view>
+  <view class="welcome-actions">
+    <text wx:if="{{draft}}" class="draft-note">{{unavailable ? '协议及主体资料尚待完善，当前可使用本机学习。' : '开发预览：主体与备案待补齐，协议为草稿。本次选择仅用于体验同步流程。'}}</text>
+    <view class="consent-line"><checkbox-group bindchange="onAgreement"><label class="consent-check"><checkbox value="agree" checked="{{agreed}}" color="#456F59" disabled="{{unavailable}}" /><text>我已阅读并同意</text></label></checkbox-group><button class="legal-link" data-kind="terms" bindtap="onLegal">《用户协议》</button><button class="legal-link" data-kind="privacy" bindtap="onLegal">《隐私政策》</button></view>
+    <text wx:if="{{error}}" class="form-error">{{error}}</text>
+    <button class="primary-button" disabled="{{!agreed || busy || unavailable}}" loading="{{busy}}" bindtap="onContinue">{{enableOnly ? '同意并开启同步' : draft ? '同意并体验' : '同意并开始'}}</button>
+    <button class="text-button welcome-skip" bindtap="onLocal">{{enableOnly ? '暂不开启，返回' : '暂不同意，仅本机学习'}}</button>
+    <text class="welcome-footnote">头像昵称可快捷填写，也可以跳过</text>
+  </view>
+</view>

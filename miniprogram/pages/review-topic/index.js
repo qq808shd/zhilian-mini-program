@@ -1,2 +1,18 @@
-const { getModuleById, getTopicsByModule } = require("../../data/content"); const { getQuestionStats } = require("../../utils/storage");
-Page({data:{module:null,topics:[]},onLoad(options){const module=getModuleById(options.moduleId);if(!module)return;wx.setNavigationBarTitle({title:`${module.name}复习`});const records=Object.values(getQuestionStats());this.setData({module,topics:getTopicsByModule(module.id).map((topic)=>{const items=records.filter((i)=>i.topicId===topic.id);const attempts=items.reduce((s,i)=>s+i.attempts,0);return {...topic,attempts,accuracy:attempts?Math.round(items.reduce((s,i)=>s+i.correct,0)/attempts*100):0,activeWrongCount:items.filter((i)=>i.activeWrong).length};})});},onOpenTopic(e){wx.navigateTo({url:`/pages/review-detail/index?topicId=${e.currentTarget.dataset.id}`});}});
+const { getModuleById } = require("../../data/content");
+const { getLearningOverview } = require("../../utils/learningView");
+Page({
+  data: { module: null, topics: [] },
+  onLoad(options) {
+    const module = getModuleById(options.moduleId);
+    if (!module) return;
+    wx.setNavigationBarTitle({ title: `${module.name}复习` });
+    this.setData({ module });
+  },
+  onShow() {
+    if (!this.data.module) return;
+    const topics = getLearningOverview().topics.filter((topic) => topic.moduleId === this.data.module.id)
+      .sort((a, b) => b.activeWrongCount - a.activeWrongCount);
+    this.setData({ topics });
+  },
+  onOpenTopic(event) { wx.navigateTo({ url: `/pages/review-detail/index?topicId=${event.currentTarget.dataset.id}` }); }
+});
