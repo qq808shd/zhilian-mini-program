@@ -33,12 +33,12 @@ function setup() {
     })
   };
 }
-function load(relative, page = false) {
+function load(relative, page = false, overrides = {}) {
   const file = path.resolve(__dirname, "../miniprogram/", relative);
   const module = { exports: {} };
   let result, nextTimer = 1;
   vm.runInNewContext(fs.readFileSync(file, "utf8"), {
-    module, exports: module.exports, require: createRequire(file), wx, getApp,
+    module, exports: module.exports, require: (name) => overrides[name] || createRequire(file)(name), wx, getApp,
     Page: (value) => { result = value; },
     setTimeout: (fn) => { const id = nextTimer++; timers.set(id, fn); return id; },
     clearTimeout: (id) => timers.delete(id), setInterval: () => 1, clearInterval() {},
@@ -186,4 +186,49 @@ test("settings cancellation is inert; answer reset preserves learning and record
   assert.equal(Object.keys(storage.getQuestionStats()).length, 0);
   assert.equal(storage.getGroupProgress("idiom", 0).maxIndex, 6);
   assert.ok(storage.getStatsResetPending());
+});
+
+
+test("agreeing once starts automatic sync without a separate switch or profile requirement", () => {
+  setup(); let syncCalls = 0;
+  const w = load("pages/welcome/index.js", true, { "../../utils/cloudSync": { syncCloudData() { syncCalls++; return Promise.resolve(); } } });
+  w.onLoad({}); w.onAgreement({ detail: { value: ["agree"] } }); w.onContinue();
+  assert.equal(account.isSyncAuthorized(), true); assert.equal(syncCalls, 1);
+  assert.equal(profile.getProfile().customized, false);
+  assert.equal(navigations.at(-1), "/pages/profile/index?onboarding=1");
+  const next = page("welcome"); next.onLoad({});
+  assert.equal(navigations.at(-1), "/pages/study/index");
+});
+
+test("a new answer schedules and uploads automatically after consent", async () => {
+  setup(); account.acceptTerms(); const requests = [];
+  wx.login = (o) => queueMicrotask(() => o.success({ code: "test-code" }));
+  wx.request = (o) => {
+    requests.push(o);
+    const data = o.url.endsWith("/auth/wechat") ? { token: "test", expiresAt: Date.now() + 3600000 }
+      : { initialized: true, revision: 1, stats: storage.getQuestionStats(), progress: storage.getStudyProgress(),
+          ackedEventIds: o.method === "PUT" ? o.data.events.map((e) => e.eventId) : [] };
+    queueMicrotask(() => { o.success({ statusCode: 200, data }); o.complete(); });
+    return { abort() {} };
+  };
+  const cloud = load("utils/cloudSync.js"); await cloud.initializeCloudSync();
+  storage.recordQuestionResult("q-auto", "verbal", "idiom", false);
+  assert.equal(timers.size, 1);
+  const [id, scheduled] = timers.entries().next().value; timers.delete(id); scheduled();
+  await cloud.syncCloudData();
+  const uploads = requests.filter((r) => r.method === "PUT");
+  assert.equal(uploads.length, 1); assert.equal(uploads[0].data.events[0].questionId, "q-auto");
+  assert.equal(storage.getPendingAnswerEvents().length, 0);
+  assert.equal(app.globalData.cloudSync.state, "ready");
+});
+
+test("sync details only retries an authorized session; a legacy pause returns to consent without silently enabling it", async () => {
+  setup(); account.acceptTerms(); let calls = 0;
+  const p = load("pages/sync-status/index.js", true, { "../../utils/cloudSync": { syncCloudData() { calls++; return Promise.resolve(); } } });
+  app.globalData.cloudSync.state = "offline"; p.onShow(); await p.onSync();
+  assert.equal(calls, 1);
+  account.stopSyncPreference(); p.refresh(); const saved = account.getPreferences();
+  await p.onSync();
+  assert.equal(calls, 1); assert.deepEqual(account.getPreferences(), saved);
+  assert.equal(navigations.at(-1), "/pages/welcome/index?consent=1");
 });

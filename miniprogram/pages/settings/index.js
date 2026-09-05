@@ -11,7 +11,7 @@ Page({
   onLegal: openLegal, onPrivacy: openPrivacyContract,
   onClear() {
     if (!this.data.hasAnswers) { wx.showToast({ title: "暂无答题记录", icon: "none" }); return; }
-    wx.showModal({ title: "清空答题记录？", content: "作答统计和错题将清空，学习进度保留。若开启同步，清空指令也会同步到云端；未开启时会保留指令，恢复同步后处理。此操作不可恢复。", confirmText: "确认清空", confirmColor: "#AD5146",
+    wx.showModal({ title: "清空答题记录？", content: "作答统计和错题将清空，学习进度保留。已同意协议时，清空指令会自动同步到云端；尚未同意时会保留指令，同意后处理。此操作不可恢复。", confirmText: "确认清空", confirmColor: "#AD5146",
       success: (result) => { if (result.confirm) {
         try { clearQuestionStats(); this.refresh(); wx.showToast({ title: "答题记录已清空", icon: "success" }); }
         catch (_) { wx.showToast({ title: "清空失败，请重试", icon: "none" }); }
