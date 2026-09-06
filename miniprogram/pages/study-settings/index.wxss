@@ -14,8 +14,10 @@
 .quantity-slider { margin:12rpx 0 0; padding:12rpx 0; }
 .slider-labels { display:flex; justify-content:space-between; color:var(--color-text-secondary); font-size:24rpx; }
 .quantity-note { display:block; margin-top:20rpx; }
-.plan-note, .effective-note { display:block; font-size:24rpx; line-height:1.6; color:var(--color-text-secondary); }
+.effective-note { display:block; font-size:24rpx; line-height:1.6; color:var(--color-text-secondary); }
 .effective-note { margin:8rpx 0 24rpx; }
 
 .plan-page { padding-bottom:calc(160rpx + env(safe-area-inset-bottom)); }
 .save-footer { position:fixed; z-index:10; left:0; right:0; bottom:0; padding:16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom)); background:var(--color-background); border-top:1rpx solid var(--color-border); }
+
+.plan-help { display:flex; align-items:center; justify-content:space-between; gap:16rpx; width:100%!important; min-height:88rpx; padding:0; background:transparent; color:var(--color-primary); font-size:25rpx; line-height:1.5; }
