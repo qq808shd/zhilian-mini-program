@@ -2,3 +2,6 @@
 
 .learning-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 32rpx; padding: 32rpx; text-align: center; }
 .account-total { text-align: center; margin-top: 16rpx; }
+
+/* Custom navigation owns the bottom safe area; reserve its full height once. */
+.page { padding-bottom:calc(48px + 32rpx + env(safe-area-inset-bottom)); }

@@ -201,7 +201,7 @@ function createDatabase(dbPath) {
       stats,
       progress,
       learningVersion: 4,
-      learningSettingsVersion: 1,
+      learningSettingsVersion: 2,
       learningState: learningModel.replay(statements.listLearning.all(userId).map((r) => JSON.parse(r.payload)))
     };
   }

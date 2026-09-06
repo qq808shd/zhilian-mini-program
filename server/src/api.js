@@ -132,8 +132,11 @@ function normalizeLearningEvents(value) {
     if (!e.at) throw apiError(400, "INVALID_PAYLOAD", "学习时间无效");
     if (raw.settings !== undefined) {
       const s = raw.settings;
-      if (!s || ![5, 10, 20].includes(s.newCount) || !['', 'original', 'photo800'].includes(s.batchId || '') || (s.batchId && s.topicId !== 'idiom')) throw apiError(400, "INVALID_PAYLOAD", "学习设置无效");
+      if (!s || !Number.isInteger(s.newCount) || s.newCount < 1 || s.newCount > 200 || (s.version !== undefined && ![1, 2].includes(s.version)) ||
+          (s.version !== 2 && ![5, 10, 20].includes(s.newCount)) || !['', 'original', 'photo800'].includes(s.batchId || '') ||
+          (s.batchId && (s.topicId !== 'idiom' || s.version === 2))) throw apiError(400, "INVALID_PAYLOAD", "学习设置无效");
       e.settings = { topicId: safeId(s.topicId, "topicId"), batchId: s.batchId || '', newCount: s.newCount };
+      if (s.version === 2) e.settings.version = 2;
       if (raw.kind === 'plan') e.settings.id = safeId(s.id, 'settingsId');
     }
     if (raw.kind === 'preferences') {
@@ -147,7 +150,7 @@ function normalizeLearningEvents(value) {
       e.day = raw.day;
     }
     if (raw.kind === "plan") {
-      if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 35) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
+      if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 215) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
       const limits = { review: 10, new: e.settings ? e.settings.newCount : 10, practice: 5 }, seen = new Set();
       e.tasks = raw.tasks.map((t) => {
         if (!t || !limits[t.phase] || seen.has(t.id)) throw apiError(400, "INVALID_PAYLOAD", "今日任务顺序或数量无效");

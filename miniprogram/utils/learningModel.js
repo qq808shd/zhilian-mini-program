@@ -78,7 +78,7 @@ function applyEvent(state, event) {
     // Explicit preferences may replace an untouched plan; started work keeps its original schedule.
     const untouched = prior && !Object.keys(prior.started).length && !Object.keys(prior.completed).length;
     const currentSettingsId = state.studySettings ? state.studySettings.id : 'default';
-    const replacement = untouched && event.settings && event.settings.id === currentSettingsId && (!prior.settings || prior.settings.id !== currentSettingsId);
+    const replacement = untouched && event.settings && event.settings.id === currentSettingsId && (!prior.settings || prior.settings.id !== currentSettingsId || (prior.settings.version || 1) < (event.settings.version || 1));
     if (!prior || replacement || event.at < prior.createdAt || (event.at === prior.createdAt && event.id < prior.id)) {
       state.days[event.day] = { id: event.id, day: event.day, createdAt: event.at, ...(event.settings ? { settings: { ...event.settings } } : {}), tasks: event.tasks.map((t) => ({ ...t })), completed: {}, started: {}, extraCompleted: prior ? prior.extraCompleted || {} : {} };
     }

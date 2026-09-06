@@ -180,7 +180,7 @@ async function performSync(runGeneration) {
     ? pendingAtStart.map((event) => event.eventId)
     : (result.ackedEventIds || []);
   applyCloudSnapshot(result, ackedEventIds, resetStats);
-  const supportsSettings = result.learningSettingsVersion === 1;
+  const supportsSettings = result.learningSettingsVersion >= 2;
   const settingsEventIds = new Set(payload.learningEvents.filter((e) => e.kind === 'preferences' || e.settings).map((e) => e.id));
   const learningAcks = (result.ackedLearningEventIds || []).filter((id) => supportsSettings || !settingsEventIds.has(id));
   learningEngine.applySnapshot(result, learningAcks);

@@ -252,11 +252,30 @@ test('daily preferences and 20-item plans sync with explicit capability, bounds 
     const pref={id:'prefs-1',kind:'preferences',at:now,settings:{topicId:'idiom',batchId:'photo800',newCount:20}};
     const plan={id:'plan-20',kind:'plan',at:now+1,day,settings:{...pref.settings,id:pref.id},tasks:Array.from({length:20},(_,i)=>({id:`new:k${i}`,phase:'new',knowledgeId:`k${i}`,questionId:''}))};
     const put=events=>request(fixture.baseUrl,'/v1/sync',{method:'PUT',headers:a,body:JSON.stringify({learningEvents:events})});
-    const saved=await put([plan,pref]);assert.equal(saved.status,200);assert.equal(saved.body.learningSettingsVersion,1);assert.equal(saved.body.learningState.studySettings.newCount,20);assert.equal(saved.body.learningState.days[day].tasks.length,20);
+    const saved=await put([plan,pref]);assert.equal(saved.status,200);assert.equal(saved.body.learningSettingsVersion,2);assert.equal(saved.body.learningState.studySettings.newCount,20);assert.equal(saved.body.learningState.days[day].tasks.length,20);
     const duplicate=await put([pref,plan]);assert.deepEqual(duplicate.body.learningState,saved.body.learningState);
     assert.equal((await request(fixture.baseUrl,'/v1/sync',{headers:b})).body.learningState.studySettings,undefined);
     assert.equal((await put([{...pref,id:'bad',settings:{...pref.settings,newCount:100}}])).status,400);
     assert.equal((await put([{...plan,id:'oversize',tasks:[...plan.tasks,{id:'new:extra',phase:'new',knowledgeId:'extra'}]}])).status,400);
     assert.equal((await put([{...pref,id:'bad-batch',settings:{...pref.settings,topicId:'poetry'}}])).status,400);
+  } finally {await fixture.close();}
+});
+test('version 2 accepts 200 new items, rejects overflow and syncs resumable progress in batches', async()=>{
+  const fixture=await createFixture();
+  try {
+    const token=(await request(fixture.baseUrl,'/v1/auth/wechat',{method:'POST',body:JSON.stringify({code:'quantity-v2'})})).body.token;
+    const headers={Authorization:`Bearer ${token}`},now=Date.now(),model=require('../../miniprogram/utils/learningModel'),day=model.dayKey(now);
+    const pref={id:'slider-pref',kind:'preferences',at:now,settings:{version:2,topicId:'idiom',batchId:'',newCount:200}};
+    const tasks=['review','new','practice'].flatMap(phase=>Array.from({length:({review:10,new:200,practice:5})[phase]},(_,i)=>({id:`${phase}:k${i}`,phase,knowledgeId:`k${i}`,questionId:phase==='new'?'':`q${i}`})));
+    const plan={id:'plan-200',kind:'plan',at:now+1,day,settings:{...pref.settings,id:pref.id},tasks};
+    const put=events=>request(fixture.baseUrl,'/v1/sync',{method:'PUT',headers,body:JSON.stringify({learningEvents:events})});
+    const saved=await put([pref,plan]);assert.equal(saved.status,200);assert.equal(saved.body.learningSettingsVersion,2);assert.equal(saved.body.learningState.days[day].tasks.length,215);assert.equal(saved.body.learningState.studySettings.version,2);
+    for(const newCount of [0,201,1.5]) assert.equal((await put([{...pref,id:`invalid:${newCount}`,settings:{...pref.settings,newCount}}])).status,400);
+    assert.equal((await put([{...pref,id:'batch-v2',settings:{...pref.settings,batchId:'original'}}])).status,400);
+    assert.equal((await put([{...plan,id:'overflow',tasks:[...tasks,{id:'new:extra',phase:'new',knowledgeId:'extra'}]}])).status,400);
+    const completions=tasks.map((t,i)=>({kind:t.phase==='new'?'learn':'answer',at:now+2+i,day,planId:plan.id,taskId:t.id,...t,id:`done:${t.id}`,topicId:'idiom',moduleId:'verbal',correct:true}));
+    const first=await put(completions.slice(0,200));assert.equal(first.status,200);assert.equal(Object.keys(first.body.learningState.days[day].completed).length,200);
+    const rest=await put(completions.slice(200));assert.equal(rest.status,200);assert.equal(Object.keys(rest.body.learningState.days[day].completed).length,215);
+    const again=await put(completions.slice(200));assert.deepEqual(again.body.learningState,rest.body.learningState);
   } finally {await fixture.close();}
 });

@@ -1,7 +1,9 @@
 const engine = require("../../utils/learningEngine");
 Page({
   data: { daily: {}, greeting: "" },
-  onShow() { this.refresh(); },
+  onShow() {
+    const bar = this.getTabBar && this.getTabBar();
+    if (bar) bar.refresh(); this.refresh(); },
   refresh() {
     const hour = new Date().getHours();
     this.setData({ greeting: hour < 11 ? "早上好" : hour < 14 ? "中午好" : hour < 18 ? "下午好" : "晚上好", daily: engine.dailyView() });

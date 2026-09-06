@@ -5,7 +5,7 @@
     <text class="continue-title">{{daily.subject}}</text>
     <text class="continue-copy">{{daily.goal ? '每天新学 ' + daily.goal + ' 个 · 先复习，再学新知' : '继续完成已开始的学习安排'}}</text>
     <view class="daily-counts"><view><text class="count-number">{{daily.due || 0}}</text><text>待复习</text></view><view><text class="count-number">{{daily.fresh || 0}}</text><text>待新学</text></view><view><text class="count-number">{{daily.practice || 0}}</text><text>待练习</text></view></view>
-    <view class="continue-progress"><progress-meter value="{{daily.progress || 0}}" label="今日学习进度" /><text>{{daily.remaining ? '已完成 ' + daily.completed + ' 项 · 预计还需 ' + daily.minutes + ' 分钟' : daily.total ? '今天的安排已完成' : '当前范围暂无新学或到期内容，可调整学习设置'}}</text></view>
+    <view class="continue-progress"><progress-meter value="{{daily.progress || 0}}" label="今日学习进度" /><text>{{daily.remaining ? '已完成 ' + daily.completed + ' 项 · 预计还需 ' + daily.minutes + ' 分钟' : daily.total ? '今天的安排已完成' : '当前分类暂无新学或到期内容，可调整学习设置'}}</text></view>
     <text wx:if="{{daily.settingsPending}}" class="pending-note">明日起：{{daily.nextSubject}} · 每天新学 {{daily.nextGoal}} 个</text>
     <button class="primary-button" hover-class="button-pressed" bindtap="onToday">{{daily.button || '开始今日学习'}} →</button>
   </view>

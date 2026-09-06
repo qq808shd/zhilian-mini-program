@@ -270,17 +270,17 @@ test("app registers the consent guard for every page", () => {
 
 test('an older V4 server cannot acknowledge and discard learning settings it does not understand', async()=>{
   setup(); account.acceptTerms(); const engine=require('../miniprogram/utils/learningEngine');
-  engine.saveStudySettings({topicId:'idiom',batchId:'photo800',newCount:20});
+  engine.saveStudySettings({topicId:'idiom',newCount:200});
   wx.login=o=>queueMicrotask(()=>o.success({code:'test'}));
   wx.request=o=>{
     const data=o.url.endsWith('/auth/wechat') ? {token:'t',expiresAt:Date.now()+3600000} : {
-      initialized:true,learningVersion:4,learningState:engine.model.emptyState(),stats:{},progress:{},
+      initialized:true,learningVersion:4,learningSettingsVersion:1,learningState:engine.model.emptyState(),stats:{},progress:{},
       ackedLearningEventIds:o.method==='PUT' ? o.data.learningEvents.map(e=>e.id) : []
     };
     queueMicrotask(()=>{o.success({statusCode:200,data});o.complete();});return {abort(){}};
   };
   const cloud=load('utils/cloudSync.js');await cloud.initializeCloudSync();
   assert.equal(app.globalData.cloudSync.state,'offline');assert.match(app.globalData.cloudSync.lastError,/学习设置/);
-  assert.ok(engine.getPendingEvents().some(e=>e.kind==='preferences'));assert.equal(engine.getStudySettings().newCount,20);
+  assert.ok(engine.getPendingEvents().some(e=>e.kind==='preferences'));assert.equal(engine.getStudySettings().newCount,200);
   cloud.stopCloudSync();
 });

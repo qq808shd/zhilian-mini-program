@@ -105,36 +105,44 @@ function topicSummary(topicId, now = Date.now()) {
     consolidatingCount: items.filter((r) => ['due', 'consolidating'].includes(r.state)).length };
 }
 function makeTask(k, phase, question) { return { id: `${phase}:${k.id}`, phase, knowledgeId: k.id, questionId: question ? question.id : '' }; }
-const DEFAULT_SETTINGS = { id: 'default', topicId: 'idiom', batchId: 'original', newCount: 10 };
+const DEFAULT_SETTINGS = { id: 'default', version: 2, topicId: 'idiom', batchId: '', newCount: 10 };
+function studyLimit(topicId) {
+  return Math.min(200, content.knowledge.filter((k) => k.topicId === topicId).length);
+}
 function getStudySettings(now = Date.now()) {
   const saved = getState(now).studySettings;
-  if (!saved || !content.getTopicById(saved.topicId)) return { ...DEFAULT_SETTINGS };
-  return { id: saved.id, topicId: saved.topicId, batchId: saved.batchId || '', newCount: saved.newCount };
+  if (!saved) return { ...DEFAULT_SETTINGS };
+  const topicId = content.getTopicById(saved.topicId) ? saved.topicId : DEFAULT_SETTINGS.topicId;
+  const newCount = Math.max(1, Math.min(studyLimit(topicId), Number.isInteger(saved.newCount) ? saved.newCount : 10));
+  // Upgrade old batch preferences once, through the same durable event queue.
+  // Started plans keep their tasks; the next untouched plan uses the whole category.
+  if (saved.version !== 2 || saved.batchId || saved.topicId !== topicId || saved.newCount !== newCount) {
+    const event = emit({ kind: 'preferences', settings: { version: 2, topicId, batchId: '', newCount } }, now);
+    return { ...event.settings, id: event.id };
+  }
+  return { id: saved.id, version: 2, topicId, batchId: '', newCount };
 }
 function settingsLabel(settings) {
   if (!settings) return '原有学习安排';
   const topic = content.getTopicById(settings.topicId);
-  const batch = topic && (topic.groupBatches || []).find((b) => b.id === settings.batchId);
-  return topic ? topic.name + (batch ? ' · ' + batch.label : '') : '学习安排';
+  return topic ? topic.name : '学习安排';
 }
 function hasStarted(plan) { return !!(plan && (Object.keys(plan.started).length || Object.keys(plan.completed).length)); }
 function saveStudySettings(input, now = Date.now()) {
   const topic = content.getTopicById(input.topicId);
-  if (!topic || ![5, 10, 20].includes(input.newCount)) throw new Error('请选择学习分类和每天的新学数量');
-  const batchId = input.batchId || '';
-  if (batchId && !(topic.groupBatches || []).some((b) => b.id === batchId)) throw new Error('请选择有效的学习范围');
+  if (!topic || !Number.isInteger(input.newCount) || input.newCount < 1 || input.newCount > studyLimit(topic.id)) throw new Error('请选择分类内有效的新学数量，最多 200 个');
   const current = getStudySettings(now);
-  if (current.topicId === topic.id && current.batchId === batchId && current.newCount === input.newCount) return { changed: false };
+  if (current.topicId === topic.id && current.newCount === input.newCount) return { changed: false };
   const plan = getState(now).days[model.dayKey(now)];
-  emit({ kind: 'preferences', settings: { topicId: topic.id, batchId, newCount: input.newCount } }, now);
+  emit({ kind: 'preferences', settings: { version: 2, topicId: topic.id, batchId: '', newCount: input.newCount } }, now);
   ensurePlan(now);
   return { changed: true, tomorrow: hasStarted(plan) };
 }
 function ensurePlan(now = Date.now()) {
-  const state = getState(now), day = model.dayKey(now), settings = getStudySettings(now);
+  const settings = getStudySettings(now), state = getState(now), day = model.dayKey(now);
   const prior = state.days[day];
-  if (prior && (hasStarted(prior) || (prior.settings && prior.settings.id === settings.id))) return prior;
-  const ordered = content.knowledge.filter((k) => k.topicId === settings.topicId && (!settings.batchId || k.batchId === settings.batchId));
+  if (prior && (hasStarted(prior) || (prior.settings && prior.settings.id === settings.id && prior.settings.version === 2))) return prior;
+  const ordered = content.knowledge.filter((k) => k.topicId === settings.topicId);
   const scope = new Set(ordered.map((k) => k.id));
   const due = reviewItems(settings.topicId, now).filter((r) => r.state === 'due' && scope.has(r.id)).slice(0, 10);
   const dueIds = new Set(due.map((r) => r.id));
@@ -246,5 +254,5 @@ function overview(now = Date.now()) {
   return { ...topicSummary(null, now), today, sevenDayAccuracy: answers.length ? Math.round(answers.filter((e) => e.correct).length / answers.length * 100) : null };
 }
 module.exports = { getState, getPendingEvents, importLegacySnapshot, applySnapshot, startLearning, learn, onAnswer, reviewItems, topicSummary,
-  getStudySettings, saveStudySettings, settingsLabel, ensurePlan, dailyView, beginTask, completeTask, repairDailyAnswers, getDraft, saveDraft, groupAction, navigateAction, practiceGroup,
+  getStudySettings, saveStudySettings, studyLimit, settingsLabel, ensurePlan, dailyView, beginTask, completeTask, repairDailyAnswers, getDraft, saveDraft, groupAction, navigateAction, practiceGroup,
   resetAnswers, recall, markGroupPracticed, recommendation, overview, model };

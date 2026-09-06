@@ -4,7 +4,9 @@ const { getQuestionStats, setExamRequest } = require("../../utils/storage");
 const { getLearningOverview, summarize } = require("../../utils/learningView");
 Page({
   data: { summary: {}, moduleStats: [], weakTopics: [] },
-  onShow() { this.refreshStats(); },
+  onShow() {
+    const bar = this.getTabBar && this.getTabBar();
+    if (bar) bar.refresh(); this.refreshStats(); },
   refreshStats() {
     const records = Object.values(getQuestionStats());
     const view = getLearningOverview();

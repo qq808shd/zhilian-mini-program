@@ -5,7 +5,9 @@ const { getSyncView } = require("../../utils/accountView");
 const product = require("../../config/product");
 Page({
   data: { profile: {}, summary: {}, learned: 0, sync: {}, filing: product.filingNumber || "备案信息 · 待补齐" },
-  onShow() { this.refresh(); this.timer = setInterval(() => this.setData({ sync: getSyncView() }), 1500); },
+  onShow() {
+    const bar = this.getTabBar && this.getTabBar();
+    if (bar) bar.refresh(); this.refresh(); this.timer = setInterval(() => this.setData({ sync: getSyncView() }), 1500); },
   onHide() { clearInterval(this.timer); }, onUnload() { clearInterval(this.timer); },
   refresh() { const overview = getLearningOverview(); this.setData({ learning: engine.overview(), profile: getProfile(), summary: overview.summary,
     learned: overview.topics.reduce((sum, topic) => sum + topic.learnedCount, 0), sync: getSyncView() }); },

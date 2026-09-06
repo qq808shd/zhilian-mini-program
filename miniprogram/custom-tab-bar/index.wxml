@@ -1,0 +1,8 @@
+<view class="tab-bar">
+  <view class="tab-items" role="tablist">
+    <button wx:for="{{tabs}}" wx:key="route" class="tab-item {{selected === index ? 'is-selected' : ''}}" data-index="{{index}}" bindtap="onTab" hover-class="tab-pressed" aria-role="tab" aria-selected="{{selected === index}}" aria-label="{{item.label}}">
+      <image class="tab-icon" src="/assets/tabbar/{{item.icon}}{{selected === index ? '-active' : ''}}.png" mode="aspectFit" aria-hidden="true" />
+      <text class="tab-label">{{item.label}}</text>
+    </button>
+  </view>
+</view>

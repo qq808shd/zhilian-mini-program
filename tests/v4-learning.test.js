@@ -69,7 +69,7 @@ test('V4 merely swiping cards does not mark formal learning complete', () => {
 });
 test('V4 wrong -> retry once -> correct stays consolidating and is due tomorrow', () => {
   setup(); const now = Date.now(); const q=answer(first.id,false,now);
-  engine.saveStudySettings({ topicId: q.topicId, batchId: "", newCount: 10 }, now);
+  engine.saveStudySettings({ topicId: q.topicId, batchId: "", newCount: Math.min(10, engine.studyLimit(q.topicId)) }, now);
   assert.equal(engine.reviewItems()[0].state,'due');
   const v=engine.dailyView(); assert.equal(v.next.phase,'review'); assert.equal(v.next.question.id,q.id);
   finishCurrent(Date.now(),true); assert.equal(engine.ensurePlan().tasks.filter((t)=>t.phase==='retry').length,1);

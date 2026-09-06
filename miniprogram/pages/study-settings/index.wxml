@@ -1,9 +1,20 @@
 <view class="page plan-page">
-  <view class="page-header"><text class="page-title">安排自己的学习节奏</text><text class="page-subtitle">选择学习内容和每天的新学数量。</text></view>
-  <view class="card settings-card"><text class="section-title">学习模块</text><view class="choice-grid"><button wx:for="{{modules}}" wx:key="id" class="choice {{moduleId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onModule">{{moduleId === item.id ? '✓ ' : ''}}{{item.name}}</button></view><text class="field-title">学习分类</text><view class="choice-grid"><button wx:for="{{topics}}" wx:key="id" class="choice {{topicId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onTopic">{{topicId === item.id ? '✓ ' : ''}}{{item.name}}</button></view>
-    <block wx:if="{{batches.length > 1}}"><text class="field-title">词库范围</text><view class="batch-list"><button wx:for="{{batches}}" wx:key="id" class="choice {{batchId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onBatch">{{batchId === item.id ? '✓ ' : ''}}{{item.label}}</button></view></block><text class="status-note scope-note">当前范围共 {{scopeCount}} 个知识，按原有顺序学习。</text>
+  <view class="page-header"><text class="page-title">安排自己的学习节奏</text><text class="page-subtitle">选好分类，调整每天的新学数量。</text></view>
+  <view class="card settings-card">
+    <text class="section-title">学习模块</text>
+    <view class="choice-grid"><button wx:for="{{modules}}" wx:key="id" class="choice {{moduleId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onModule" hover-class="button-pressed">{{moduleId === item.id ? '✓ ' : ''}}{{item.name}}</button></view>
+    <text class="field-title">学习分类</text>
+    <view class="choice-grid"><button wx:for="{{topics}}" wx:key="id" class="choice {{topicId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onTopic" hover-class="button-pressed">{{topicId === item.id ? '✓ ' : ''}}{{item.name}}</button></view>
+    <text class="status-note scope-note">本分类共 {{scopeCount}} 个知识，按内容顺序学习。</text>
   </view>
-  <view class="card settings-card"><text class="section-title">每天新学多少个</text><view class="count-options"><button wx:for="{{counts}}" wx:key="*this" class="choice {{newCount === item ? 'selected' : ''}}" data-count="{{item}}" bindtap="onCount">{{newCount === item ? '✓ ' : ''}}{{item}} 个</button></view><text class="status-note">到期复习最多 10 个，学后练习最多 5 题，均来自所选范围。内容不足时按实际数量安排。</text></view>
-  <text class="effective-note">{{tomorrow ? '今天已经开始学习，新设置从明天生效，今天的进度会保留。' : '保存后立即更新今天的学习安排。'}}</text>
-  <text wx:if="{{error}}" class="form-error">{{error}}</text><button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="onSave">保存学习设置</button>
+  <view class="card settings-card quantity-card">
+    <view class="quantity-heading"><text class="section-title">每天新学</text><view class="quantity-value"><text wx:if="{{newCount === scopeCount && scopeCount > 0}}" class="all-label">全部</text><text class="quantity-number">{{newCount}}</text><text>个</text></view></view>
+    <slider class="quantity-slider" min="1" max="{{sliderMax}}" step="1" value="{{sliderValue || 1}}" disabled="{{maxCount <= 1}}" activeColor="#456F59" backgroundColor="#DDE4D9" block-color="#456F59" block-size="24" bindchanging="onChanging" bindchange="onCount" aria-label="每天新学数量" />
+    <view class="slider-labels"><text>{{scopeCount ? '1 个' : '暂无内容'}}</text><text>{{scopeCount <= 200 ? '全部 ' + scopeCount + ' 个' : '200 个'}}</text></view>
+    <text class="status-note quantity-note">{{scopeCount <= 200 ? '滑到最右，选择本分类全部内容。' : '滑动选择数量，每天最多新学 200 个。'}}未学内容不足时按实际数量安排。</text>
+  </view>
+  <text class="plan-note">每天另安排最多 10 个到期复习、5 道学后练习。</text>
+  <text class="effective-note">{{tomorrow ? '新设置明天生效，今天的学习进度会保留。' : '保存后立即更新今天的学习安排。'}}</text>
+  <text wx:if="{{error}}" class="form-error">{{error}}</text>
+  <view class="save-footer"><button class="primary-button" loading="{{saving}}" disabled="{{saving || !maxCount}}" bindtap="onSave" hover-class="button-pressed">保存学习设置</button></view>
 </view>

@@ -13,6 +13,8 @@ Page({
     resultItems: [], resultTopics: [], resultFilter: "all", filteredResults: [], resultIndex: 0, resultItem: null, recommendation: null
   },
   onShow() {
+    const bar = this.getTabBar && this.getTabBar();
+    if (bar) bar.refresh();
     const request = consumeExamRequest();
     if (request) {
       if (this.data.state === "exam") {

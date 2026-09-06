@@ -1,34 +1,42 @@
 const engine = require("../../utils/learningEngine");
 const { modules, topics, knowledge, getTopicById } = require("../../data/content");
 Page({
-  data: { modules, topics: [], batches: [], counts: [5, 10, 20], moduleId: '', topicId: '', batchId: '', newCount: 10, scopeCount: 0, saving: false, error: '', tomorrow: false },
+  data: { modules, topics: [], moduleId: '', topicId: '', newCount: 10, sliderValue: 10, scopeCount: 0, maxCount: 200, sliderMax: 200, saving: false, error: '', tomorrow: false },
   onLoad() {
     const settings = engine.getStudySettings(), topic = getTopicById(settings.topicId);
-    this.setData({ moduleId: topic.moduleId, topicId: topic.id, batchId: settings.batchId, newCount: settings.newCount }); this.refresh();
+    this.setData({ moduleId: topic.moduleId, topicId: topic.id, newCount: settings.newCount }); this.refresh();
   },
   refresh() {
-    const topic = getTopicById(this.data.topicId), day = engine.dailyView();
-    this.setData({ topics: topics.filter((t) => t.moduleId === this.data.moduleId),
-      batches: [{ id: '', label: '全部' }].concat(topic.groupBatches || []),
-      scopeCount: knowledge.filter((k) => k.topicId === topic.id && (!this.data.batchId || k.batchId === this.data.batchId)).length,
-      tomorrow: day.started, error: '' });
+    const scopeCount = knowledge.filter((k) => k.topicId === this.data.topicId).length;
+    const maxCount = engine.studyLimit(this.data.topicId);
+    const newCount = Math.min(maxCount, Math.max(1, this.data.newCount));
+    this.setData({ topics: topics.filter((t) => t.moduleId === this.data.moduleId), scopeCount, maxCount,
+      sliderMax: Math.max(2, maxCount), newCount, sliderValue: newCount,
+      tomorrow: engine.dailyView().started, error: '' });
   },
   onModule(event) {
     const moduleId = event.currentTarget.dataset.id;
     if (moduleId === this.data.moduleId) return;
     const topic = topics.find((t) => t.moduleId === moduleId);
     if (!topic) return;
-    this.setData({ moduleId, topicId: topic.id, batchId: '' }); this.refresh();
+    this.setData({ moduleId, topicId: topic.id }); this.refresh();
   },
   onTopic(event) {
     const topic = topics.find((t) => t.id === event.currentTarget.dataset.id && t.moduleId === this.data.moduleId);
     if (!topic || topic.id === this.data.topicId) return;
-    this.setData({ topicId: topic.id, batchId: '' }); this.refresh();
+    this.setData({ topicId: topic.id }); this.refresh();
   },
-  onBatch(event) { this.setData({ batchId: event.currentTarget.dataset.id }); this.refresh(); },
-  onCount(event) { this.setData({ newCount: Number(event.currentTarget.dataset.count), error: '' }); },
+  onChanging(event) { this.updateCount(event, false); },
+  onCount(event) { this.updateCount(event, true); },
+  updateCount(event, settled) {
+    const value = Number(event.detail.value);
+    if (!Number.isFinite(value) || !this.data.maxCount) return;
+    const newCount = Math.min(this.data.maxCount, Math.max(1, Math.round(value)));
+    // While dragging, only refresh the label; let the native thumb follow the finger.
+    this.setData({ newCount, ...(settled ? { sliderValue: newCount } : {}), error: '' });
+  },
   onSave() {
-    if (this.data.saving) return;
+    if (this.data.saving || !this.data.maxCount) return;
     this.setData({ saving: true, error: '' });
     try {
       const result = engine.saveStudySettings(this.data);
