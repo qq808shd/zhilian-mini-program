@@ -243,3 +243,20 @@ test("V4 reordered offline results replay chronologically and reset preserves le
     const reset=await put([{id:'reset',kind:'reset',at:now+1}]); assert.equal(reset.body.learningState.records.k.wrongCount,0); assert.ok(reset.body.learningState.records.k.firstLearnedAt);
   } finally { await fixture.close(); }
 });
+
+test('daily preferences and 20-item plans sync with explicit capability, bounds and user isolation', async()=>{
+  const fixture=await createFixture();
+  try {
+    const auth=async code=>({Authorization:`Bearer ${(await request(fixture.baseUrl,'/v1/auth/wechat',{method:'POST',body:JSON.stringify({code})})).body.token}`});
+    const a=await auth('settings-a'), b=await auth('settings-b'), now=Date.now(),day=require('../../miniprogram/utils/learningModel').dayKey(now);
+    const pref={id:'prefs-1',kind:'preferences',at:now,settings:{topicId:'idiom',batchId:'photo800',newCount:20}};
+    const plan={id:'plan-20',kind:'plan',at:now+1,day,settings:{...pref.settings,id:pref.id},tasks:Array.from({length:20},(_,i)=>({id:`new:k${i}`,phase:'new',knowledgeId:`k${i}`,questionId:''}))};
+    const put=events=>request(fixture.baseUrl,'/v1/sync',{method:'PUT',headers:a,body:JSON.stringify({learningEvents:events})});
+    const saved=await put([plan,pref]);assert.equal(saved.status,200);assert.equal(saved.body.learningSettingsVersion,1);assert.equal(saved.body.learningState.studySettings.newCount,20);assert.equal(saved.body.learningState.days[day].tasks.length,20);
+    const duplicate=await put([pref,plan]);assert.deepEqual(duplicate.body.learningState,saved.body.learningState);
+    assert.equal((await request(fixture.baseUrl,'/v1/sync',{headers:b})).body.learningState.studySettings,undefined);
+    assert.equal((await put([{...pref,id:'bad',settings:{...pref.settings,newCount:100}}])).status,400);
+    assert.equal((await put([{...plan,id:'oversize',tasks:[...plan.tasks,{id:'new:extra',phase:'new',knowledgeId:'extra'}]}])).status,400);
+    assert.equal((await put([{...pref,id:'bad-batch',settings:{...pref.settings,topicId:'poetry'}}])).status,400);
+  } finally {await fixture.close();}
+});

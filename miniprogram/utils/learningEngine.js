@@ -105,21 +105,46 @@ function topicSummary(topicId, now = Date.now()) {
     consolidatingCount: items.filter((r) => ['due', 'consolidating'].includes(r.state)).length };
 }
 function makeTask(k, phase, question) { return { id: `${phase}:${k.id}`, phase, knowledgeId: k.id, questionId: question ? question.id : '' }; }
+const DEFAULT_SETTINGS = { id: 'default', topicId: 'idiom', batchId: 'original', newCount: 10 };
+function getStudySettings(now = Date.now()) {
+  const saved = getState(now).studySettings;
+  if (!saved || !content.getTopicById(saved.topicId)) return { ...DEFAULT_SETTINGS };
+  return { id: saved.id, topicId: saved.topicId, batchId: saved.batchId || '', newCount: saved.newCount };
+}
+function settingsLabel(settings) {
+  if (!settings) return '原有学习安排';
+  const topic = content.getTopicById(settings.topicId);
+  const batch = topic && (topic.groupBatches || []).find((b) => b.id === settings.batchId);
+  return topic ? topic.name + (batch ? ' · ' + batch.label : '') : '学习安排';
+}
+function hasStarted(plan) { return !!(plan && (Object.keys(plan.started).length || Object.keys(plan.completed).length)); }
+function saveStudySettings(input, now = Date.now()) {
+  const topic = content.getTopicById(input.topicId);
+  if (!topic || ![5, 10, 20].includes(input.newCount)) throw new Error('请选择学习分类和每天的新学数量');
+  const batchId = input.batchId || '';
+  if (batchId && !(topic.groupBatches || []).some((b) => b.id === batchId)) throw new Error('请选择有效的学习范围');
+  const current = getStudySettings(now);
+  if (current.topicId === topic.id && current.batchId === batchId && current.newCount === input.newCount) return { changed: false };
+  const plan = getState(now).days[model.dayKey(now)];
+  emit({ kind: 'preferences', settings: { topicId: topic.id, batchId, newCount: input.newCount } }, now);
+  ensurePlan(now);
+  return { changed: true, tomorrow: hasStarted(plan) };
+}
 function ensurePlan(now = Date.now()) {
-  const state = getState(now), day = model.dayKey(now);
-  if (state.days[day]) return state.days[day];
-  const due = reviewItems(null, now).filter((r) => r.state === 'due').slice(0, 10);
+  const state = getState(now), day = model.dayKey(now), settings = getStudySettings(now);
+  const prior = state.days[day];
+  if (prior && (hasStarted(prior) || (prior.settings && prior.settings.id === settings.id))) return prior;
+  const ordered = content.knowledge.filter((k) => k.topicId === settings.topicId && (!settings.batchId || k.batchId === settings.batchId));
+  const scope = new Set(ordered.map((k) => k.id));
+  const due = reviewItems(settings.topicId, now).filter((r) => r.state === 'due' && scope.has(r.id)).slice(0, 10);
   const dueIds = new Set(due.map((r) => r.id));
-  const recent = Object.values(state.records).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
-  const preferredTopic = recent ? recent.topicId : "idiom";
-  const ordered = content.knowledge.filter((k) => k.topicId === preferredTopic).concat(content.knowledge.filter((k) => k.topicId !== preferredTopic));
-  const fresh = ordered.filter((k) => !dueIds.has(k.id) && !(state.records[k.id] && state.records[k.id].firstLearnedAt)).slice(0, 10);
+  const fresh = ordered.filter((k) => !dueIds.has(k.id) && !(state.records[k.id] && state.records[k.id].firstLearnedAt)).slice(0, settings.newCount);
   const practiceSource = fresh.length ? fresh : ordered.filter((k) => { const r = state.records[k.id]; return r && r.firstLearnedAt && r.reviewStage < 4 && !r.lastReviewedAt && !dueIds.has(k.id); });
   const practice = practiceSource.filter((k) => (related.get(k.id) || []).length).slice(0, 5);
   const tasks = due.map((r) => makeTask(knowledgeMap.get(r.id), 'review', (related.get(r.id) || [])[0]))
     .concat(fresh.map((k) => makeTask(k, 'new')))
     .concat(practice.map((k) => makeTask(k, 'practice', related.get(k.id)[0])));
-  emit({ kind: 'plan', day, tasks }, now);
+  emit({ kind: 'plan', day, tasks, settings }, now);
   return getState(now).days[day];
 }
 function dailyView(now = Date.now()) {
@@ -131,10 +156,13 @@ function dailyView(now = Date.now()) {
   const done = completed.map((t) => ({ ...t, ...plan.completed[t.id] }));
   const answers = done.filter((t) => t.kind === 'answer' && !t.redacted);
   const state = getState(now);
+  const settings = getStudySettings(now);
   const involved = new Set(done.map((t) => t.knowledgeId));
   const tomorrow = reviewItems(null, now).filter((r) => r.nextReviewAt && r.nextReviewAt < model.afterDays(now, 2) && r.state !== 'mastered');
   const newlyMastered = new Set(state.activity.filter((a) => model.dayKey(a.at) === plan.day && a.newlyMastered && involved.has(a.knowledgeId)).map((a) => a.knowledgeId)).size;
-  return { day: plan.day, planId: plan.id, total: plan.tasks.length, completed: completed.length, remaining: remaining.length,
+  return { subject: settingsLabel(plan.settings), goal: plan.settings ? plan.settings.newCount : null,
+    settingsPending: hasStarted(plan) && (!plan.settings || plan.settings.id !== settings.id), nextSubject: settingsLabel(settings), nextGoal: settings.newCount,
+    day: plan.day, planId: plan.id, total: plan.tasks.length, completed: completed.length, remaining: remaining.length,
     progress: plan.tasks.length ? Math.round(completed.length / plan.tasks.length * 100) : 100,
     due: counts('review'), fresh: counts('new'), practice: counts('practice') + counts('retry'), minutes: Math.ceil(remaining.reduce((sum, t) => sum + (t.phase === 'new' ? 60 : 40), 0) / 60),
     started: completed.length > 0 || Object.keys(plan.started).length > 0,
@@ -218,5 +246,5 @@ function overview(now = Date.now()) {
   return { ...topicSummary(null, now), today, sevenDayAccuracy: answers.length ? Math.round(answers.filter((e) => e.correct).length / answers.length * 100) : null };
 }
 module.exports = { getState, getPendingEvents, importLegacySnapshot, applySnapshot, startLearning, learn, onAnswer, reviewItems, topicSummary,
-  ensurePlan, dailyView, beginTask, completeTask, repairDailyAnswers, getDraft, saveDraft, groupAction, navigateAction, practiceGroup,
+  getStudySettings, saveStudySettings, settingsLabel, ensurePlan, dailyView, beginTask, completeTask, repairDailyAnswers, getDraft, saveDraft, groupAction, navigateAction, practiceGroup,
   resetAnswers, recall, markGroupPracticed, recommendation, overview, model };

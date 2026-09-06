@@ -55,13 +55,13 @@ test("question counts cover empty, short and large banks; all entry points cap a
     assert.equal(new Set(chosen.map((q) => q.id)).size, chosen.length);
   }
 });
-test("home uses real records and resumes the exact reading cursor without reducing cloud progress", () => {
+test("free learning retains the exact reading cursor without reducing cloud progress", () => {
   setup(); assert.equal(learning.getLearningOverview().summary.accuracy, null);
   storage.markGroupProgress("idiom", 0, 12, 20);
   learning.saveReadingPosition("idiom", 0, 3);
   const home = page("study"); home.onShow();
-  assert.equal(home.data.resume.currentIndex, 3);
-  home.onResume(); assert.ok(navigations.at(-1).includes("learn/index?topicId=idiom&setIndex=0"));
+  home.onFreeStudy(); assert.equal(navigations.at(-1), "/pages/free-study/index");
+  assert.equal(learning.getReadingIndex("idiom", 0, 20), 3);
   const learn = page("learn"); learn.onLoad({ topicId: "idiom", setIndex: "0" });
   assert.equal(learn.data.currentIndex, 3);
   learn.onSwiperChange({ detail: { current: 2 } });

@@ -58,6 +58,10 @@ function updateRecord(previous, event) {
   return r;
 }
 function applyEvent(state, event) {
+  if (event.kind === 'preferences') {
+    state.studySettings = { ...event.settings, id: event.id, at: event.at };
+    return state;
+  }
   if (event.kind === 'reset') {
     state.resetAt = event.at;
     Object.values(state.records).forEach((r) => {
@@ -71,9 +75,12 @@ function applyEvent(state, event) {
 
   if (event.kind === 'plan') {
     const prior = state.days[event.day];
-    // Canonical earliest plan; completed work from a second offline plan is still recorded separately.
-    if (!prior || event.at < prior.createdAt || (event.at === prior.createdAt && event.id < prior.id)) {
-      state.days[event.day] = { id: event.id, day: event.day, createdAt: event.at, tasks: event.tasks.map((t) => ({ ...t })), completed: {}, started: {}, extraCompleted: prior ? prior.extraCompleted || {} : {} };
+    // Explicit preferences may replace an untouched plan; started work keeps its original schedule.
+    const untouched = prior && !Object.keys(prior.started).length && !Object.keys(prior.completed).length;
+    const currentSettingsId = state.studySettings ? state.studySettings.id : 'default';
+    const replacement = untouched && event.settings && event.settings.id === currentSettingsId && (!prior.settings || prior.settings.id !== currentSettingsId);
+    if (!prior || replacement || event.at < prior.createdAt || (event.at === prior.createdAt && event.id < prior.id)) {
+      state.days[event.day] = { id: event.id, day: event.day, createdAt: event.at, ...(event.settings ? { settings: { ...event.settings } } : {}), tasks: event.tasks.map((t) => ({ ...t })), completed: {}, started: {}, extraCompleted: prior ? prior.extraCompleted || {} : {} };
     }
     return state;
   }

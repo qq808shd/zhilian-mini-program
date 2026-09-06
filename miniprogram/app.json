@@ -20,7 +20,9 @@
     "pages/help/index",
     "pages/history/index",
     "pages/filing/index",
-    "pages/today-study/index"
+    "pages/today-study/index",
+    "pages/free-study/index",
+    "pages/study-settings/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F7F8F2",

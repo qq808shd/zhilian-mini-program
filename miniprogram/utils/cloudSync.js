@@ -180,7 +180,11 @@ async function performSync(runGeneration) {
     ? pendingAtStart.map((event) => event.eventId)
     : (result.ackedEventIds || []);
   applyCloudSnapshot(result, ackedEventIds, resetStats);
-  learningEngine.applySnapshot(result, result.ackedLearningEventIds || []);
+  const supportsSettings = result.learningSettingsVersion === 1;
+  const settingsEventIds = new Set(payload.learningEvents.filter((e) => e.kind === 'preferences' || e.settings).map((e) => e.id));
+  const learningAcks = (result.ackedLearningEventIds || []).filter((id) => supportsSettings || !settingsEventIds.has(id));
+  learningEngine.applySnapshot(result, learningAcks);
+  if (!supportsSettings && settingsEventIds.size) throw new Error("学习设置等待同步，服务更新后将自动重试");
   if (learningEngine.getPendingEvents().length && result.learningVersion !== 4) throw new Error("学习记录已保存在本机，云端需更新至 V4 后继续同步");
   return result;
 }

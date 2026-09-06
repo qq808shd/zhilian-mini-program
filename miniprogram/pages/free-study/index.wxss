@@ -1,0 +1,14 @@
+.free-page { padding-bottom:calc(32rpx + env(safe-area-inset-bottom)); }
+.free-intro { padding:32rpx; }
+.free-intro .page-title { font-size:38rpx; }
+.subject-browser { display:flex; align-items:flex-start; }
+.module-rail { width:172rpx; flex-shrink:0; position:sticky; top:16rpx; padding:0 12rpx; box-sizing:border-box; }
+button.module-choice { width:100%!important; min-height:124rpx; padding:16rpx 8rpx; margin:0 0 8rpx; background:transparent; border:1rpx solid transparent; color:var(--color-text-secondary); font-size:25rpx; line-height:1.5; }
+button.module-choice.selected { border-color:var(--color-primary-border); background:var(--color-primary-soft); color:var(--color-primary-dark); font-weight:650; }
+.module-symbol { display:block; font-size:31rpx; margin-bottom:4rpx; }
+.topic-pane { flex:1; min-width:0; padding:0 28rpx 0 8rpx; }
+.topic-pane .group-label { display:block; margin:12rpx 0 20rpx; }
+button.topic-choice { display:block; width:100%!important; padding:24rpx; margin-bottom:16rpx; text-align:left; background:var(--color-surface); border:1rpx solid var(--color-border); border-radius:var(--radius-md); }
+.topic-title { display:flex; justify-content:space-between; gap:8rpx; font-size:30rpx; font-weight:650; color:var(--color-text); }
+.topic-description, .topic-meta { display:block; margin-top:12rpx; font-size:24rpx; line-height:1.65; color:var(--color-text-secondary); }
+.topic-meta { color:var(--color-primary); }

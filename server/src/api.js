@@ -124,12 +124,22 @@ function normalizeEvents(value, limit = MAX_EVENT_BATCH) {
 function normalizeLearningEvents(value) {
   if (value === undefined) return [];
   if (!Array.isArray(value) || value.length > 200) throw apiError(400, "INVALID_PAYLOAD", "学习事件数量超出限制");
-  const kinds = ["seed", "start", "learn", "rating", "answer", "recall", "plan", "begin", "group", "reset"];
+  const kinds = ["seed", "start", "learn", "rating", "answer", "recall", "plan", "begin", "group", "reset", "preferences"];
   const phases = ["review", "new", "practice", "retry"];
   return value.map((raw) => {
     if (!raw || !kinds.includes(raw.kind)) throw apiError(400, "INVALID_PAYLOAD", "学习事件类型无效");
     const e = { id: safeId(raw.id, "learningEventId"), kind: raw.kind, at: safeInteger(raw.at, 0, Date.now() + 300000) };
     if (!e.at) throw apiError(400, "INVALID_PAYLOAD", "学习时间无效");
+    if (raw.settings !== undefined) {
+      const s = raw.settings;
+      if (!s || ![5, 10, 20].includes(s.newCount) || !['', 'original', 'photo800'].includes(s.batchId || '') || (s.batchId && s.topicId !== 'idiom')) throw apiError(400, "INVALID_PAYLOAD", "学习设置无效");
+      e.settings = { topicId: safeId(s.topicId, "topicId"), batchId: s.batchId || '', newCount: s.newCount };
+      if (raw.kind === 'plan') e.settings.id = safeId(s.id, 'settingsId');
+    }
+    if (raw.kind === 'preferences') {
+      if (!e.settings) throw apiError(400, "INVALID_PAYLOAD", "缺少学习设置");
+      return e;
+    }
     if (raw.kind === "reset") return e;
     if (raw.kind === "group") return { ...e, groupKey: safeId(raw.groupKey, "groupKey") };
     if (raw.day !== undefined) {
@@ -137,8 +147,8 @@ function normalizeLearningEvents(value) {
       e.day = raw.day;
     }
     if (raw.kind === "plan") {
-      if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 25) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
-      const limits = { review: 10, new: 10, practice: 5 }, seen = new Set();
+      if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 35) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
+      const limits = { review: 10, new: e.settings ? e.settings.newCount : 10, practice: 5 }, seen = new Set();
       e.tasks = raw.tasks.map((t) => {
         if (!t || !limits[t.phase] || seen.has(t.id)) throw apiError(400, "INVALID_PAYLOAD", "今日任务顺序或数量无效");
         limits[t.phase] -= 1; seen.add(t.id);

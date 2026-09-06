@@ -35,5 +35,5 @@ Page({
     }
   },
   onHome() { wx.switchTab({ url: '/pages/study/index' }); },
-  onFreeStudy() { wx.navigateTo({ url: '/pages/group/index?topicId=idiom' }); }
+  onFreeStudy() { wx.navigateTo({ url: '/pages/free-study/index' }); }
 });
