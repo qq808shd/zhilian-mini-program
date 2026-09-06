@@ -1,5 +1,6 @@
-const { markProfilePromptDone } = require("./account");
+const { markProfilePromptDone, needsWelcome } = require("./account");
 function finishOnboarding() {
+  if (needsWelcome()) { wx.reLaunch({ url: "/pages/welcome/index" }); return; }
   markProfilePromptDone();
   const app = getApp(), target = app.globalData.launchTarget;
   app.globalData.launchTarget = null;

@@ -52,9 +52,9 @@ function load(relative, page = false, overrides = {}) {
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
 const page = (name) => load(`pages/${name}/index.js`, true);
 
-test("first use stays local until consent; preview consent cannot authorize a draft release or changed policy", () => {
+test("entry requires consent, including legacy local users; preview cannot authorize draft release or changed policy", () => {
   setup(); assert.equal(account.needsWelcome(), true); assert.equal(account.isSyncAuthorized(), false);
-  account.chooseLocalMode(); assert.equal(account.needsWelcome(), false);
+  account.chooseLocalMode(); assert.equal(account.needsWelcome(), true);
   assert.throws(() => account.enableSyncPreference());
   account.acceptTerms(); assert.equal(account.isSyncAuthorized(), true);
   const original = { ...product };
@@ -160,7 +160,7 @@ test("nickname waits for native review; rejection does not save and approval com
 });
 
 test("skipping profile leaves it untouched and restores the original learning destination", () => {
-  setup(); app.globalData.launchTarget = { path: "pages/learn/index", query: { topicId: "idiom", setIndex: "7" } };
+  setup(); account.acceptTerms(); app.globalData.launchTarget = { path: "pages/learn/index", query: { topicId: "idiom", setIndex: "7" } };
   const p = page("profile"); p.onLoad({ onboarding: "1" });
   p.onChooseAvatar({ detail: {} }); p.onNicknameInput({ detail: { value: "未保存" } }); p.onSkip();
   assert.equal(profile.getProfile().customized, false);
@@ -168,14 +168,15 @@ test("skipping profile leaves it untouched and restores the original learning de
   assert.equal(app.globalData.launchTarget, null);
 });
 
-test("welcome never accepts unchecked terms; local choice completes onboarding without consent", () => {
+test("welcome never accepts unchecked terms and has no local bypass", () => {
   setup(); const w = page("welcome"); w.onLoad({}); w.onContinue();
   assert.equal(account.hasCurrentConsent(), false); assert.equal(navigations.length, 0);
   w.onLegal({ currentTarget: { dataset: { kind: "privacy" } } });
   assert.equal(navigations.at(-1), "/pages/legal/index?kind=privacy");
-  assert.equal(w.data.agreed, false); w.onLocal();
-  assert.equal(account.needsWelcome(), false); assert.equal(account.isSyncAuthorized(), false);
-  assert.equal(navigations.at(-1), "/pages/study/index");
+  assert.equal(w.data.agreed, false); assert.equal(w.onLocal, undefined);
+  assert.equal(account.needsWelcome(), true); assert.equal(account.isSyncAuthorized(), false);
+  require("../miniprogram/utils/accountNavigation").finishOnboarding();
+  assert.equal(navigations.at(-1), "/pages/welcome/index");
 });
 
 test("settings cancellation is inert; answer reset preserves learning and records cloud reset", () => {
@@ -231,4 +232,38 @@ test("sync details only retries an authorized session; a legacy pause returns to
   await p.onSync();
   assert.equal(calls, 1); assert.deepEqual(account.getPreferences(), saved);
   assert.equal(navigations.at(-1), "/pages/welcome/index?consent=1");
+});
+
+
+test("page guard blocks deep links, tab re-entry and stale consent while allowing legal reading", () => {
+  setup(); const { guardPage } = require("../miniprogram/utils/consentGate");
+  wx.nextTick = (fn) => fn();
+  wx.reLaunch = (o) => { navigations.push(o.url); o.complete && o.complete(); };
+  let calls = 0;
+  const p = guardPage({ onLoad() { calls++; }, onShow() { calls++; } });
+  p.route = "pages/learn/index";
+  p.onLoad({ topicId: "idiom", setIndex: "7" }); p.onShow();
+  assert.equal(calls, 0); assert.equal(navigations.at(-1), "/pages/welcome/index");
+  assert.deepEqual(app.globalData.launchTarget, { path: p.route, query: { topicId: "idiom", setIndex: "7" } });
+  const legal = guardPage({ onLoad() { calls++; } }); legal.route = "pages/legal/index";
+  legal.onLoad({ kind: "privacy" }); assert.equal(calls, 1);
+  account.acceptTerms(); p.onLoad({}); p.onShow(); assert.equal(calls, 3);
+  account.stopSyncPreference(); p.onShow(); assert.equal(calls, 3);
+  account.acceptTerms(); p.onShow(); assert.equal(calls, 4);
+  const version = product.policyVersion;
+  try { product.policyVersion += "-new"; p.onShow(); assert.equal(calls, 4); }
+  finally { product.policyVersion = version; }
+});
+
+test("app registers the consent guard for every page", () => {
+  setup(); let registered, application;
+  const file = path.resolve(__dirname, "../miniprogram/app.js");
+  const context = vm.createContext({ require: createRequire(file), Page(value) { registered = value; }, App(value) { application = value; } });
+  vm.runInContext(fs.readFileSync(file, "utf8"), context);
+  let shown = 0;
+  context.Page({ onShow() { shown++; } }); registered.route = "pages/study/index";
+  wx.nextTick = (fn) => fn(); registered.onShow();
+  assert.equal(shown, 0); assert.equal(navigations.at(-1), "/pages/welcome/index");
+  account.acceptTerms(); registered.onShow(); assert.equal(shown, 1);
+  assert.equal(typeof application.onShow, "function");
 });

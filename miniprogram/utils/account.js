@@ -17,12 +17,11 @@ function hasCurrentConsent() {
 }
 function isSyncAuthorized() { return hasCurrentConsent() && getPreferences().cloudEnabled === true; }
 function needsWelcome() {
-  const saved = getPreferences();
-  return !saved.onboardingComplete || (!!saved.acceptedAt && !hasCurrentConsent());
+  return !isSyncAuthorized();
 }
 function acceptTerms() {
   const scope = getConsentScope();
-  if (scope === "unavailable") throw new Error("协议资料尚未补齐，请先使用本机学习");
+  if (scope === "unavailable") throw new Error("服务尚未开放，请稍后再试");
   const saved = { ...getPreferences(), onboardingComplete: true, policyVersion: product.policyVersion,
     consentScope: scope, acceptedAt: Date.now(), cloudEnabled: true };
   wx.setStorageSync(KEY, saved);
