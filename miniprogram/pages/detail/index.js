@@ -1,3 +1,4 @@
+const engine = require("../../utils/learningEngine");
 const {
   questions,
   getModuleName,
@@ -25,6 +26,7 @@ Page({
     }
 
     this.setData({
+      recallMode: options.recall === "1",
       item: {
         ...item,
         moduleName: getModuleName(item.moduleId),
@@ -36,6 +38,7 @@ Page({
     });
   },
 
+  onRecall(event) { if (!this.data.recallMode || !this.data.answerVisible || this.data.recallDone) return; engine.recall(this.data.item.id, event.currentTarget.dataset.value); this.setData({ recallDone: true }); wx.showToast({ title: "已安排下次复习", icon: "none" }); },
   onToggleAnswer() {
     this.setData({
       answerVisible: !this.data.answerVisible
@@ -56,7 +59,7 @@ Page({
     }
 
     setExamRequest({
-      mode: "questionIds",
+      mode: "questionIds", direct: true,
       questionIds: relatedIds
     });
     wx.switchTab({

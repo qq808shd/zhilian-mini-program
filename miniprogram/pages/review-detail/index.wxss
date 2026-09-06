@@ -16,3 +16,7 @@
 .wrong-stem { display: block; font-size: 30rpx; line-height: 1.7; margin: 24rpx 0 16rpx; }
 .wrong-card .secondary-button { font-size: 25rpx; padding: 0 14rpx; }
 .more-button { margin-top: 24rpx; }
+.recall-row { display: block; padding: 28rpx; margin-top: 16rpx; text-align: left; line-height: 1.6; }
+.review-filters { display: flex; gap: 12rpx; }
+.review-filters button { flex: 1; width: auto; padding: 26rpx 8rpx; font-size: 26rpx; border-radius: 14rpx; background: var(--color-surface); border: 1rpx solid var(--color-border); }
+.review-filters .chosen { background: var(--color-primary-soft); color: var(--color-primary); border-color: var(--color-primary); }

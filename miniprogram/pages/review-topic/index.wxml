@@ -1,4 +1,4 @@
 <view class="page" wx:if="{{module}}">
   <view class="page-header"><text class="crumb">复习 / {{module.name}}</text><text class="page-title topic-title">找到需要巩固的专项</text><text class="page-subtitle">待复习较多的分类优先，按自己的节奏逐个巩固。</text></view>
-  <view class="stack"><ui-entry wx:for="{{topics}}" wx:key="id" title="{{item.name}}" meta="{{item.attempts ? '累计正确率 ' + item.accuracy + '% · 作答 ' + item.attempts + ' 次' : '尚未练习'}}" badge="{{item.activeWrongCount ? item.activeWrongCount + ' 道待复习' : item.masteredCount ? item.masteredCount + ' 道错题已巩固' : '当前没有错题'}}" warning="{{item.activeWrongCount > 0}}" data-id="{{item.id}}" bind:activate="onOpenTopic" /></view>
+  <view class="stack"><ui-entry wx:for="{{topics}}" wx:key="id" title="{{item.name}}" meta="已掌握 {{item.masteredCount}} · 到期 {{item.dueCount}} 项" badge="{{item.consolidatingCount}} 项待巩固" warning="{{item.activeWrongCount > 0}}" data-id="{{item.id}}" bind:activate="onOpenTopic" /></view>
 </view>

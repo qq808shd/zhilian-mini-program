@@ -308,3 +308,7 @@
 .finish-links .text-button { min-height: 72rpx; }
 .learn-header, .learn-footer, .progress-track { flex-shrink: 0; }
 @media (max-height: 500px) { .learn-page { height: auto; overflow: visible; } .learning-swiper { flex: none; height: 600rpx; } }
+
+.rating-row { display: flex; gap: 10rpx; margin-top: 16rpx; }
+.rating-row button { flex: 1; width: auto; min-height: 88rpx; padding: 24rpx 4rpx; border: 2rpx solid var(--color-border); background: white; font-size: 25rpx; border-radius: 12rpx; }
+.rating-row button.selected { background: var(--color-primary-soft); border-color: var(--color-primary); color: var(--color-primary); }

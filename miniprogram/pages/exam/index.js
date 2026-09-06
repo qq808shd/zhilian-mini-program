@@ -1,3 +1,4 @@
+const engine = require("../../utils/learningEngine");
 const { modules, questions, getTopicsByModule, getModuleById, getTopicById, getModuleName, getTopicName, getKnowledgeById } = require("../../data/content");
 const { recordQuestionResult, getActiveWrongQuestionIds, consumeExamRequest } = require("../../utils/storage");
 const { getQuestionCountOptions, selectQuestions, formatDuration } = require("../../utils/examSession");
@@ -34,15 +35,18 @@ Page({
     this.clock = null;
   },
   applyRequest(request) {
+    this.groupKey = request.groupKey || "";
     if (request.mode === "topic") { this.configureTopic(getTopicById(request.topicId)); return; }
-    const ids = request.mode === "wrong" ? getActiveWrongQuestionIds(request.topicId ? { topicId: request.topicId } : {}) : request.questionIds || [];
+    const ids = request.mode === "wrong" ? engine.reviewItems(request.topicId).filter((r) => ["due", "consolidating"].includes(r.state)).map((r) => r.questionId).filter(Boolean) : request.questionIds || [];
     const idSet = new Set(ids);
     const source = questions.filter((question) => idSet.has(question.id));
     if (!source.length) { wx.showToast({ title: "目前没有可练习的题目", icon: "none" }); return; }
     this.customSource = source;
     this.configureSetup(source, { sourceKind: request.mode, sessionMode: "practice", sessionTitle: request.title || (request.mode === "wrong" ? "错题巩固" : "关联知识练习"), selectedTopic: getTopicById(source[0].topicId), selectedModule: getModuleById(source[0].moduleId) });
+    if (request.direct) { this.setData({ sessionMode: request.sessionMode || "practice" }); this.startWithQuestions(selectQuestions(source, request.count || 10)); }
   },
   onModuleTap(event) {
+    this.groupKey = "";
     const selectedModule = getModuleById(event.currentTarget.dataset.id);
     if (!selectedModule) return;
     this.customSource = null;
@@ -50,6 +54,7 @@ Page({
   },
   onTopicTap(event) { this.configureTopic(getTopicById(event.currentTarget.dataset.id)); },
   configureTopic(topic) {
+    this.groupKey = "";
     if (!topic) return;
     this.customSource = null;
     this.configureSetup(questions.filter((q) => q.topicId === topic.id), { selectedTopic: topic, selectedModule: getModuleById(topic.moduleId), sourceKind: "topic", sessionTitle: topic.name, sessionMode: "practice" });
@@ -146,7 +151,8 @@ Page({
     this.setData({ state: "result", sheetOpen: false, resultItems, resultTopics, resultFilter: "all", filteredResults: resultItems, resultIndex: 0, resultItem: resultItems[0],
       elapsed: formatDuration(Math.floor(this.elapsedMs / 1000)),
       resultSummary: { correctCount, wrongCount: resultItems.length - correctCount, totalCount: resultItems.length, accuracy: Math.round(correctCount / resultItems.length * 100) },
-      recommendation: weak ? { topicId: weak.id, title: `下一步，巩固${weak.name}`, description: `本次答对 ${weak.correct} / ${weak.total} 题。先理解错因，再练一次。` } : { topicId: resultTopics[0].id, title: "这一轮表现不错", description: "本次全部答对。可以继续学习这个专项，扩大积累。" } });
+      recommendation: engine.recommendation(resultItems) });
+    engine.markGroupPracticed(this.groupKey);
     wx.pageScrollTo({ scrollTop: 0, duration: 0 });
   },
   onResultFilter(event) {
@@ -161,7 +167,9 @@ Page({
   },
   onRetryWrong() {
     this.customSource = this.data.resultItems.filter((item) => !item.isCorrect);
-    this.configureSetup(this.customSource, { sourceKind: "wrong", sessionMode: "practice", sessionTitle: "本次错题再练" });
+    this.groupKey = "";
+    this.setData({ sourceKind: "wrong", sessionMode: "practice", sessionTitle: "本次错题再练" });
+    this.startWithQuestions(this.customSource);
   },
   onBackToSetup() { this.configureTopic(this.data.selectedTopic); },
   onStudyTopic() { wx.navigateTo({ url: `/pages/group/index?topicId=${this.data.recommendation.topicId}` }); },

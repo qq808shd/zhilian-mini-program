@@ -56,6 +56,7 @@
     </view>
   </view>
 
+  <view wx:if="{{recallMode && answerVisible}}" class="section"><text class="status-note">{{recallDone ? '结果已保存，下次按计划继续复习。' : '这次回忆得怎么样？'}}</text><view wx:if="{{!recallDone}}" class="actions-row"><button class="secondary-button" data-value="none" bindtap="onRecall">不会</button><button class="secondary-button" data-value="fuzzy" bindtap="onRecall">模糊</button><button class="primary-button" data-value="remembered" bindtap="onRecall">记住了</button></view></view>
   <button
     class="primary-button related-button"
     hover-class="button-pressed"

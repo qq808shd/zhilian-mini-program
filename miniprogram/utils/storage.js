@@ -190,13 +190,46 @@ function getQuestionStats() {
   return wx.getStorageSync(STATS_KEY) || {};
 }
 
-function recordQuestionResult(questionId, moduleId, topicId, isCorrect) {
-  const answeredAt = Date.now();
+function recoverAnswerWrites() {
+  const key = "zhilian_answer_operations_v4";
+  const journal = wx.getStorageSync(key) || {};
+  Object.keys(journal).forEach((id) => {
+    const entry = journal[id];
+    if (entry.done || !entry.event) return;
+    const stats = wx.getStorageSync(STATS_KEY) || {};
+    stats[entry.event.questionId] = entry.next;
+    wx.setStorageSync(STATS_KEY, stats);
+    if (!getPendingAnswerEvents().some((e) => e.eventId === id)) enqueueAnswerEvent(entry.event);
+    if (!entry.skipLearning) require("./learningEngine").onAnswer(entry.event);
+    journal[id] = { done: true, at: entry.event.answeredAt };
+    wx.setStorageSync(key, journal);
+  });
+}
+
+function recordQuestionResult(questionId, moduleId, topicId, isCorrect, options = {}) {
+  recoverAnswerWrites();
+  if (require("../data/content").getQuestionById(questionId)) require("./learningEngine").getState();
+  const answeredAt = options.answeredAt || Date.now();
   const stats = getQuestionStats();
   const event = createAnswerEvent(questionId, moduleId, topicId, isCorrect, answeredAt);
-  const next = applyAnswerEvent(stats, event);
+  if (options.eventId) event.eventId = options.eventId;
+  const journalKey = "zhilian_answer_operations_v4";
+  const journal = wx.getStorageSync(journalKey) || {};
+  const saved = journal[event.eventId];
+  if ((saved && saved.done) || (options.eventId && getPendingAnswerEvents().some((e) => e.eventId === event.eventId))) return stats[questionId];
+  // Save the exact before/after result before either legacy write. A replay installs it once.
+  const next = saved ? saved.next : applyAnswerEvent(stats, event);
+  journal[event.eventId] = { next, event, skipLearning: !!options.skipLearning, done: false };
+  wx.setStorageSync(journalKey, journal);
+  stats[questionId] = next;
   wx.setStorageSync(STATS_KEY, stats);
-  enqueueAnswerEvent(event);
+  if (!getPendingAnswerEvents().some((e) => e.eventId === event.eventId)) enqueueAnswerEvent(event);
+  if (!options.skipLearning) require("./learningEngine").onAnswer(event);
+  journal[event.eventId] = { done: true, at: answeredAt };
+  const cutoff = Date.now() - 32 * 86400000;
+  const retained = new Set(require("./learningEngine").getPendingEvents().map((e) => e.id));
+  Object.keys(journal).forEach((id) => { if (journal[id].done && journal[id].at < cutoff && !retained.has(id)) delete journal[id]; });
+  wx.setStorageSync(journalKey, journal);
   notifyCloudSync();
   return next;
 }
@@ -240,7 +273,7 @@ function consumeExamRequest() {
   return request;
 }
 function getStatsResetPending() { return Boolean(wx.getStorageSync(CLOUD_STATS_RESET_KEY)); }
-function isCloudSyncDirty() { return Boolean(wx.getStorageSync(CLOUD_SYNC_DIRTY_KEY)); }
+function isCloudSyncDirty() { return Boolean(wx.getStorageSync(CLOUD_SYNC_DIRTY_KEY)) || require("./learningEngine").getPendingEvents().length > 0; }
 
 function mergeProgress(remoteProgress, localProgress) {
   const merged = { ...(remoteProgress || {}) };
@@ -281,6 +314,8 @@ function applyCloudSnapshot(snapshot, ackedEventIds = [], resetAcknowledged = fa
 }
 
 function clearQuestionStats() {
+  recoverAnswerWrites();
+  require("./learningEngine").resetAnswers();
   wx.removeStorageSync(STATS_KEY);
   wx.removeStorageSync(PENDING_ANSWER_EVENTS_KEY);
   wx.setStorageSync(CLOUD_STATS_RESET_KEY, true);
@@ -288,6 +323,7 @@ function clearQuestionStats() {
 }
 
 module.exports = {
+  notifyCloudSync, recoverAnswerWrites,
   getQuestionStats, recordQuestionResult, getActiveWrongQuestionIds,
   getStudyProgress, getGroupProgress, markGroupProgress,
   setExamRequest, consumeExamRequest, clearQuestionStats,

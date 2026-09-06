@@ -10,7 +10,7 @@ function getSyncView() {
   const authorized = isSyncAuthorized();
   const status = getApp().globalData.cloudSync || {};
   const dirty = isCloudSyncDirty();
-  const pendingCount = getPendingAnswerEvents().length;
+  const pendingCount = getPendingAnswerEvents().length + require("./learningEngine").getPendingEvents().length;
   let title = "学习记录，仅保存在本机";
   let description = "阅读并同意协议后，学习记录会自动保存到云端。";
   let state = "local";
@@ -20,7 +20,7 @@ function getSyncView() {
     state = status.state || "syncing";
     if (!isCloudEnabled()) { title = "同步服务尚未配置"; description = "学习记录保留在本机。"; }
     else if (state === "syncing") { title = "正在同步学习记录"; description = "可以继续学习，本机记录会保留。"; }
-    else if (state === "offline") { title = "同步暂未完成"; description = "本机记录已保留，恢复网络后自动重试。"; }
+    else if (state === "offline") { title = "同步暂未完成"; description = status.lastError && status.lastError.includes("V4") ? status.lastError : "本机记录已保留，恢复网络后自动重试。"; }
     else if (dirty) { title = "有学习记录等待同步"; description = "记录已暂存本机，将在后台自动上传。"; }
     else if (state === "ready") { title = "学习记录已同步"; description = "其他设备使用同一微信可继续学习。"; }
     else { title = "等待同步学习记录"; description = "学习记录已保留，将在后台自动同步。"; }

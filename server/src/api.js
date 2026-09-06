@@ -53,7 +53,7 @@ function readJson(request) {
 
 function safeId(value, fieldName) {
   const normalized = String(value || "");
-  if (!ID_PATTERN.test(normalized)) throw apiError(400, "INVALID_PAYLOAD", `${fieldName} 格式不正确`);
+  if (!ID_PATTERN.test(normalized) || ["__proto__", "constructor", "prototype"].includes(normalized)) throw apiError(400, "INVALID_PAYLOAD", `${fieldName} 格式不正确`);
   return normalized;
 }
 
@@ -121,6 +121,62 @@ function normalizeEvents(value, limit = MAX_EVENT_BATCH) {
   }));
 }
 
+function normalizeLearningEvents(value) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > 200) throw apiError(400, "INVALID_PAYLOAD", "学习事件数量超出限制");
+  const kinds = ["seed", "start", "learn", "rating", "answer", "recall", "plan", "begin", "group", "reset"];
+  const phases = ["review", "new", "practice", "retry"];
+  return value.map((raw) => {
+    if (!raw || !kinds.includes(raw.kind)) throw apiError(400, "INVALID_PAYLOAD", "学习事件类型无效");
+    const e = { id: safeId(raw.id, "learningEventId"), kind: raw.kind, at: safeInteger(raw.at, 0, Date.now() + 300000) };
+    if (!e.at) throw apiError(400, "INVALID_PAYLOAD", "学习时间无效");
+    if (raw.kind === "reset") return e;
+    if (raw.kind === "group") return { ...e, groupKey: safeId(raw.groupKey, "groupKey") };
+    if (raw.day !== undefined) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.day)) throw apiError(400, "INVALID_PAYLOAD", "学习日期无效");
+      e.day = raw.day;
+    }
+    if (raw.kind === "plan") {
+      if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 25) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
+      const limits = { review: 10, new: 10, practice: 5 }, seen = new Set();
+      e.tasks = raw.tasks.map((t) => {
+        if (!t || !limits[t.phase] || seen.has(t.id)) throw apiError(400, "INVALID_PAYLOAD", "今日任务顺序或数量无效");
+        limits[t.phase] -= 1; seen.add(t.id);
+        return { id: safeId(t.id, "taskId"), phase: t.phase, knowledgeId: safeId(t.knowledgeId, "knowledgeId"), questionId: t.questionId ? safeId(t.questionId, "questionId") : "" };
+      });
+      const order = { review: 0, new: 1, practice: 2 };
+      if (e.tasks.some((t, i) => i && order[t.phase] < order[e.tasks[i - 1].phase])) throw apiError(400, "INVALID_PAYLOAD", "今日任务阶段顺序无效");
+      return e;
+    }
+    if (raw.taskId) {
+      e.taskId = safeId(raw.taskId, "taskId"); e.planId = safeId(raw.planId, "planId");
+      if (!e.day) throw apiError(400, "INVALID_PAYLOAD", "缺少任务日期");
+    }
+    if (raw.kind === "begin") {
+      if (!e.taskId) throw apiError(400, "INVALID_PAYLOAD", "缺少任务");
+      return e;
+    }
+    e.knowledgeId = safeId(raw.knowledgeId, "knowledgeId");
+    e.moduleId = safeId(raw.moduleId, "moduleId"); e.topicId = safeId(raw.topicId, "topicId");
+    if (raw.kind === "seed") { e.learned = raw.learned === true; e.wrong = safeInteger(raw.wrong, 0, 100000000); return e; }
+    if (raw.questionId) e.questionId = safeId(raw.questionId, "questionId");
+    if (["answer", "recall"].includes(raw.kind)) {
+      if (typeof raw.correct !== "boolean") throw apiError(400, "INVALID_PAYLOAD", "缺少检验结果");
+      e.correct = raw.correct;
+    }
+    if (raw.rating) {
+      if (!["none", "fuzzy", "remembered"].includes(raw.rating)) throw apiError(400, "INVALID_PAYLOAD", "自评无效");
+      e.rating = raw.rating;
+    }
+    if (raw.phase) {
+      if (!phases.includes(raw.phase)) throw apiError(400, "INVALID_PAYLOAD", "阶段无效");
+      e.phase = raw.phase;
+    }
+    e.retry = raw.phase === "retry" && !!e.taskId;
+    return e;
+  });
+}
+
 function normalizeSyncPayload(body) {
   const bootstrap = body.bootstrap && typeof body.bootstrap === "object" ? {
     stats: normalizeStats(body.bootstrap.stats),
@@ -129,6 +185,7 @@ function normalizeSyncPayload(body) {
   } : null;
   return {
     bootstrap,
+    learningEvents: normalizeLearningEvents(body.learningEvents),
     events: normalizeEvents(body.events),
     progress: normalizeProgress(body.progress),
     resetStats: Boolean(body.resetStats)
@@ -175,7 +232,7 @@ function createApiHandler({ config, database, exchangeCode = exchangeWechatCode 
 
     try {
       if (request.method === "GET" && requestUrl.pathname === "/health") {
-        return sendJson(response, 200, { ok: true, service: "zhilian-sync-api", serverTime: Date.now() });
+        return sendJson(response, 200, { ok: true, learningVersion: 4, service: "zhilian-sync-api", serverTime: Date.now() });
       }
 
       if (request.method === "POST" && requestUrl.pathname === "/v1/auth/wechat") {

@@ -1,1 +1,4 @@
 
+
+.learning-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 32rpx; padding: 32rpx; text-align: center; }
+.account-total { text-align: center; margin-top: 16rpx; }

@@ -1,4 +1,5 @@
 const {
+  knowledge,
   getTopicById,
   getModuleById,
   getKnowledgeByTopic
@@ -40,15 +41,10 @@ Page({
   },
 
   onLoad(options) {
-    const topic = getTopicById(options.topicId);
-    if (!topic || !topic.catalogEnabled) {
-      wx.showToast({ title: "该分类暂不支持全部查看", icon: "none" });
-      wx.navigateBack();
-      return;
-    }
-
-    const module = getModuleById(topic.moduleId);
-    this.allItems = getKnowledgeByTopic(topic.id).map((item, index) => ({
+    const topic = options.topicId ? getTopicById(options.topicId) : { id: "", name: "全部知识", moduleId: "" };
+    if (!topic) { wx.navigateBack(); return; }
+    const module = getModuleById(topic.moduleId) || { name: "快速查询" };
+    this.allItems = (topic.id ? getKnowledgeByTopic(topic.id) : knowledge).map((item, index) => ({
       id: item.id,
       title: item.title,
       summary: item.summary,
@@ -61,7 +57,7 @@ Page({
     this.expandedIds = new Set();
     this.collapsedIds = new Set();
     this.filteredItems = [];
-    wx.setNavigationBarTitle({ title: `${topic.name}词库` });
+    wx.setNavigationBarTitle({ title: `${topic.name}查询` });
     this.setData({ topic, module, total: this.allItems.length });
     this.applyFilter("");
   },

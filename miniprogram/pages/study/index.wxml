@@ -1,23 +1,21 @@
 <view class="page study-page">
   <view class="home-heading"><text class="kicker">知练 · 每一次积累都有意义</text><text class="page-title">{{greeting}}，慢慢学，稳稳记。</text></view>
   <view class="continue-card">
-    <view class="continue-top"><text class="pill">{{resume ? '接着上次学' : '从一组高频词开始'}}</text><text class="continue-decoration" aria-hidden="true">知 / 练</text></view>
-    <text class="continue-title">{{resume ? resume.topicName + ' · ' + resume.setName : '今天，积累一点新知识'}}</text>
-    <text class="continue-copy">{{resume ? '上次读到「' + resume.title + '」' : '先回忆，再看解析。学完一组，练一练。'}}</text>
-    <view wx:if="{{resume}}" class="continue-progress"><progress-meter value="{{resume.progress}}" label="第 {{resume.currentIndex + 1}} 条，共 {{resume.count}} 条" /><text>第 {{resume.currentIndex + 1}} / {{resume.count}} 条</text></view>
-    <button class="primary-button" hover-class="button-pressed" bindtap="onResume">{{resume ? '继续学习' : '开始学习成语'}} <text class="cta-arrow">→</text></button>
+    <view class="continue-top"><text class="pill">今日学习</text><text class="continue-decoration" aria-hidden="true">知 / 练</text></view>
+    <text class="continue-title">{{daily.remaining ? '今天还有 ' + daily.remaining + ' 项' : daily.total ? '今日学习已完成' : '今天暂无到期任务'}}</text>
+    <text class="continue-copy">{{daily.remaining ? '预计约 ' + daily.minutes + ' 分钟 · 先复习，再学新知' : '可以看看今日总结，或继续自由学习。'}}</text>
+    <view class="daily-counts"><text>待复习 {{daily.due}}</text><text>新学 {{daily.fresh}}</text><text>巩固 {{daily.practice}}</text></view>
+    <view class="continue-progress"><progress-meter value="{{daily.progress || 0}}" label="今日学习进度" /><text>已完成 {{daily.completed}} 项</text></view>
+    <button class="primary-button" hover-class="button-pressed" bindtap="onToday">{{daily.button}} <text class="cta-arrow">→</text></button>
   </view>
-  <view class="quick-actions">
-    <button hover-class="button-pressed" bindtap="onPractice"><text class="quick-title">开始练习 <text>↗</text></text><text class="quick-note">专项练习 / 自我测验</text></button>
-    <button hover-class="button-pressed" bindtap="onReview"><text class="quick-title">错题复习 <text>↗</text></text><text class="quick-note">{{summary.activeWrongCount ? summary.activeWrongCount + ' 道等待巩固' : '查看积累与学习反馈'}}</text></button>
+  <view wx:if="{{weakTopic}}" class="weak-note"><text class="status-note">优先巩固 · {{weakTopic.name}}有 {{weakTopic.activeWrongCount}} 项待巩固</text><button class="text-button" bindtap="onWeakTopic">去复习 ›</button></view>
+  <view wx:if="{{recent.length}}" class="section">
+    <view class="section-heading"><text class="section-title">最近学习</text><text class="section-note">下一步已安排</text></view>
+    <button wx:for="{{recent}}" wx:key="key" class="recent-row" data-index="{{index}}" bindtap="onOpenRecent" hover-class="button-pressed"><view><text>{{item.topicName}} · {{item.setName}}</text><text class="quick-note">{{item.actionLabel}} · {{item.title}}</text></view><text>›</text></button>
   </view>
-  <view wx:if="{{weakTopic}}" class="weak-note"><text class="status-note">优先巩固 · {{weakTopic.name}}有 {{weakTopic.activeWrongCount}} 道待复习</text><button class="text-button" bindtap="onWeakTopic">去复习 ›</button></view>
   <view class="section">
-    <view class="section-heading"><text class="section-title">按专项积累</text><text class="section-note">4 个学习模块</text></view>
+    <view class="section-heading"><text class="section-title">自由学习</text><text class="section-note">4 个学习模块</text></view>
     <view class="stack"><ui-entry wx:for="{{moduleCards}}" wx:key="id" title="{{item.name}}" symbol="{{item.symbol}}" description="{{item.description}}" meta="{{item.meta}}" data-id="{{item.id}}" bind:activate="onOpenModule" /></view>
   </view>
-  <view wx:if="{{recent.length}}" class="section">
-    <view class="section-heading"><text class="section-title">最近学习</text><text class="section-note">随时接着读</text></view>
-    <button wx:for="{{recent}}" wx:key="key" class="recent-row" data-index="{{index}}" bindtap="onOpenRecent" hover-class="button-pressed"><view><text>{{item.topicName}} · {{item.setName}}</text><text class="quick-note">{{item.title}} · 第 {{item.currentIndex + 1}} / {{item.count}} 条</text></view><text>›</text></button>
-  </view>
+  <button class="secondary-button section" bindtap="onSearch">搜索知识 · 快速查询</button>
 </view>

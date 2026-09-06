@@ -3,6 +3,8 @@ const { needsWelcome } = require("./utils/account");
 
 App({
   onLaunch() {
+    require("./utils/storage").recoverAnswerWrites();
+    require("./utils/learningEngine").repairDailyAnswers();
     initializeCloudSync();
   },
   onShow(options = {}) {

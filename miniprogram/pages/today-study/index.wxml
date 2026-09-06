@@ -1,0 +1,40 @@
+<view class="page daily-page">
+  <block wx:if="{{task}}">
+    <view class="page-header"><text class="kicker">{{phaseLabel}}</text><text class="page-title">{{checkpoint ? '学过了，练一练' : task.phase === 'new' ? '先回忆，再看解析' : task.phase === 'retry' ? '再试一次，记得更牢' : '检验一下你的记忆'}}</text><text class="page-subtitle">已完成 {{daily.completed}} 项 · 还剩 {{daily.remaining}} 项</text></view>
+    <progress-meter value="{{daily.progress}}" label="今日进度" />
+    <view wx:if="{{checkpoint}}" class="card daily-card">
+      <text class="daily-title">本轮 {{daily.summary.newCount}} 个知识点已学习</text><text class="page-subtitle">接下来用少量题目检验记忆。每题确认后可以查看解析，答错的内容会在本轮稍后再练一次。</text>
+      <button class="primary-button" bindtap="onBeginPractice">开始巩固</button>
+      <button class="text-button" bindtap="onHome">稍后再练 · 进度已保存</button>
+    </view>
+    <block wx:else>
+      <view class="card daily-card">
+        <text class="pill">{{task.question ? '选择答案后确认' : task.phase === 'new' ? '主动回忆' : '回忆检验'}}</text>
+        <text class="daily-title">{{task.question ? task.question.stem : task.knowledge.title}}</text>
+        <block wx:if="{{task.question}}">
+          <button wx:for="{{task.question.options}}" wx:key="id" class="daily-option {{selected === item.id ? 'selected' : ''}} {{feedback && item.id === task.question.answer ? 'correct' : ''}}" data-id="{{item.id}}" bindtap="onSelect"><text class="option-id">{{item.id}}</text><text>{{item.text}}</text><text wx:if="{{selected === item.id}}" class="option-check">已选</text></button>
+          <view wx:if="{{feedback}}" class="daily-feedback {{feedback.correct ? '' : 'incorrect'}}"><text class="section-title">{{feedback.correct ? '回答正确' : '这次没有答对'}}</text><text class="page-subtitle">正确答案：{{feedback.answer}}</text><text class="daily-body">{{feedback.explanation}}</text><text class="status-note">{{task.phase === 'retry' ? '本轮到这里即可，后续按日期继续复习。' : feedback.correct ? '已保存，后续会按计划检验记忆。' : '已加入本轮稍后再练。'}}</text></view>
+        </block>
+        <block wx:else>
+          <text wx:if="{{!revealed}}" class="page-subtitle">你还记得它的含义、用法或推导过程吗？先在心里说一遍。</text>
+          <view wx:if="{{revealed}}" class="daily-answer">
+            <math-formula wx:if="{{task.knowledge.formulaLines.length}}" lines="{{task.knowledge.formulaLines}}" note="{{task.knowledge.formulaNote}}" spoken="{{task.knowledge.summary}}" size="{{task.knowledge.formulaSize}}" />
+            <text class="daily-body">{{task.knowledge.summary}}</text><text wx:if="{{task.knowledge.detail !== task.knowledge.summary}}" class="daily-body">{{task.knowledge.detail}}</text><text wx:if="{{task.knowledge.memory}}" class="inset-note daily-body">{{task.knowledge.memory}}</text>
+            <text class="status-note">{{task.phase === 'new' ? '回忆得怎么样？自评可跳过。' : '请选择这次回忆结果，用来安排下次复习。'}}</text>
+            <view class="rating-row"><button class="{{rating === 'none' ? 'selected' : ''}}" data-value="none" bindtap="onRate">不会</button><button class="{{rating === 'fuzzy' ? 'selected' : ''}}" data-value="fuzzy" bindtap="onRate">有点模糊</button><button class="{{rating === 'remembered' ? 'selected' : ''}}" data-value="remembered" bindtap="onRate">记住了</button></view>
+          </view>
+        </block>
+      </view>
+      <button class="primary-button daily-next" disabled="{{task.question && !selected}}" bindtap="onContinue">{{feedback ? '继续下一项' : task.question ? '确认答案' : revealed ? '完成这一项' : '查看解析'}}</button>
+      <text class="status-note center-note">进度自动保存，可以随时离开</text>
+    </block>
+  </block>
+  <block wx:else>
+    <view class="page-header"><text class="kicker">{{daily.day}} · 今日总结</text><text class="page-title">{{daily.total ? '今天的学习完成了' : '今天暂无到期任务'}}</text><text class="page-subtitle">{{daily.total ? '每次回忆都算数，记忆需要下一次检验。' : '可以自由学习；新的到期内容会自动出现在这里。'}}</text></view>
+    <view class="card daily-card"><view class="summary-grid">
+      <view><text class="metric-value">{{daily.summary.newCount}}</text><text class="metric-label">新学知识</text></view><view><text class="metric-value">{{daily.summary.reviewCount}}</text><text class="metric-label">到期复习</text></view><view><text class="metric-value">{{daily.summary.exerciseCount}}</text><text class="metric-label">练习题数</text></view><view><text class="metric-value">{{daily.summary.accuracy === null ? '—' : daily.summary.accuracy + '%'}}</text><text class="metric-label">本轮正确率</text></view><view><text class="metric-value">{{daily.summary.newlyMastered}}</text><text class="metric-label">新增掌握</text></view><view><text class="metric-value">{{daily.summary.weakCount}}</text><text class="metric-label">仍需巩固</text></view>
+    </view></view>
+    <view class="inset-note section"><text class="section-title">{{daily.summary.tomorrowCount ? '明天继续巩固' : '接下来，按计划复习'}}</text><text class="page-subtitle">{{daily.summary.tomorrowCount ? '截至明天有 ' + daily.summary.tomorrowCount + ' 项需要回顾，优先安排到期内容。' : '当前没有明日到期项，后续复习会自动安排。'}}</text><text class="status-note">{{daily.summary.tomorrowTitles}}</text></view>
+    <view class="stack section"><button class="primary-button" bindtap="onHome">返回首页</button><button class="secondary-button" bindtap="onFreeStudy">自由学习</button></view>
+  </block>
+</view>

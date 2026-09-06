@@ -1,0 +1,17 @@
+.daily-page .page-title { margin-top: 16rpx; font-size: 42rpx; }
+.daily-card { padding: 32rpx; margin-top: 28rpx; }
+.daily-title { display: block; margin: 24rpx 0 32rpx; font-size: 38rpx; font-weight: 650; line-height: 1.65; }
+.daily-body { display: block; white-space: pre-wrap; font-size: 29rpx; line-height: 1.85; margin: 24rpx 0; }
+button.daily-option { width: 100%; display: flex; gap: 16rpx; align-items: flex-start; padding: 24rpx; margin-top: 16rpx; border: 2rpx solid var(--color-border); border-radius: 16rpx; background: var(--color-surface); text-align: left; font-size: 28rpx; line-height: 1.65; }
+button.daily-option.selected, .rating-row button.selected { border-color: var(--color-primary); background: var(--color-primary-soft); color: var(--color-primary-dark); }
+button.daily-option.correct { border-color: var(--color-success); }
+.option-id { font-weight: 700; flex-shrink: 0; }
+.option-check { margin-left: auto; flex-shrink: 0; font-size: 22rpx; }
+.daily-feedback { padding: 24rpx; margin-top: 32rpx; background: var(--color-success-soft); border-radius: 16rpx; }
+.daily-feedback.incorrect { background: var(--color-danger-soft); }
+.rating-row { display: flex; gap: 12rpx; margin: 24rpx 0 8rpx; }
+.rating-row button { flex: 1; width: auto; padding: 24rpx 4rpx; min-height: 88rpx; border: 2rpx solid var(--color-border); background: var(--color-surface); font-size: 25rpx; border-radius: 12rpx; }
+.daily-next { margin-top: 32rpx; }
+.center-note { text-align: center; margin-top: 20rpx; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40rpx 24rpx; text-align: center; padding: 16rpx 0; }
+.daily-card > .primary-button { margin-top: 32rpx; }

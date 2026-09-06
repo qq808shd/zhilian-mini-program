@@ -22,6 +22,9 @@ global.wx = {
       data = { initialized: false, revision: 0, stats: {}, progress: {} };
     } else if (path === "/v1/sync" && options.method === "PUT") {
       data = {
+        learningVersion: 4,
+        learningState: require("../miniprogram/utils/learningModel").replay(options.data.learningEvents || []),
+        ackedLearningEventIds: (options.data.learningEvents || []).map((e) => e.id),
         initialized: true,
         revision: 1,
         stats: options.data.bootstrap.stats,

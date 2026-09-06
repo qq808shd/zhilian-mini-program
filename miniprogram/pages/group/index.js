@@ -1,3 +1,4 @@
+const engine = require("../../utils/learningEngine");
 const { getTopicById, getModuleById, getSetsForTopic } = require("../../data/content");
 const { getGroupProgress, setExamRequest } = require("../../utils/storage");
 
@@ -11,23 +12,27 @@ Page({
     const module = getModuleById(topic.moduleId);
     const sets = getSetsForTopic(topicId).map((set) => {
       const { items, ...setSummary } = set;
+      const action = engine.groupAction(topicId, set.index);
       const progress = getGroupProgress(topicId, set.index);
-      const learnedCount = progress ? Math.min((progress.maxIndex || 0) + 1, set.count) : 0;
+      const learnedCount = action.learnedCount;
       const completed = Boolean(progress && progress.total === set.count && progress.maxIndex >= set.count - 1);
       return {
-        ...setSummary,
+        ...setSummary, preview: items.slice(0, 3).map((i) => i.title).join("、"),
         learnedCount,
         progress: Math.round(learnedCount / set.count * 100),
-        status: completed ? "已浏览 · 可重新学习" : learnedCount ? `已浏览 ${learnedCount} 条 · 继续学习` : "开始学习"
+        status: action.label, action
       };
     });
     wx.setNavigationBarTitle({ title: topic.name });
-    this.setData({ topic, module, sets, total: sets.reduce((sum, set) => sum + set.count, 0) });
+    const suggested = sets.find((s) => !s.action.completed || s.action.type === "practice" || s.action.type === "review") || sets[sets.length - 1];
+    this.setData({ topic, module, sets, suggested: suggested && suggested.action, metrics: engine.topicSummary(topicId), total: sets.reduce((sum, set) => sum + set.count, 0) });
   },
   onOpenSet(event) {
     const { index } = event.currentTarget.dataset;
-    wx.navigateTo({ url: `/pages/learn/index?topicId=${this.data.topic.id}&setIndex=${index}` });
+    engine.navigateAction(engine.groupAction(this.data.topic.id, Number(index)));
   },
+  onContinue() { engine.navigateAction(this.data.suggested); },
+  onWeak() { wx.navigateTo({ url: `/pages/review-detail/index?topicId=${this.data.topic.id}` }); },
   onPractice() {
     setExamRequest({ mode: "topic", topicId: this.data.topic.id });
     wx.switchTab({ url: "/pages/exam/index" });

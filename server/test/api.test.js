@@ -206,3 +206,40 @@ test("用户数据相互隔离，清空统计不会删除学习进度", async ()
     await fixture.close();
   }
 });
+
+test("V4 learning events survive duplicate uploads, isolate users, and restore daily progression", async () => {
+  const fixture = await createFixture();
+  try {
+    const login = async (code) => { const r = await request(fixture.baseUrl, '/v1/auth/wechat', { method:'POST', body:JSON.stringify({code}) }); return {Authorization:`Bearer ${r.body.token}`}; };
+    const a=await login('v4-a'), b=await login('v4-b');
+    const now=Date.now(), day=require('../../miniprogram/utils/learningModel').dayKey(now);
+    const events=[
+      {id:'plan-one',kind:'plan',at:now,day,tasks:[{id:'new:k1',phase:'new',knowledgeId:'k1',questionId:''}]},
+      {id:'learn-one',kind:'learn',at:now+1,knowledgeId:'k1',moduleId:'m1',topicId:'t1',rating:'fuzzy',day,planId:'plan-one',taskId:'new:k1',phase:'new'}
+    ];
+    const put=(headers,learningEvents)=>request(fixture.baseUrl,'/v1/sync',{method:'PUT',headers,body:JSON.stringify({learningEvents})});
+    const first=await put(a,events); assert.equal(first.status,200); assert.equal(first.body.learningVersion,4);
+    assert.equal(first.body.learningState.records.k1.selfRating,'fuzzy'); assert.ok(first.body.learningState.days[day].completed['new:k1']);
+    const again=await put(a,events); assert.deepEqual(again.body.learningState,first.body.learningState); assert.deepEqual(again.body.ackedLearningEventIds,events.map(e=>e.id));
+    const empty=await request(fixture.baseUrl,'/v1/sync',{headers:b}); assert.deepEqual(empty.body.learningState.records,{});
+    const other=await put(b,events); assert.ok(other.body.learningState.records.k1,'same event ID in a different user is not lost');
+    const invalid=await put(a,[{...events[1],rating:'unexpected'}]); assert.equal(invalid.status,400);
+    const snapshot=await request(fixture.baseUrl,'/v1/sync',{headers:a}); assert.deepEqual(snapshot.body.learningState,first.body.learningState);
+  } finally { await fixture.close(); }
+});
+
+test("V4 reordered offline results replay chronologically and reset preserves learning completion", async () => {
+  const { replay, afterDays, status }=require('../../miniprogram/utils/learningModel');
+  const fixture=await createFixture();
+  try {
+    const login=await request(fixture.baseUrl,'/v1/auth/wechat',{method:'POST',body:JSON.stringify({code:'v4-order'})});
+    const headers={Authorization:`Bearer ${login.body.token}`}; const now=Date.now();
+    const wrong={id:'older',kind:'answer',at:now-1000,knowledgeId:'k',topicId:'t',moduleId:'m',correct:false};
+    const correct={...wrong,id:'newer',at:now,correct:true};
+    const put=(events)=>request(fixture.baseUrl,'/v1/sync',{method:'PUT',headers,body:JSON.stringify({learningEvents:events})});
+    await put([correct]); const merged=await put([wrong]);
+    assert.equal(merged.body.learningState.records.k.reviewStage,1); assert.equal(merged.body.learningState.records.k.nextReviewAt,afterDays(now,1));
+    assert.equal(status(merged.body.learningState.records.k,now),'consolidating'); assert.deepEqual(merged.body.learningState,replay([wrong,correct]));
+    const reset=await put([{id:'reset',kind:'reset',at:now+1}]); assert.equal(reset.body.learningState.records.k.wrongCount,0); assert.ok(reset.body.learningState.records.k.firstLearnedAt);
+  } finally { await fixture.close(); }
+});

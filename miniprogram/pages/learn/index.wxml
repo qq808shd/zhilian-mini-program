@@ -14,7 +14,7 @@
           <view class="prompt-area">
             <text class="knowledge-title">{{item.title}}</text>
             <math-formula
-              wx:if="{{item.formulaLines && item.formulaLines.length}}"
+              wx:if="{{item.revealed && item.formulaLines && item.formulaLines.length}}"
               lines="{{item.formulaLines}}"
               note="{{item.formulaNote}}"
               spoken="{{item.summary}}"
@@ -40,6 +40,8 @@
               <text class="answer-detail">{{item.detail}}</text>
             </block>
             <view wx:if="{{item.memory}}" class="memory-box"><text class="memory-label">记忆提示</text><text class="memory-text">{{item.memory}}</text></view>
+            <text class="status-note">回忆得怎么样？自评可跳过。</text>
+            <view class="rating-row"><button class="{{item.rating === 'none' ? 'selected' : ''}}" data-index="{{index}}" data-value="none" bindtap="onRate">不会</button><button class="{{item.rating === 'fuzzy' ? 'selected' : ''}}" data-index="{{index}}" data-value="fuzzy" bindtap="onRate">有点模糊</button><button class="{{item.rating === 'remembered' ? 'selected' : ''}}" data-index="{{index}}" data-value="remembered" bindtap="onRate">记住了</button></view>
             <view wx:if="{{item.source}}" class="source-box"><text class="source-label">资料口径</text><text class="source-text">{{item.source}}</text></view>
           </view>
         </view>
@@ -47,15 +49,15 @@
     </swiper-item>
   </swiper>
   <view class="learn-footer">
-    <block wx:if="{{currentIndex < total - 1}}">
-      <text class="swipe-hint">左右滑动，继续下一条</text>
-      <view class="nav-actions"><button class="secondary-button" hover-class="button-pressed" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" hover-class="button-pressed" bindtap="onNext">下一条</button></view>
-    </block>
-    <view wx:else class="finish-panel">
-      <text class="finish-text">这一组已浏览完，用练习检验一下</text>
-      <view class="nav-actions"><button class="secondary-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" bindtap="onPracticeSet">练习这一组</button></view>
-      <view class="finish-links"><button class="text-button" bindtap="onRestart">重新学习</button><button class="text-button" bindtap="onBackGroups">返回分组</button></view>
+    <view wx:if="{{groupComplete}}" class="finish-panel">
+      <text class="finish-text">本组 {{total}} 个知识点已学习 · {{groupAction.type === 'practice' ? '建议完成 5 道巩固练习' : '下一步已安排'}}</text>
+      <button class="primary-button" bindtap="onAction">{{groupAction.type === 'practice' ? '开始巩固' : groupAction.label}}</button>
+      <view class="finish-links"><button class="text-button" bindtap="onRestart">重新学习</button><button class="text-button" bindtap="onBackGroups">稍后再练</button></view>
     </view>
+    <block wx:else>
+      <text class="swipe-hint">已学习 {{groupAction.learnedCount}} / {{total}} · 查看解析后继续</text>
+      <view class="nav-actions"><button class="secondary-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" bindtap="onNext">{{learningItems[currentIndex].revealed ? currentIndex === total - 1 ? '完成本组学习' : '完成并继续' : '查看解析'}}</button></view>
+    </block>
   </view>
 </view>
 <view wx:elif="{{error}}" class="page"><ui-state title="暂时找不到这组内容" description="返回学习页，重新选择一个分类。" action="返回学习" bind:action="onGoStudy" /></view>

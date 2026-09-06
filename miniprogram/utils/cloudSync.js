@@ -1,3 +1,4 @@
+const learningEngine = require("./learningEngine");
 const cloudConfig = require("../config/cloud");
 const { isSyncAuthorized, stopSyncPreference } = require("./account");
 const {
@@ -145,11 +146,14 @@ function scheduleCloudSync(delay = cloudConfig.syncDebounceMs || 1800) {
 async function performSync(runGeneration) {
   assertAllowed(runGeneration);
   setSyncStatus("syncing", { lastError: "" });
+  learningEngine.repairDailyAnswers();
   const remote = await authorizedRequest({ path: "/v1/sync", runGeneration });
   assertAllowed(runGeneration);
 
+  learningEngine.importLegacySnapshot(remote);
   if (remote.initialized && !isCloudSyncDirty()) {
     applyCloudSnapshot(remote, []);
+    learningEngine.applySnapshot(remote);
     return remote;
   }
 
@@ -159,6 +163,7 @@ async function performSync(runGeneration) {
   const sentEvents = firstCloudImport ? [] : pendingAtStart.slice(0, cloudConfig.maxEventBatch || 200);
   const payload = {
     resetStats,
+    learningEvents: learningEngine.getPendingEvents().slice(0, 200),
     events: sentEvents,
     progress: firstCloudImport ? {} : getStudyProgress(),
     ...(firstCloudImport ? {
@@ -175,6 +180,8 @@ async function performSync(runGeneration) {
     ? pendingAtStart.map((event) => event.eventId)
     : (result.ackedEventIds || []);
   applyCloudSnapshot(result, ackedEventIds, resetStats);
+  learningEngine.applySnapshot(result, result.ackedLearningEventIds || []);
+  if (learningEngine.getPendingEvents().length && result.learningVersion !== 4) throw new Error("学习记录已保存在本机，云端需更新至 V4 后继续同步");
   return result;
 }
 
@@ -194,6 +201,7 @@ function syncCloudData() {
       wx.setStorageSync(SYNC_META_KEY, detail);
       setSyncStatus("ready", { ...detail, lastError: "" });
       if (isCloudSyncDirty()) scheduleCloudSync(300);
+      else if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }
       return result;
     })
     .catch((error) => {

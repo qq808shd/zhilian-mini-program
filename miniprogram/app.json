@@ -19,7 +19,8 @@
     "pages/legal/index",
     "pages/help/index",
     "pages/history/index",
-    "pages/filing/index"
+    "pages/filing/index",
+    "pages/today-study/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F7F8F2",

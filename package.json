@@ -1,0 +1,6 @@
+{
+  "name": "zhilian-mini-program",
+  "private": true,
+  "scripts": { "test": "node --test tests/*.test.js server/test/*.test.js" },
+  "engines": { "node": ">=24" }
+}

@@ -1,3 +1,4 @@
+const learningModel = require("../../miniprogram/utils/learningModel");
 const fs = require("node:fs");
 const path = require("node:path");
 const { randomUUID } = require("node:crypto");
@@ -59,6 +60,11 @@ function createDatabase(dbPath) {
     );
     CREATE INDEX IF NOT EXISTS answer_events_user_question
       ON answer_events(user_id, question_id, answered_at);
+    CREATE TABLE IF NOT EXISTS learning_events (
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      event_id TEXT NOT NULL, occurred_at INTEGER NOT NULL, payload TEXT NOT NULL,
+      PRIMARY KEY (user_id, event_id)
+    );
     CREATE TABLE IF NOT EXISTS study_progress (
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       progress_key TEXT NOT NULL,
@@ -73,6 +79,8 @@ function createDatabase(dbPath) {
   `);
 
   const statements = {
+    insertLearning: db.prepare("INSERT OR IGNORE INTO learning_events(user_id, event_id, occurred_at, payload) VALUES (?, ?, ?, ?)"),
+    listLearning: db.prepare("SELECT payload FROM learning_events WHERE user_id = ? ORDER BY occurred_at, event_id"),
     getUserByOpenid: db.prepare("SELECT * FROM users WHERE openid = ?"),
     getUserById: db.prepare("SELECT * FROM users WHERE id = ?"),
     insertUser: db.prepare("INSERT INTO users(id, openid, unionid, created_at, last_seen_at) VALUES (?, ?, ?, ?, ?)"),
@@ -191,7 +199,9 @@ function createDatabase(dbPath) {
       revision: meta.revision,
       updatedAt: meta.updated_at,
       stats,
-      progress
+      progress,
+      learningVersion: 4,
+      learningState: learningModel.replay(statements.listLearning.all(userId).map((r) => JSON.parse(r.payload)))
     };
   }
 
@@ -302,6 +312,7 @@ function createDatabase(dbPath) {
   function applySync(userId, payload) {
     const now = Date.now();
     const ackedEventIds = [];
+    const ackedLearningEventIds = [];
     let changed = false;
 
     transaction(() => {
@@ -340,11 +351,16 @@ function createDatabase(dbPath) {
         changed = true;
       });
 
+      (payload.learningEvents || []).forEach((event) => {
+        const result = statements.insertLearning.run(userId, event.id, event.at, JSON.stringify(event));
+        if (Number(result.changes)) changed = true;
+        ackedLearningEventIds.push(event.id);
+      });
       const initialized = toBoolean(meta.initialized) || Boolean(payload.bootstrap) || payload.events.length > 0 || Object.keys(payload.progress).length > 0 || payload.resetStats;
       statements.updateMeta.run(initialized ? 1 : 0, changed ? 1 : 0, now, userId);
     });
 
-    return { ...getSnapshot(userId), ackedEventIds };
+    return { ...getSnapshot(userId), ackedEventIds, ackedLearningEventIds };
   }
 
   return {
