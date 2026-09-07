@@ -52,6 +52,22 @@ function load(relative, page = false, overrides = {}) {
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
 const page = (name) => load(`pages/${name}/index.js`, true);
 
+test("My keeps automatic sync out of the menu and copies the configured contact email", () => {
+  setup(); let clipboard;
+  wx.setClipboardData = options => { clipboard = options.data; options.success(); };
+  const p = page("me"); p.onShow();
+  assert.equal(p.data.email, "386305161@qq.com");
+  assert.equal(p.data.sync, undefined);
+  assert.equal(p.onSync, undefined);
+  p.onContact(); assert.equal(clipboard, p.data.email);
+  assert.deepEqual(navigations, []);
+});
+
+test("legacy review links enter automatic review directly", () => {
+  setup(); page("review").onLoad();
+  assert.deepEqual(navigations, ["/pages/today-study/index?mode=review"]);
+});
+
 test("entry requires consent, including legacy local users; preview cannot authorize draft release or changed policy", () => {
   setup(); assert.equal(account.needsWelcome(), true); assert.equal(account.isSyncAuthorized(), false);
   account.chooseLocalMode(); assert.equal(account.needsWelcome(), true);
@@ -223,17 +239,11 @@ test("a new answer schedules and uploads automatically after consent", async () 
   assert.equal(app.globalData.cloudSync.state, "ready");
 });
 
-test("sync details only retries an authorized session; a legacy pause returns to consent without silently enabling it", async () => {
-  setup(); account.acceptTerms(); let calls = 0;
-  const p = load("pages/sync-status/index.js", true, { "../../utils/cloudSync": { syncCloudData() { calls++; return Promise.resolve(); } } });
-  app.globalData.cloudSync.state = "offline"; p.onShow(); await p.onSync();
-  assert.equal(calls, 1);
-  account.stopSyncPreference(); p.refresh(); const saved = account.getPreferences();
-  await p.onSync();
-  assert.equal(calls, 1); assert.deepEqual(account.getPreferences(), saved);
-  assert.equal(navigations.at(-1), "/pages/welcome/index?consent=1");
+test("legacy sync URL returns to profile without manual sync or changing authorization", () => {
+  setup();account.acceptTerms();account.stopSyncPreference();const saved=account.getPreferences();
+  const p=load('pages/sync-status/index.js',true);p.onLoad();
+  assert.equal(p.onSync,undefined);assert.deepEqual(account.getPreferences(),saved);assert.equal(navigations.at(-1),'/pages/me/index');
 });
-
 
 test("page guard blocks deep links, tab re-entry and stale consent while allowing legal reading", () => {
   setup(); const { guardPage } = require("../miniprogram/utils/consentGate");

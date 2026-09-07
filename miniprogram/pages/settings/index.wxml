@@ -1,5 +1,5 @@
 <view class="page account-page">
-  <text class="group-label">资料与数据</text><view class="list-card"><account-row title="个人资料" icon="person" data-page="profile" bind:activate="onOpen" /><account-row title="学习记录同步" detail="{{sync.authorized ? '自动同步' : '待确认协议'}}" icon="cloud" data-page="sync-status" bind:activate="onOpen" /></view>
+  <text class="group-label">资料与数据</text><view class="list-card"><account-row title="个人资料" icon="person" data-page="profile" bind:activate="onOpen" /></view>
   <text class="group-label">隐私与协议</text><view class="list-card"><account-row title="隐私政策" icon="shield" data-kind="privacy" bind:activate="onLegal" /><account-row title="用户协议" icon="document" data-kind="terms" bind:activate="onLegal" /><account-row title="微信隐私指引" icon="lock" bind:activate="onPrivacy" /></view>
   <text class="group-label">数据管理</text><view class="list-card"><account-row title="清空答题记录" icon="trash" bind:activate="onClear" /><account-row title="删除本机个人资料" danger="{{true}}" icon="person" bind:activate="onDeleteProfile" /></view><text class="status-note section">清空答题记录不会删除学习进度。删除个人资料只影响此设备的头像和昵称。</text>
 </view>

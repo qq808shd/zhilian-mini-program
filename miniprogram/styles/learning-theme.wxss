@@ -1,0 +1,28 @@
+page {
+  --color-background:#f8f7f3;
+  --color-primary:#4d785b;
+  --color-primary-dark:#303d36;
+  --color-primary-soft:#edf3e8;
+  --color-text:#303d36;
+  --color-text-secondary:#68736c;
+  --color-text-tertiary:#68736c;
+  --color-border:#e8e9e3;
+  --learning-blue:#527fad;
+  --learning-blue-soft:#ecf3fa;
+  --learning-amber:#b57a32;
+  --learning-amber-soft:#fbf1df;
+  --learning-coral:#b56859;
+  --learning-coral-soft:#faeee9;
+  --learning-tint:#f3f6ee;
+  --learning-green:#eef3ea;
+  --learning-radius:20px;
+  --learning-shadow:0 2px 10px rgba(48,61,54,.045);
+  --learning-gutter:20px;
+  --learning-gap:12px;
+}
+.learning-icon { display:block; flex-shrink:0; width:22px; height:22px; }
+.learning-icon.small { width:16px; height:16px; }
+.learning-label { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--color-primary); font-weight:500; }
+button.familiar-button { display:flex; align-items:center; justify-content:center; gap:6px; flex-shrink:0; width:auto; min-width:44px; min-height:44px; padding:0 4px 0 12px; margin:0; background:transparent; color:var(--color-text); font-size:13px; font-weight:400; line-height:1.4; }
+.familiar-button image { width:24px; height:24px; }
+button.reveal-button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 16px; border:0; background:transparent; color:var(--learning-blue); font-size:16px; font-weight:400; }

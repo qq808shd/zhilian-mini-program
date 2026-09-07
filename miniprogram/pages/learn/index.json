@@ -2,5 +2,7 @@
   "navigationBarTitleText": "卡片学习",
   "usingComponents": {
     "math-formula": "/components/math-formula/index"
-  }
+  },
+  "navigationBarBackgroundColor": "#F8F7F3",
+  "backgroundColor": "#F8F7F3"
 }

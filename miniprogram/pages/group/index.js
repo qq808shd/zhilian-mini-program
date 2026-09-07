@@ -1,6 +1,6 @@
 const engine = require("../../utils/learningEngine");
 const { getTopicById, getModuleById, getSetsForTopic } = require("../../data/content");
-const { getGroupProgress, setExamRequest } = require("../../utils/storage");
+const { setExamRequest } = require("../../utils/storage");
 
 Page({
   data: { topic: null, module: null, sets: [], total: 0 },
@@ -13,9 +13,7 @@ Page({
     const sets = getSetsForTopic(topicId).map((set) => {
       const { items, ...setSummary } = set;
       const action = engine.groupAction(topicId, set.index);
-      const progress = getGroupProgress(topicId, set.index);
       const learnedCount = action.learnedCount;
-      const completed = Boolean(progress && progress.total === set.count && progress.maxIndex >= set.count - 1);
       return {
         ...setSummary, preview: items.slice(0, 3).map((i) => i.title).join("、"),
         learnedCount,
@@ -24,7 +22,7 @@ Page({
       };
     });
     wx.setNavigationBarTitle({ title: topic.name });
-    const suggested = sets.find((s) => !s.action.completed || s.action.type === "practice" || s.action.type === "review") || sets[sets.length - 1];
+    const suggested = sets.find((s) => !s.action.completed) || sets[sets.length - 1];
     this.setData({ topic, module, sets, suggested: suggested && suggested.action, metrics: engine.topicSummary(topicId), total: sets.reduce((sum, set) => sum + set.count, 0) });
   },
   onOpenSet(event) {

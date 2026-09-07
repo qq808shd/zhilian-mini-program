@@ -1,35 +1,25 @@
 const { getTopicById, getModuleById } = require('../../data/content');
-const { setExamRequest } = require('../../utils/storage');
 const engine = require('../../utils/learningEngine');
+const filters = [{ value: 'due', label: '今日待复习' }, { value: 'all', label: '全部已学' }, { value: 'none', label: '陌生' }, { value: 'fuzzy', label: '了解' }, { value: 'remembered', label: '掌握' }, { value: 'known', label: '熟知' }];
 Page({
-  data: { topic: null, module: null, summary: {}, ranked: [], items: [], filter: 'active', sort: 'frequent', visibleCount: 40, total: 0, hasMore: false },
-  onLoad(options) { const topic = getTopicById(options.topicId); if (!topic) return; wx.setNavigationBarTitle({ title: `${topic.name}复习` }); this.setData({ topic, module: getModuleById(topic.moduleId) }); },
+  data: { topic: null, module: null, summary: {}, items: [], filter: 'due', filters, filterIndex: 0, visibleCount: 40, total: 0, hasMore: false },
+  onLoad(options) {
+    const topic = getTopicById(options.topicId); if (!topic) return;
+    const filterIndex = Math.max(0, filters.findIndex(f => f.value === options.filter));
+    wx.setNavigationBarTitle({ title: topic.name + ' · 已学内容' });
+    this.setData({ topic, module: getModuleById(topic.moduleId), filter: filters[filterIndex].value, filterIndex });
+  },
   onShow() { if (this.data.topic) this.refresh(); },
-  refresh() {
-    this.allItems = engine.reviewItems(this.data.topic.id);
-    const summary = engine.topicSummary(this.data.topic.id);
-    this.setData({ summary: { ...summary, activeWrongCount: summary.consolidatingCount }, ranked: this.allItems.filter((r) => r.wrongCount > 0 && r.state !== 'mastered').sort((a,b) => b.wrongCount - a.wrongCount).slice(0,5) });
-    this.renderItems();
-  },
+  refresh() { this.allItems = engine.reviewItems(this.data.topic.id); this.setData({ summary: engine.topicSummary(this.data.topic.id) }); this.renderItems(); },
   renderItems() {
-    const filtered = this.allItems.filter((r) => this.data.filter === 'active' ? ['due','consolidating'].includes(r.state) : r.state === this.data.filter)
-      .sort(this.data.sort === 'recent' ? (a,b) => (b.lastReviewedAt || 0) - (a.lastReviewedAt || 0) : (a,b) => b.wrongCount - a.wrongCount || a.nextReviewAt - b.nextReviewAt);
-    this.setData({ items: filtered.slice(0,this.data.visibleCount), total: filtered.length, hasMore: filtered.length > this.data.visibleCount });
+    const filter = this.data.filter;
+    const filtered = this.allItems.filter(r => filter === 'all' || (filter === 'due' ? r.due : filter === 'known' ? r.excluded : !r.excluded && r.rating === filter));
+    this.setData({ items: filtered.slice(0, this.data.visibleCount), total: filtered.length, hasMore: filtered.length > this.data.visibleCount });
   },
-  onFilter(e) { this.setData({ filter: e.currentTarget.dataset.value, visibleCount: 40 }); this.renderItems(); },
-  onSort(e) { this.setData({ sort: e.currentTarget.dataset.value, visibleCount: 40 }); this.renderItems(); },
+  onFilter(e) { const filterIndex = Number(e.detail.value); if (!filters[filterIndex]) return; this.setData({ filter: filters[filterIndex].value, filterIndex, visibleCount: 40 }); this.renderItems(); },
   onMore() { this.setData({ visibleCount: this.data.visibleCount + 40 }); this.renderItems(); },
-  onOpenKnowledge(e) { wx.navigateTo({ url: `/pages/detail/index?id=${e.currentTarget.dataset.id}` }); },
-  onPracticeOne(e) {
-    const item = this.allItems.find((r) => r.id === e.currentTarget.dataset.id); if (!item) return;
-    if (!item.questionId) { wx.navigateTo({ url: `/pages/detail/index?id=${item.id}&recall=1` }); return; }
-    setExamRequest({ mode: 'questionIds', questionIds: [item.questionId], direct: true }); wx.switchTab({ url: '/pages/exam/index' });
-  },
-  onStartWrongExam() {
-    const questionIds = this.allItems.filter((r) => ['due','consolidating'].includes(r.state) && r.questionId).map((r) => r.questionId);
-    if (!questionIds.length) { wx.navigateTo({ url: '/pages/today-study/index' }); return; }
-    setExamRequest({ mode: 'questionIds', questionIds, direct: true, count: 10, title: '薄弱知识巩固' }); wx.switchTab({ url: '/pages/exam/index' });
-  },
-  onToday() { wx.navigateTo({ url: '/pages/today-study/index' }); },
-  onStudy() { wx.navigateTo({ url: `/pages/group/index?topicId=${this.data.topic.id}` }); }
+  onOpenKnowledge(e) { wx.navigateTo({ url: '/pages/detail/index?id=' + e.currentTarget.dataset.id }); },
+  onPracticeOne(e) { wx.navigateTo({ url: '/pages/detail/index?id=' + e.currentTarget.dataset.id + '&recall=1' }); },
+  onToday() { wx.navigateTo({ url: '/pages/today-study/index?mode=review&topicId=' + this.data.topic.id }); },
+  onStudy() { wx.navigateTo({ url: '/pages/group/index?topicId=' + this.data.topic.id }); }
 });

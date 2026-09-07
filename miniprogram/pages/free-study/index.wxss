@@ -12,3 +12,5 @@ button.topic-choice { display:block; width:100%!important; padding:24rpx; margin
 .topic-title { display:flex; justify-content:space-between; gap:8rpx; font-size:30rpx; font-weight:650; color:var(--color-text); }
 .topic-description, .topic-meta { display:block; margin-top:12rpx; font-size:24rpx; line-height:1.65; color:var(--color-text-secondary); }
 .topic-meta { color:var(--color-primary); }
+
+button.topic-choice.current-topic { border-color:var(--color-primary-border); background:var(--color-primary-soft); }

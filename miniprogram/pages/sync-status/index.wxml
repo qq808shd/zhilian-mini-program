@@ -1,4 +1,1 @@
-<view class="page account-page"><view class="page-header"><text class="eyebrow">学习数据</text><text class="page-title">安心积累，接着学</text></view>
-  <view class="card sync-detail"><image class="sync-symbol" src="/assets/account/cloud.svg" /><text class="section-title">{{sync.title}}</text><text class="page-subtitle">{{sync.description}}</text><view class="sync-facts"><view><text>上次成功同步</text><text>{{sync.lastSynced}}</text></view><view><text>待同步记录</text><text>{{sync.pendingCount}} 条</text></view><view wx:if="{{sync.resetPending}}"><text>答题清空指令</text><text>等待同步</text></view></view></view>
-  <view wx:if="{{!sync.authorized || sync.state === 'offline'}}" class="section stack"><button class="primary-button" loading="{{busy}}" disabled="{{busy}}" bindtap="onSync">{{sync.authorized ? '重试同步' : '阅读协议并继续'}}</button></view>
-</view>
+<view></view>

@@ -51,12 +51,6 @@
         "text": "练习"
       },
       {
-        "pagePath": "pages/review/index",
-        "iconPath": "assets/tabbar/review.png",
-        "selectedIconPath": "assets/tabbar/review-active.png",
-        "text": "复习"
-      },
-      {
         "pagePath": "pages/me/index",
         "iconPath": "assets/tabbar/me.png",
         "selectedIconPath": "assets/tabbar/me-active.png",

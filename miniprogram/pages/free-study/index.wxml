@@ -1,7 +1,7 @@
 <view class="free-page">
-  <view class="free-intro"><text class="page-title">想学什么，由你选择</text><text class="page-subtitle">先选模块，再进入分类学习。</text></view>
+  <view class="free-intro"><text class="page-title">{{scopeMode ? '选择学习内容' : '想学什么，由你选择'}}</text><text class="page-subtitle">{{scopeMode ? '切换后，新学和复习使用所选范围。' : '先选模块，再进入分类学习。'}}</text></view>
   <view class="subject-browser">
     <view class="module-rail"><button wx:for="{{modules}}" wx:key="id" class="module-choice {{activeId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="onModule" aria-label="{{item.name + (activeId === item.id ? '，已选中' : '')}}"><text class="module-symbol">{{item.symbol}}</text><text>{{item.name}}</text></button></view>
-    <view class="topic-pane"><text class="group-label">{{activeName}}</text><button wx:for="{{topics}}" wx:key="id" class="topic-choice" data-id="{{item.id}}" bindtap="onTopic" hover-class="button-pressed"><view class="topic-title"><text>{{item.name}}</text><text>›</text></view><text class="topic-description">{{item.description}}</text><text class="topic-meta">{{item.knowledgeCount}} 个知识 · 已学习 {{item.learnedCount}}</text></button><button class="text-button" bindtap="onSearch">搜索全部知识 ›</button></view>
+    <view class="topic-pane"><text class="group-label">{{activeName}}</text><button wx:for="{{topics}}" wx:key="id" class="topic-choice {{scopeMode && selectedTopicId === item.id ? 'current-topic' : ''}}" data-id="{{item.id}}" bindtap="onTopic" hover-class="button-pressed"><view class="topic-title"><text>{{item.name}}</text><text>{{scopeMode && selectedTopicId === item.id ? '当前' : '›'}}</text></view><text class="topic-description">{{item.description}}</text><text class="topic-meta">{{item.knowledgeCount}} 个知识 · 已学习 {{item.learnedCount}}</text><text class="topic-meta">学习进度 {{item.progress}}% · 待复习 {{item.dueCount}}</text></button><button class="text-button" bindtap="onSearch">搜索全部知识 ›</button></view>
   </view>
 </view>

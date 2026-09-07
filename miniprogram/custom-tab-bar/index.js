@@ -4,7 +4,6 @@ Component({
     tabs: [
       { route: 'pages/study/index', label: '学习', icon: 'study' },
       { route: 'pages/exam/index', label: '练习', icon: 'exam' },
-      { route: 'pages/review/index', label: '复习', icon: 'review' },
       { route: 'pages/me/index', label: '我的', icon: 'me' }
     ]
   },

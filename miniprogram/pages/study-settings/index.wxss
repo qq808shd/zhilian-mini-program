@@ -1,23 +1,22 @@
-.plan-page .page-title { font-size:38rpx; }
-.plan-page .page-header { margin-bottom:24rpx; }
-.settings-card { margin-bottom:24rpx; padding:28rpx; }
-.choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12rpx; margin-top:16rpx; }
-.choice { display:flex; align-items:center; justify-content:center; width:100%!important; min-width:0; min-height:88rpx; padding:16rpx 12rpx; margin:0; border:1rpx solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-background); font-size:27rpx; line-height:1.5; color:var(--color-text-secondary); }
-.choice.selected { border-color:var(--color-primary); background:var(--color-primary-soft); color:var(--color-primary-dark); font-weight:650; }
-.field-title { display:block; margin-top:24rpx; font-size:28rpx; font-weight:600; }
-.scope-note { display:block; margin-top:20rpx; }
-.quantity-card { background:var(--color-primary-soft); border-color:var(--color-primary-border); }
-.quantity-heading { display:flex; align-items:center; justify-content:space-between; gap:16rpx; min-height:64rpx; }
-.quantity-value { display:flex; align-items:baseline; gap:8rpx; color:var(--color-primary-dark); font-size:25rpx; white-space:nowrap; }
-.quantity-number { font-size:48rpx; font-weight:650; line-height:1.2; font-variant-numeric:tabular-nums; }
-.all-label { font-size:23rpx; }
-.quantity-slider { margin:12rpx 0 0; padding:12rpx 0; }
-.slider-labels { display:flex; justify-content:space-between; color:var(--color-text-secondary); font-size:24rpx; }
-.quantity-note { display:block; margin-top:20rpx; }
-.effective-note { display:block; font-size:24rpx; line-height:1.6; color:var(--color-text-secondary); }
-.effective-note { margin:8rpx 0 24rpx; }
-
-.plan-page { padding-bottom:calc(160rpx + env(safe-area-inset-bottom)); }
-.save-footer { position:fixed; z-index:10; left:0; right:0; bottom:0; padding:16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom)); background:var(--color-background); border-top:1rpx solid var(--color-border); }
-
-.plan-help { display:flex; align-items:center; justify-content:space-between; gap:16rpx; width:100%!important; min-height:88rpx; padding:0; background:transparent; color:var(--color-primary); font-size:25rpx; line-height:1.5; }
+@import "../../styles/learning-theme.wxss";
+.plan-page { padding:12px 20px calc(88px + env(safe-area-inset-bottom)); }
+.settings-scope { display:flex; align-items:center; gap:14px; padding:12px 20px; border-radius:var(--learning-radius); background:var(--color-primary-soft); }
+.settings-art { width:112rpx; height:112rpx; flex-shrink:0; border-radius:24rpx; }
+.scope-label { display:block; color:var(--color-text-secondary); font-size:13px; }
+.scope-name { display:block; margin-top:12rpx; font-size:22px; font-weight:600; }
+.quantity-card { margin-top:12px; padding:20px; border:0; border-radius:var(--learning-radius); box-shadow:var(--learning-shadow); }
+.quantity-heading { display:flex; align-items:center; justify-content:center; gap:20rpx; font-size:16px; font-weight:500; }
+.quantity-value { display:flex; align-items:baseline; justify-content:center; gap:20rpx; margin:40rpx 0 32rpx; font-size:28rpx; }
+.quantity-number { font-size:88rpx; font-weight:600; line-height:1.2; font-variant-numeric:tabular-nums; }
+.quantity-control { display:flex; align-items:center; gap:8rpx; }
+.quantity-slider { flex:1; min-width:0; margin:0 8rpx; padding:12rpx 0; }
+.plan-page .step-button { display:flex; align-items:center; justify-content:center; width:88rpx; min-width:0; height:88rpx; padding:0; flex-shrink:0; border-radius:50%; background:var(--learning-green); }
+.step-button[disabled] { opacity:.4; }
+.slider-labels { display:flex; justify-content:space-between; padding:12rpx 22rpx 0; color:var(--color-text-secondary); font-size:13px; }
+.quantity-note { display:block; margin-top:32rpx; text-align:center; color:var(--color-text-secondary); font-size:13px; }
+.plan-page .reset-entry { display:flex; align-items:center; gap:20rpx; width:100%; min-width:0; min-height:68px; margin-top:12px; padding:12px; border-radius:var(--learning-radius); background:var(--color-surface); box-shadow:var(--learning-shadow); text-align:left; color:var(--color-text); font-size:16px; line-height:1.5; }
+.reset-icon { display:flex; justify-content:center; align-items:center; width:64rpx; height:64rpx; border-radius:20rpx; background:#faf2ec; flex-shrink:0; }
+.reset-copy { flex:1; min-width:0; }
+.reset-note { display:block; margin-top:6rpx; color:var(--color-text-secondary); font-size:13px; }
+.save-footer { position:fixed; z-index:10; left:0; right:0; bottom:0; padding:8px 20px calc(12px + env(safe-area-inset-bottom)); background:var(--color-background); }
+.save-button { gap:16rpx; min-height:96rpx; border-radius:16px; font-size:16px; font-weight:500; }

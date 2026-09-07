@@ -1,62 +1,43 @@
 <view class="learn-page" wx:if="{{topic}}">
-  <view class="learn-header">
-    <view class="learn-heading"><text class="learn-crumb">{{module.name}} / {{topic.name}}</text><text class="learn-set">{{setName}}</text></view>
-    <view class="learn-counter"><text class="learn-position">{{currentIndex + 1}} / {{total}}</text><text class="learn-percent">{{progressPercent}}%</text></view>
-  </view>
-  <view class="progress-track">
-    <view wx:for="{{learningItems}}" wx:key="id" class="progress-segment {{index <= currentIndex ? 'is-active' : ''}}"></view>
-  </view>
-  <swiper class="learning-swiper" current="{{swiperCurrent}}" bindchange="onSwiperChange" duration="260">
+  <view class="learn-header"><view class="learn-position"><text class="position-current">{{currentIndex + 1}}</text><text class="position-total"> / {{total}}</text></view><progress percent="{{(currentIndex + 1) / total * 100}}" stroke-width="6" activeColor="#4D785B" backgroundColor="#E8EAE4" border-radius="3" aria-label="当前 {{currentIndex + 1}}，共 {{total}} 条" /></view>
+  <swiper class="learning-swiper {{saving || confirming ? 'is-busy' : ''}}" current="{{swiperCurrent}}" bindchange="onSwiperChange" duration="260">
     <swiper-item wx:for="{{learningItems}}" wx:key="id">
       <scroll-view class="card-scroll" scroll-y>
         <view class="learning-card {{item.revealed ? 'is-revealed' : 'is-prompt'}}">
-          <view class="card-meta"><text class="card-index">学习卡片 {{index + 1}}</text><text class="card-state">{{item.revealed ? '已展开解析' : '先回忆'}}</text></view>
-          <view class="prompt-area">
-            <text class="knowledge-title">{{item.title}}</text>
-            <math-formula
-              wx:if="{{item.revealed && item.formulaLines && item.formulaLines.length}}"
-              lines="{{item.formulaLines}}"
-              note="{{item.formulaNote}}"
-              spoken="{{item.summary}}"
-              size="{{item.formulaSize}}"
-            />
-            <text wx:if="{{!hideDefinitionBeforeReveal}}" class="knowledge-summary">{{item.formulaLines && item.formulaLines.length ? '先看懂公式结构，再点击查看推导、例题和易错点。' : item.summary}}</text>
-            <text wx:elif="{{!item.revealed}}" class="recall-hint">先在心里回想它的含义，再点击查看解析。</text>
-            <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="reveal-hover" data-index="{{index}}" bindtap="onReveal">点击查看解析</button>
+          <view class="card-meta">
+            <view class="card-tags"><text class="card-state {{item.learned ? 'is-learned' : ''}}">{{item.degreeLabel}}</text><text class="card-index">{{item.learned ? '已学习' : '未学习'}}</text></view>
+            <button class="familiar-button" disabled="{{saving || confirming}}" data-index="{{index}}" bindtap="onFamiliar" hover-class="button-pressed" aria-label="{{item.excluded ? '取消熟知' : '标记熟知'}}"><image src="/assets/learning/{{item.excluded ? 'star-active' : 'star'}}.svg" aria-hidden="true" /><text>{{item.excluded ? '已熟知' : '熟知'}}</text></button>
           </view>
+          <text class="knowledge-title">{{item.title}}</text>
+          <math-formula wx:if="{{item.revealed && item.formulaLines && item.formulaLines.length}}" lines="{{item.formulaLines}}" note="{{item.formulaNote}}" spoken="{{item.summary}}" size="{{item.formulaSize}}" />
+          <button wx:if="{{!item.revealed}}" class="reveal-button" hover-class="button-pressed" data-index="{{index}}" bindtap="onReveal"><image class="learning-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" />点击查看{{item.formulaLines && item.formulaLines.length ? '解析' : '释义'}}</button>
           <view wx:if="{{item.revealed}}" class="answer-area">
-            <view class="answer-divider"></view>
-            <block wx:if="{{hideDefinitionBeforeReveal}}">
-              <text class="answer-label">释义</text>
-              <text class="definition-text">{{item.summary}}</text>
-              <block wx:if="{{item.hasSeparateDetail}}">
-                <view class="answer-section-divider"></view>
-                <text class="answer-label">详细解析</text>
-                <text class="answer-detail">{{item.detail}}</text>
-              </block>
-            </block>
-            <block wx:else>
+            <view class="definition-panel"><view class="learning-label"><image class="learning-icon small" src="/assets/learning/book.svg" aria-hidden="true" /><text>释义</text></view><text class="definition-text">{{item.summary}}</text></view>
+            <block wx:if="{{item.hasSeparateDetail}}">
+              <view class="answer-section-divider"></view>
               <text class="answer-label">解析</text>
               <text class="answer-detail">{{item.detail}}</text>
             </block>
             <view wx:if="{{item.memory}}" class="memory-box"><text class="memory-label">记忆提示</text><text class="memory-text">{{item.memory}}</text></view>
-            <text class="status-note">回忆得怎么样？自评可跳过。</text>
-            <view class="rating-row"><button class="{{item.rating === 'none' ? 'selected' : ''}}" data-index="{{index}}" data-value="none" bindtap="onRate">不会</button><button class="{{item.rating === 'fuzzy' ? 'selected' : ''}}" data-index="{{index}}" data-value="fuzzy" bindtap="onRate">有点模糊</button><button class="{{item.rating === 'remembered' ? 'selected' : ''}}" data-index="{{index}}" data-value="remembered" bindtap="onRate">记住了</button></view>
-            <view wx:if="{{item.source}}" class="source-box"><text class="source-label">资料口径</text><text class="source-text">{{item.source}}</text></view>
           </view>
         </view>
       </scroll-view>
     </swiper-item>
   </swiper>
   <view class="learn-footer">
-    <view wx:if="{{groupComplete}}" class="finish-panel">
-      <text class="finish-text">本组 {{total}} 个知识点已学习 · {{groupAction.type === 'practice' ? '建议完成 5 道巩固练习' : '下一步已安排'}}</text>
-      <button class="primary-button" bindtap="onAction">{{groupAction.type === 'practice' ? '开始巩固' : groupAction.label}}</button>
-      <view class="finish-links"><button class="text-button" bindtap="onRestart">重新学习</button><button class="text-button" bindtap="onBackGroups">稍后再练</button></view>
+    <view wx:if="{{showCompletion}}" class="finish-panel">
+      <text class="finish-text">本组 {{total}} 个知识点已学习</text>
+      <button wx:if="{{groupAction.type === 'next'}}" class="primary-button" bindtap="onAction">学习下一组</button>
+      <button wx:else class="primary-button" bindtap="onBackGroups">返回学习范围</button>
+      <view class="finish-links"><button class="text-button" bindtap="onRestart">回看本组</button><button class="text-button" bindtap="onPracticeSet">自由练习</button></view>
     </view>
     <block wx:else>
-      <text class="swipe-hint">已学习 {{groupAction.learnedCount}} / {{total}} · 查看解析后继续</text>
-      <view class="nav-actions"><button class="secondary-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一条</button><button class="primary-button" bindtap="onNext">{{learningItems[currentIndex].revealed ? currentIndex === total - 1 ? '完成本组学习' : '完成并继续' : '查看解析'}}</button></view>
+      <view class="degree-actions">
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="none" bindtap="onRate"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="fuzzy" bindtap="onRate"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="remembered" bindtap="onRate"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
+      </view>
+      <button wx:if="{{learningItems[currentIndex].excluded}}" class="text-button familiar-continue" bindtap="advanceAfterRating">继续学习</button>
     </block>
   </view>
 </view>

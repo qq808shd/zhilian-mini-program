@@ -1,7 +1,18 @@
-
-
-.learning-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 32rpx; padding: 32rpx; text-align: center; }
-.account-total { text-align: center; margin-top: 16rpx; }
-
-/* Custom navigation owns the bottom safe area; reserve its full height once. */
-.page { padding-bottom:calc(48px + 32rpx + env(safe-area-inset-bottom)); }
+@import "../../styles/learning-theme.wxss";
+.account-page { padding:16px 20px calc(48px + 20px + env(safe-area-inset-bottom)); }
+button.profile-header { padding:8px 0 24px; }
+.account-avatar { width:64px; height:64px; }
+.profile-name { font-size:22px; }
+.profile-caption { font-size:13px; }
+.learning-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; padding:14px 8px; text-align:center; border:0; border-radius:20px; box-shadow:var(--learning-shadow); }
+.metric-icon { display:block; width:16px; height:16px; margin:0 auto 6px; }
+.learning-metrics .metric-value { font-size:22px; font-weight:500; line-height:26px; }
+.learning-metrics .metric-label { margin-top:4px; font-size:12px; line-height:18px; white-space:nowrap; }
+.list-card { margin-top:16px; border:0; border-radius:20px; box-shadow:var(--learning-shadow); }
+button.contact-row { display:flex; align-items:center; gap:12px; width:100%; min-width:0; min-height:72px; margin-top:16px; padding:16px; border-radius:20px; background:var(--color-surface); text-align:left; color:var(--color-text); box-shadow:var(--learning-shadow); }
+.contact-icon { display:flex; align-items:center; justify-content:center; width:40px; height:40px; flex-shrink:0; border-radius:12px; background:var(--learning-blue-soft); }
+.contact-copy { flex:1; min-width:0; }
+.contact-title { display:block; font-size:16px; font-weight:400; }
+.contact-email { display:block; margin-top:6px; font-size:13px; color:var(--color-text-secondary); word-break:break-all; }
+.contact-action { font-size:13px; font-weight:400; color:var(--learning-blue); }
+.filing-footer { margin-top:16px; }

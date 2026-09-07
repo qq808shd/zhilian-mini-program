@@ -104,27 +104,27 @@ test("assessment allows changes and jumping; cancellation preserves state; submi
   assert.equal(storage.getQuestionStats()[source[1].id].activeWrong, true);
   assert.equal(storage.getPendingAnswerEvents().length, 2);
 });
-test("same-day correct rounds preserve V4 consolidation while legacy counters keep their history", () => {
+test("free practice preserves independent learning degree while wrong counters keep history", () => {
   setup(); const q = content.questions[0]; record(q, false);
   const detail = page("review-detail"); detail.onLoad({ topicId: q.topicId }); detail.onShow();
-  assert.equal(detail.data.summary.activeWrongCount, 1);
+  assert.equal(detail.data.summary.learnedCount, 0);
   for (let i = 0; i < 2; i += 1) {
     const e = page("exam"); e.applyRequest({ mode: "wrong", topicId: q.topicId });
     e.onStartExam(); e.onChooseOption(event({ id: q.answer })); e.onConfirm(); e.submitExam();
     detail.onShow();
-    assert.equal(detail.data.summary.activeWrongCount, 1);
+    assert.equal(detail.data.summary.learnedCount, 0);
   }
-  detail.onFilter(event({ value: "mastered" })); assert.equal(detail.data.items.length, 0);
+  detail.onFilter({ detail: { value: 4 } }); assert.equal(detail.data.items.length, 0);
   assert.equal(detail.data.summary.masteredCount, 0);
   assert.equal(storage.getQuestionStats()[q.id].attempts, 3);
   assert.equal(storage.getQuestionStats()[q.id].wrong, 1);
   assert.equal(storage.getPendingAnswerEvents().length, 3);
 });
-test("large wrong-question lists load 40 at a time; practice still uses at most 20", () => {
+test("large learned lists load 40 at a time; independent wrong practice still uses at most 20", () => {
   setup(); const source = content.questions.filter((q) => q.topicId === "idiom").slice(0, 85);
-  source.forEach((q) => record(q, false));
-  const detail = page("review-detail"); detail.onLoad({ topicId: "idiom" }); detail.onShow();
-  assert.equal(detail.data.items.length, 40); assert.equal(detail.data.ranked.length, 5);
+  source.forEach((q) => { require('../miniprogram/utils/learningEngine').learn(q.knowledgeId, 'none'); record(q, false); });
+  const detail = page("review-detail"); detail.onLoad({ topicId: "idiom", filter: 'all' }); detail.onShow();
+  assert.equal(detail.data.items.length, 40); assert.equal(detail.data.summary.learnedCount, 85);
   detail.onMore(); assert.equal(detail.data.items.length, 80);
   const e = page("exam"); e.applyRequest({ mode: "wrong", topicId: "idiom" });
   e.onCountTap(event({ value: 20 })); e.onStartExam(); assert.equal(e.data.examQuestions.length, 20);

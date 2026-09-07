@@ -20,7 +20,7 @@ function getSyncView() {
     state = status.state || "syncing";
     if (!isCloudEnabled()) { title = "同步服务尚未配置"; description = "服务暂不可用，请稍后重试。"; }
     else if (state === "syncing") { title = "正在同步学习记录"; description = "请稍候，正在更新记录。"; }
-    else if (state === "offline") { title = "同步暂未完成"; description = status.lastError && /V4|学习设置/.test(status.lastError) ? status.lastError : "恢复网络后将自动重试。"; }
+    else if (state === "offline") { title = "同步暂未完成"; description = status.lastError && /V[45]|学习设置|学习服务/.test(status.lastError) ? status.lastError : "恢复网络后将自动重试。"; }
     else if (dirty) { title = "有学习记录等待同步"; description = "将在后台自动更新。"; }
     else if (state === "ready") { title = "学习记录已同步"; description = "其他设备使用同一微信可继续学习。"; }
     else { title = "等待同步学习记录"; description = "学习记录已保留，将在后台自动同步。"; }

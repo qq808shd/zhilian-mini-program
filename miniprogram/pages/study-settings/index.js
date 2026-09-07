@@ -1,55 +1,54 @@
-const engine = require("../../utils/learningEngine");
-const { modules, topics, knowledge, getTopicById } = require("../../data/content");
+const engine = require('../../utils/learningEngine');
+const { knowledge, getTopicById } = require('../../data/content');
 Page({
-  data: { modules, topics: [], moduleId: '', topicId: '', newCount: 10, sliderValue: 10, scopeCount: 0, maxCount: 200, sliderMax: 200, saving: false, error: '', tomorrow: false },
+  data: { topicId: '', topicName: '', newCount: 10, sliderValue: 10, scopeCount: 0, maxCount: 200, sliderMax: 200, saving: false, clearing: false, error: '' },
   onLoad() {
     const settings = engine.getStudySettings(), topic = getTopicById(settings.topicId);
-    this.setData({ moduleId: topic.moduleId, topicId: topic.id, newCount: settings.newCount }); this.refresh();
-  },
-  refresh() {
-    const scopeCount = knowledge.filter((k) => k.topicId === this.data.topicId).length;
-    const maxCount = engine.studyLimit(this.data.topicId);
-    const newCount = Math.min(maxCount, Math.max(1, this.data.newCount));
-    this.setData({ topics: topics.filter((t) => t.moduleId === this.data.moduleId), scopeCount, maxCount,
-      sliderMax: Math.max(2, maxCount), newCount, sliderValue: newCount,
-      tomorrow: engine.dailyView().started, error: '' });
-  },
-  onModule(event) {
-    const moduleId = event.currentTarget.dataset.id;
-    if (moduleId === this.data.moduleId) return;
-    const topic = topics.find((t) => t.moduleId === moduleId);
-    if (!topic) return;
-    this.setData({ moduleId, topicId: topic.id }); this.refresh();
-  },
-  onTopic(event) {
-    const topic = topics.find((t) => t.id === event.currentTarget.dataset.id && t.moduleId === this.data.moduleId);
-    if (!topic || topic.id === this.data.topicId) return;
-    this.setData({ topicId: topic.id }); this.refresh();
+    const scopeCount = knowledge.filter(k => k.topicId === topic.id).length;
+    const maxCount = engine.studyLimit(topic.id);
+    this.setData({ topicId: topic.id, topicName: topic.name, newCount: settings.newCount, sliderValue: settings.newCount,
+      scopeCount, maxCount, sliderMax: Math.max(2, maxCount), error: '' });
   },
   onChanging(event) { this.updateCount(event, false); },
   onCount(event) { this.updateCount(event, true); },
+  onStep(event) { this.updateCount({ detail: { value: this.data.newCount + Number(event.currentTarget.dataset.step) } }, true); },
   updateCount(event, settled) {
     const value = Number(event.detail.value);
     if (!Number.isFinite(value) || !this.data.maxCount) return;
     const newCount = Math.min(this.data.maxCount, Math.max(1, Math.round(value)));
-    // While dragging, only refresh the label; let the native thumb follow the finger.
     this.setData({ newCount, ...(settled ? { sliderValue: newCount } : {}), error: '' });
   },
-  onPlanHelp() {
+  scopeIsCurrent() {
+    if (engine.getStudySettings().topicId === this.data.topicId) return true;
+    this.onLoad();
+    wx.showToast({ title: '学习范围已更新，请重新操作', icon: 'none' });
+    return false;
+  },
+  onClear() {
+    if (this.data.clearing || this.data.saving || !this.scopeIsCurrent()) return;
+    const { topicId, topicName } = this.data;
+    this.setData({ clearing: true, error: '' });
     wx.showModal({
-      title: '今日学习怎么安排',
-      content: '上面的数量只计算新学内容。\n\n先复习：从本分类已到复习时间的旧知识里安排，最多 10 个。\n\n再新学：按你设置的数量学习新内容。\n\n后练习：用本分类的配套题检查记忆，最多 5 道。\n\n10 和 5 是当前固定上限，与新学数量无关。不足时按实际数量安排，没有对应内容就跳过。',
-      showCancel: false,
-      confirmText: '知道了',
-      confirmColor: '#456F59'
+      title: `清空「${topicName}」的学习记录？`,
+      content: '该范围的学习进度、程度标记（含熟知）、复习安排和阅读位置将全部重置。\n其他范围和答题统计不受影响。此操作无法撤销。',
+      confirmText: '确认清空', cancelText: '取消', confirmColor: '#AA6557',
+      success: result => {
+        if (!result.confirm || !this.scopeIsCurrent()) return;
+        try {
+          engine.resetLearning(topicId);
+          wx.showToast({ title: '该范围学习记录已清空', icon: 'none' });
+        } catch (error) { this.setData({ error: error.message || '清空失败，请重试' }); }
+      },
+      fail: () => this.setData({ error: '暂时无法打开确认弹窗，请重试' }),
+      complete: () => this.setData({ clearing: false })
     });
   },
   onSave() {
-    if (this.data.saving || !this.data.maxCount) return;
+    if (this.data.saving || this.data.clearing || !this.data.maxCount || !this.scopeIsCurrent()) return;
     this.setData({ saving: true, error: '' });
     try {
-      const result = engine.saveStudySettings(this.data);
-      wx.showToast({ title: !result.changed ? '设置未改变' : result.tomorrow ? '已保存，明日生效' : '学习安排已更新', icon: 'none' });
+      const result = engine.saveStudySettings({ topicId: this.data.topicId, newCount: this.data.newCount });
+      wx.showToast({ title: !result.changed ? '设置未改变' : '学习安排已更新', icon: 'none' });
       wx.navigateBack();
     } catch (error) { this.setData({ error: error.message }); }
     finally { this.setData({ saving: false }); }

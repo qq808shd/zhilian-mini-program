@@ -1,9 +1,12 @@
 <view class="page account-page">
-  <text class="page-title">我的</text>
-  <button class="profile-header" data-page="profile" bindtap="onOpen" hover-class="button-pressed"><image class="account-avatar" src="{{profile.avatar}}" mode="aspectFill" binderror="onAvatarError" /><view class="profile-heading"><text class="profile-name">{{profile.nickname}}</text><text class="profile-caption">{{profile.customized ? '查看或修改个人资料' : '快捷使用微信头像和昵称'}} ›</text></view></button>
-  <view class="card learning-metrics"><view><text class="metric-value">{{learning.masteredCount}}</text><text class="metric-label">已掌握</text></view><view><text class="metric-value">{{learning.today.completed}}</text><text class="metric-label">今日完成</text></view><view><text class="metric-value">{{learning.consolidatingCount}}</text><text class="metric-label">待巩固</text></view><view><text class="metric-value">{{learning.sevenDayAccuracy === null ? '—' : learning.sevenDayAccuracy + '%'}}</text><text class="metric-label">近 7 日正确率</text></view></view>
-  <text class="status-note account-total">累计作答 {{summary.attempts || 0}} 次 · 近 7 日仅统计有日期的新作答</text>
-  <button class="sync-card" data-page="sync-status" bindtap="onOpen" hover-class="button-pressed"><image class="row-icon" src="/assets/account/cloud.svg" /><view class="row-copy"><text class="row-title">{{sync.title}}</text><text class="row-description">{{sync.description}}</text></view><text class="row-arrow">›</text></button>
+  <button class="profile-header" data-page="profile" bindtap="onOpen" hover-class="button-pressed"><image class="account-avatar" src="{{profile.avatar}}" mode="aspectFill" binderror="onAvatarError" /><view class="profile-heading"><text class="profile-name">{{profile.nickname}}</text><text class="profile-caption">个人资料</text></view><image class="learning-icon small" src="/assets/learning/chevron.svg" aria-hidden="true" /></button>
+  <view class="card learning-metrics">
+    <view><image class="metric-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text class="metric-value">{{learning.masteredCount}}</text><text class="metric-label">已掌握</text></view>
+    <view><image class="metric-icon" src="/assets/learning/calendar.svg" aria-hidden="true" /><text class="metric-value">{{learning.today.completed}}</text><text class="metric-label">今日完成</text></view>
+    <view><image class="metric-icon" src="/assets/learning/review.svg" aria-hidden="true" /><text class="metric-value">{{learning.dueCount}}</text><text class="metric-label">待复习</text></view>
+    <view><image class="metric-icon" src="/assets/learning/pencil.svg" aria-hidden="true" /><text class="metric-value">{{learning.sevenDayAccuracy === null ? '—' : learning.sevenDayAccuracy + '%'}}</text><text class="metric-label">7日正确率</text></view>
+  </view>
   <view class="list-card"><account-row title="学习记录" icon="history" data-page="history" bind:activate="onOpen" /><account-row title="设置" icon="settings" data-page="settings" bind:activate="onOpen" /><account-row title="帮助与反馈" icon="help" data-page="help" bind:activate="onOpen" /><account-row title="关于知练" icon="info" data-page="about" bind:activate="onOpen" /></view>
-  <button class="filing-footer" data-page="about" bindtap="onOpen">{{filing}} ›</button>
+  <button class="contact-row" bindtap="onContact" hover-class="button-pressed" aria-label="复制联系邮箱 {{email}}"><view class="contact-icon"><image class="learning-icon" src="/assets/learning/mail.svg" aria-hidden="true" /></view><view class="contact-copy"><text class="contact-title">联系我们</text><text class="contact-email">{{email}}</text></view><text class="contact-action">复制</text></button>
+  <button class="filing-footer" data-page="about" bindtap="onOpen">{{filing}}</button>
 </view>

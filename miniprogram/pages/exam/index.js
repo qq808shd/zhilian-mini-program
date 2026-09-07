@@ -39,7 +39,7 @@ Page({
   applyRequest(request) {
     this.groupKey = request.groupKey || "";
     if (request.mode === "topic") { this.configureTopic(getTopicById(request.topicId)); return; }
-    const ids = request.mode === "wrong" ? engine.reviewItems(request.topicId).filter((r) => ["due", "consolidating"].includes(r.state)).map((r) => r.questionId).filter(Boolean) : request.questionIds || [];
+    const ids = request.mode === "wrong" ? getActiveWrongQuestionIds({ topicId: request.topicId }) : request.questionIds || [];
     const idSet = new Set(ids);
     const source = questions.filter((question) => idSet.has(question.id));
     if (!source.length) { wx.showToast({ title: "目前没有可练习的题目", icon: "none" }); return; }

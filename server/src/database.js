@@ -115,6 +115,7 @@ function createDatabase(dbPath) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `),
     listProgress: db.prepare("SELECT * FROM study_progress WHERE user_id = ?"),
+    deleteScopeProgress: db.prepare("DELETE FROM study_progress WHERE user_id = ? AND topic_id = ? AND updated_at <= ?"),
     getProgress: db.prepare("SELECT * FROM study_progress WHERE user_id = ? AND progress_key = ?"),
     upsertProgress: db.prepare(`
       INSERT INTO study_progress(
@@ -194,15 +195,17 @@ function createDatabase(dbPath) {
       };
     });
 
+    const learningState = learningModel.replay(statements.listLearning.all(userId).map(r => JSON.parse(r.payload)));
     return {
       initialized: toBoolean(meta.initialized),
       revision: meta.revision,
       updatedAt: meta.updated_at,
       stats,
-      progress,
-      learningVersion: 4,
-      learningSettingsVersion: 2,
-      learningState: learningModel.replay(statements.listLearning.all(userId).map((r) => JSON.parse(r.payload)))
+      progress: learningModel.filterResetProgress(progress, learningState.learningResets),
+      learningVersion: learningModel.VERSION,
+      learningSettingsVersion: 3,
+      learningResetVersion: learningModel.LEARNING_RESET_VERSION,
+      learningState
     };
   }
 
@@ -318,6 +321,19 @@ function createDatabase(dbPath) {
 
     transaction(() => {
       const meta = statements.getMeta.get(userId);
+      (payload.learningEvents || []).forEach((event) => {
+        const result = statements.insertLearning.run(userId, event.id, event.at, JSON.stringify(event));
+        if (Number(result.changes)) changed = true;
+        ackedLearningEventIds.push(event.id);
+      });
+      const learningState = learningModel.replay(statements.listLearning.all(userId).map(r => JSON.parse(r.payload)));
+      const resets = learningState.learningResets || {};
+      Object.entries(resets).forEach(([topicId, reset]) => {
+        if (Number(statements.deleteScopeProgress.run(userId, topicId, reset.at).changes)) changed = true;
+      });
+      const writeScopedProgress = progress => Object.entries(learningModel.filterResetProgress(progress, resets)).forEach(([key, item]) => {
+        writeProgress(userId, key, item); changed = true;
+      });
       if (payload.resetStats) {
         const deletedStats = statements.deleteStats.run(userId);
         const deletedEvents = statements.deleteEvents.run(userId);
@@ -326,7 +342,7 @@ function createDatabase(dbPath) {
 
       if (!toBoolean(meta.initialized) && payload.bootstrap) {
         Object.values(payload.bootstrap.stats).forEach((item) => writeStat(userId, item));
-        Object.keys(payload.bootstrap.progress).forEach((key) => writeProgress(userId, key, payload.bootstrap.progress[key]));
+        writeScopedProgress(payload.bootstrap.progress);
         payload.bootstrap.events.forEach((event) => {
           statements.insertEvent.run(
             event.eventId,
@@ -347,17 +363,10 @@ function createDatabase(dbPath) {
         if (applyAnswerEvent(userId, event, now)) changed = true;
         ackedEventIds.push(event.eventId);
       });
-      Object.keys(payload.progress).forEach((key) => {
-        writeProgress(userId, key, payload.progress[key]);
-        changed = true;
-      });
+      writeScopedProgress(payload.progress);
 
-      (payload.learningEvents || []).forEach((event) => {
-        const result = statements.insertLearning.run(userId, event.id, event.at, JSON.stringify(event));
-        if (Number(result.changes)) changed = true;
-        ackedLearningEventIds.push(event.id);
-      });
-      const initialized = toBoolean(meta.initialized) || Boolean(payload.bootstrap) || payload.events.length > 0 || Object.keys(payload.progress).length > 0 || payload.resetStats;
+
+      const initialized = toBoolean(meta.initialized) || Boolean(payload.bootstrap) || payload.events.length > 0 || (payload.learningEvents || []).length > 0 || Object.keys(payload.progress).length > 0 || payload.resetStats;
       statements.updateMeta.run(initialized ? 1 : 0, changed ? 1 : 0, now, userId);
     });
 

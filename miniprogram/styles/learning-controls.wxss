@@ -1,0 +1,5 @@
+@import "learning-theme.wxss";
+.degree-actions { display:flex; align-items:stretch; gap:var(--learning-gap); width:100%; }
+button.degree-button { display:flex; flex:1 1 0%; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:0; min-width:0; max-width:none; min-height:64px; margin:0; padding:10px 4px; box-sizing:border-box; border:1px solid #f0efea; border-radius:16px; background:var(--color-surface); color:var(--color-text); font-size:14px; font-weight:400; line-height:1.25; white-space:nowrap; box-shadow:var(--learning-shadow); }
+.degree-button .degree-icon { display:block; width:22px; height:22px; flex-shrink:0; }
+button.degree-button[disabled] { opacity:.5; color:var(--color-text-secondary); box-shadow:none; }

@@ -248,7 +248,8 @@ function getActiveWrongQuestionIds(filters = {}) {
 
 function getStudyProgress() {
   migrateContentRecords();
-  return wx.getStorageSync(STUDY_PROGRESS_KEY) || {};
+  const learning = wx.getStorageSync('zhilian_learning_v4');
+  return require('./learningModel').filterResetProgress(wx.getStorageSync(STUDY_PROGRESS_KEY) || {}, learning && learning.state.learningResets);
 }
 
 function getGroupProgress(topicId, setIndex) {
@@ -260,7 +261,8 @@ function markGroupProgress(topicId, setIndex, currentIndex, total) {
   const key = `${topicId}_${setIndex}`;
   const previous = all[key] || {};
   const maxIndex = Math.max(previous.maxIndex || 0, currentIndex);
-  all[key] = { topicId, setIndex, maxIndex, total, completed: maxIndex >= total - 1, updatedAt: Date.now() };
+  const learning = wx.getStorageSync('zhilian_learning_v4'), reset = learning && (learning.state.learningResets || {})[topicId];
+  all[key] = { topicId, setIndex, maxIndex, total, completed: maxIndex >= total - 1, updatedAt: Math.max(Date.now(), reset ? reset.at + 1 : 0) };
   wx.setStorageSync(STUDY_PROGRESS_KEY, all);
   notifyCloudSync();
   return all[key];
@@ -308,7 +310,13 @@ function applyCloudSnapshot(snapshot, ackedEventIds = [], resetAcknowledged = fa
   pending.forEach((event) => applyAnswerEvent(nextStats, event));
   wx.setStorageSync(STATS_KEY, nextStats);
 
-  const mergedProgress = mergeProgress(snapshot.progress || {}, getStudyProgress());
+  const learning = wx.getStorageSync('zhilian_learning_v4');
+  const resets = { ...(learning && learning.state.learningResets || {}) };
+  Object.entries(snapshot.learningState && snapshot.learningState.learningResets || {}).forEach(([topic, reset]) => {
+    if (!resets[topic] || reset.at > resets[topic].at) resets[topic] = reset;
+  });
+  const filter = progress => require('./learningModel').filterResetProgress(progress, resets);
+  const mergedProgress = mergeProgress(filter(snapshot.progress), filter(getStudyProgress()));
   wx.setStorageSync(STUDY_PROGRESS_KEY, mergedProgress);
   wx.setStorageSync(CLOUD_SYNC_DIRTY_KEY, pending.length > 0 || getStatsResetPending());
 }

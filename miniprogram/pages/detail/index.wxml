@@ -1,6 +1,7 @@
 <view wx:if="{{item}}" class="page detail-page">
   <view class="detail-header">
-      <text class="detail-category">{{item.moduleName}} / {{item.topicName}}</text>
+    <view class="detail-topline"><text class="detail-category">{{item.moduleName}} / {{item.topicName}}</text><button class="familiar-button" disabled="{{confirming}}" bindtap="onFamiliar" hover-class="button-pressed" aria-label="{{learning.excluded ? '取消熟知' : '标记熟知'}}"><image src="/assets/learning/{{learning.excluded ? 'star-active' : 'star'}}.svg" aria-hidden="true" /><text>{{learning.excluded ? '已熟知' : '熟知'}}</text></button></view>
+    <view class="learning-status"><text class="degree-tag">{{learning.degreeLabel}}</text><text>{{learning.learned ? '已学习' : '未学习'}}</text></view>
     <text class="detail-title">{{item.title}}</text>
     <view class="tag-row">
       <text wx:for="{{item.tags}}" wx:key="*this" class="detail-tag">{{item}}</text>
@@ -8,13 +9,8 @@
   </view>
 
   <view class="memory-card card">
-    <view class="memory-card-top">
-      <text class="memory-label">先回忆，再查看</text>
-      <text class="memory-mark">回</text>
-    </view>
-    <text class="memory-prompt">你还记得「{{item.title}}」的要点吗？</text>
     <button class="toggle-button" hover-class="button-pressed" bindtap="onToggleAnswer">
-      {{answerVisible ? '收起答案' : '查看答案'}}
+      <image class="learning-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" />{{answerVisible ? '收起释义' : '点击查看释义'}}
     </button>
     <view wx:if="{{answerVisible}}" class="answer-panel">
       <math-formula
@@ -47,22 +43,19 @@
     </view>
   </view>
 
-  <view wx:if="{{answerVisible && item.source}}" class="section source-section">
-    <view class="section-heading">
-      <text class="section-title">资料口径</text>
-    </view>
-    <view class="detail-source card">
-      <text>{{item.source}}</text>
-    </view>
-  </view>
-
-  <view wx:if="{{recallMode && answerVisible}}" class="section"><text class="status-note">{{recallDone ? '结果已保存，下次按计划继续复习。' : '这次回忆得怎么样？'}}</text><view wx:if="{{!recallDone}}" class="actions-row"><button class="secondary-button" data-value="none" bindtap="onRecall">不会</button><button class="secondary-button" data-value="fuzzy" bindtap="onRecall">模糊</button><button class="primary-button" data-value="remembered" bindtap="onRecall">记住了</button></view></view>
   <button
-    class="primary-button related-button"
+    class="text-button related-button"
     hover-class="button-pressed"
     disabled="{{relatedCount === 0}}"
     bindtap="onStartRelatedExam"
   >
-    练习关联题目（{{relatedCount}}）
+    练习关联题目 · {{relatedCount}}
   </button>
+  <view class="detail-footer">
+    <view class="degree-actions">
+      <button class="degree-button" disabled="{{confirming || learning.excluded}}" hover-class="button-pressed" data-value="none" bindtap="onRecall"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
+      <button class="degree-button" disabled="{{confirming || learning.excluded}}" hover-class="button-pressed" data-value="fuzzy" bindtap="onRecall"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
+      <button class="degree-button" disabled="{{confirming || learning.excluded}}" hover-class="button-pressed" data-value="remembered" bindtap="onRecall"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
+    </view>
+  </view>
 </view>

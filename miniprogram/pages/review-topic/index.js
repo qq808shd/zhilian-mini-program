@@ -11,7 +11,7 @@ Page({
   onShow() {
     if (!this.data.module) return;
     const topics = getLearningOverview().topics.filter((topic) => topic.moduleId === this.data.module.id)
-      .sort((a, b) => b.activeWrongCount - a.activeWrongCount);
+      .sort((a, b) => b.dueCount - a.dueCount);
     this.setData({ topics });
   },
   onOpenTopic(event) { wx.navigateTo({ url: `/pages/review-detail/index?topicId=${event.currentTarget.dataset.id}` }); }

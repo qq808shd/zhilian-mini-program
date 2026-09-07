@@ -1,1 +1,5 @@
-{"navigationBarTitleText":"今日学习设置"}
+{
+  "navigationBarTitleText": "学习设置",
+  "navigationBarBackgroundColor": "#F8F7F3",
+  "backgroundColor": "#F8F7F3"
+}

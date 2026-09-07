@@ -151,6 +151,24 @@ async function performSync(runGeneration) {
   assertAllowed(runGeneration);
 
   learningEngine.importLegacySnapshot(remote);
+  const pendingLearning = learningEngine.getPendingEvents().slice(0, 200);
+  const requiresReset = pendingLearning.some(e => e.kind === 'reset-learning') || Object.keys(learningEngine.getState().learningResets || {}).length > 0;
+  const assertResetSupport = snapshot => {
+    if (requiresReset && snapshot.learningResetVersion !== learningEngine.model.LEARNING_RESET_VERSION) {
+      throw new Error('学习记录清空已保存在本机，服务更新后会同步');
+    }
+  };
+  assertResetSupport(remote);
+  const requiresV5 = pendingLearning.length > 0 || remote.learningVersion || remote.learningState;
+  const settingsVersion = pendingLearning.reduce((version, event) => Math.max(version, event.settings ? event.settings.version || 1 : 0), 0);
+  // Check capabilities before sending: an older server may acknowledge an event
+  // after discarding fields it does not understand.
+  if (requiresV5 && !(remote.learningVersion === 5 && remote.learningState && remote.learningState.version === 5)) {
+    throw new Error("学习记录和学习设置已保存在本机，云端需更新至 V5 后继续同步");
+  }
+  if (settingsVersion > (remote.learningSettingsVersion || 0)) {
+    throw new Error("学习设置已保存在本机，服务更新后将自动同步");
+  }
   if (remote.initialized && !isCloudSyncDirty()) {
     applyCloudSnapshot(remote, []);
     learningEngine.applySnapshot(remote);
@@ -163,7 +181,7 @@ async function performSync(runGeneration) {
   const sentEvents = firstCloudImport ? [] : pendingAtStart.slice(0, cloudConfig.maxEventBatch || 200);
   const payload = {
     resetStats,
-    learningEvents: learningEngine.getPendingEvents().slice(0, 200),
+    learningEvents: pendingLearning,
     events: sentEvents,
     progress: firstCloudImport ? {} : getStudyProgress(),
     ...(firstCloudImport ? {
@@ -176,16 +194,19 @@ async function performSync(runGeneration) {
   };
   const result = await authorizedRequest({ path: "/v1/sync", method: "PUT", data: payload, runGeneration });
   assertAllowed(runGeneration);
-  const ackedEventIds = firstCloudImport
-    ? pendingAtStart.map((event) => event.eventId)
-    : (result.ackedEventIds || []);
+  assertResetSupport(result);
+  const sentAnswerIds = new Set((firstCloudImport ? pendingAtStart : sentEvents).map((event) => event.eventId));
+  const ackedEventIds = (result.ackedEventIds || []).filter((id) => sentAnswerIds.has(id));
   applyCloudSnapshot(result, ackedEventIds, resetStats);
-  const supportsSettings = result.learningSettingsVersion >= 2;
-  const settingsEventIds = new Set(payload.learningEvents.filter((e) => e.kind === 'preferences' || e.settings).map((e) => e.id));
-  const learningAcks = (result.ackedLearningEventIds || []).filter((id) => supportsSettings || !settingsEventIds.has(id));
+  const supportsV5 = result.learningVersion === 5 && result.learningState && result.learningState.version === 5;
+  const sentLearning = new Map(payload.learningEvents.map((event) => [event.id, event]));
+  const learningAcks = (result.ackedLearningEventIds || []).filter((id) => {
+    const event = sentLearning.get(id);
+    return event && supportsV5 && (!event.settings || result.learningSettingsVersion >= (event.settings.version || 1));
+  });
   learningEngine.applySnapshot(result, learningAcks);
-  if (!supportsSettings && settingsEventIds.size) throw new Error("学习设置等待同步，服务更新后将自动重试");
-  if (learningEngine.getPendingEvents().length && result.learningVersion !== 4) throw new Error("学习记录已保存在本机，云端需更新至 V4 后继续同步");
+  if (settingsVersion > (result.learningSettingsVersion || 0)) throw new Error("学习设置等待同步，服务更新后将自动重试");
+  if (pendingLearning.length && !supportsV5) throw new Error("学习记录已保存在本机，云端需更新至 V5 后继续同步");
   return result;
 }
 

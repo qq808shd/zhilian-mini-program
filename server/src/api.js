@@ -1,6 +1,7 @@
 const http = require("node:http");
 const { issueSession, verifySession } = require("./session");
 const { exchangeWechatCode } = require("./wechat");
+const learningModel = require("../../miniprogram/utils/learningModel");
 
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const MAX_BOOTSTRAP_STATS = 3000;
@@ -124,32 +125,55 @@ function normalizeEvents(value, limit = MAX_EVENT_BATCH) {
 function normalizeLearningEvents(value) {
   if (value === undefined) return [];
   if (!Array.isArray(value) || value.length > 200) throw apiError(400, "INVALID_PAYLOAD", "学习事件数量超出限制");
-  const kinds = ["seed", "start", "learn", "rating", "answer", "recall", "plan", "begin", "group", "reset", "preferences"];
+  const kinds = ["seed", "start", "learn", "rating", "answer", "recall", "plan", "begin", "group", "reset", "preferences", "assessment", "exemption", "reset-learning"];
   const phases = ["review", "new", "practice", "retry"];
   return value.map((raw) => {
     if (!raw || !kinds.includes(raw.kind)) throw apiError(400, "INVALID_PAYLOAD", "学习事件类型无效");
+    if (raw.learningVersion !== undefined && ![4, 5].includes(raw.learningVersion)) throw apiError(400, "INVALID_PAYLOAD", "学习事件版本无效");
+    const isV5 = raw.learningVersion === 5;
+    if (["assessment", "exemption", "reset-learning"].includes(raw.kind) && !isV5) throw apiError(400, "INVALID_PAYLOAD", "学习事件需要 V5 协议");
     const e = { id: safeId(raw.id, "learningEventId"), kind: raw.kind, at: safeInteger(raw.at, 0, Date.now() + 300000) };
+    if (raw.learningVersion !== undefined) e.learningVersion = raw.learningVersion;
     if (!e.at) throw apiError(400, "INVALID_PAYLOAD", "学习时间无效");
     if (raw.settings !== undefined) {
       const s = raw.settings;
-      if (!s || !Number.isInteger(s.newCount) || s.newCount < 1 || s.newCount > 200 || (s.version !== undefined && ![1, 2].includes(s.version)) ||
-          (s.version !== 2 && ![5, 10, 20].includes(s.newCount)) || !['', 'original', 'photo800'].includes(s.batchId || '') ||
-          (s.batchId && (s.topicId !== 'idiom' || s.version === 2))) throw apiError(400, "INVALID_PAYLOAD", "学习设置无效");
+      if (!s || !Number.isInteger(s.newCount) || s.newCount < 1 || s.newCount > 200 || (s.version !== undefined && ![1, 2, 3].includes(s.version)) ||
+          (s.version === 3 && !isV5) || (![2, 3].includes(s.version) && ![5, 10, 20].includes(s.newCount)) || !['', 'original', 'photo800'].includes(s.batchId || '') ||
+          (s.batchId && (s.topicId !== 'idiom' || s.version >= 2))) throw apiError(400, "INVALID_PAYLOAD", "学习设置无效");
       e.settings = { topicId: safeId(s.topicId, "topicId"), batchId: s.batchId || '', newCount: s.newCount };
-      if (s.version === 2) e.settings.version = 2;
+      if ([2, 3].includes(s.version)) e.settings.version = s.version;
       if (raw.kind === 'plan') e.settings.id = safeId(s.id, 'settingsId');
     }
     if (raw.kind === 'preferences') {
       if (!e.settings) throw apiError(400, "INVALID_PAYLOAD", "缺少学习设置");
       return e;
     }
+    if (raw.kind === 'reset-learning') {
+      if (!Array.isArray(raw.knowledgeIds) || !raw.knowledgeIds.length || raw.knowledgeIds.length > 2000) throw apiError(400, 'INVALID_PAYLOAD', '清空范围无效');
+      return { ...e, topicId: safeId(raw.topicId, 'topicId'), knowledgeIds: [...new Set(raw.knowledgeIds.map(id => safeId(id, 'knowledgeId')))] };
+    }
     if (raw.kind === "reset") return e;
     if (raw.kind === "group") return { ...e, groupKey: safeId(raw.groupKey, "groupKey") };
     if (raw.day !== undefined) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.day)) throw apiError(400, "INVALID_PAYLOAD", "学习日期无效");
+      const pattern = isV5 ? /^\d{4}-\d{2}-\d{2}\/(new|review)\/[a-zA-Z0-9_-]{1,128}$/ : /^\d{4}-\d{2}-\d{2}$/;
+      if (!pattern.test(raw.day)) throw apiError(400, "INVALID_PAYLOAD", "学习日期或范围无效");
       e.day = raw.day;
     }
     if (raw.kind === "plan") {
+      if (isV5) {
+        if (!e.day || !['new', 'review'].includes(raw.mode) || !e.settings || e.settings.version !== 3 ||
+            !Array.isArray(raw.tasks) || raw.tasks.length > 2000) throw apiError(400, "INVALID_PAYLOAD", "学习计划无效");
+        e.mode = raw.mode; e.topicId = safeId(raw.topicId, "topicId");
+        if (e.day.split('/')[1] !== e.mode || e.day.split('/')[2] !== e.topicId || e.settings.topicId !== e.topicId ||
+            (e.mode === 'new' && raw.tasks.length > 200)) throw apiError(400, "INVALID_PAYLOAD", "学习计划范围或数量无效");
+        const seen = new Set();
+        e.tasks = raw.tasks.map((t) => {
+          if (!t || t.phase !== e.mode || seen.has(t.id) || t.id !== `${e.mode}:${t.knowledgeId}` || t.questionId) throw apiError(400, "INVALID_PAYLOAD", "学习任务无效");
+          seen.add(t.id);
+          return { id: safeId(t.id, "taskId"), phase: t.phase, knowledgeId: safeId(t.knowledgeId, "knowledgeId"), questionId: '' };
+        });
+        return e;
+      }
       if (!e.day || !Array.isArray(raw.tasks) || raw.tasks.length > 215) throw apiError(400, "INVALID_PAYLOAD", "今日任务无效");
       const limits = { review: 10, new: e.settings ? e.settings.newCount : 10, practice: 5 }, seen = new Set();
       e.tasks = raw.tasks.map((t) => {
@@ -171,6 +195,12 @@ function normalizeLearningEvents(value) {
     }
     e.knowledgeId = safeId(raw.knowledgeId, "knowledgeId");
     e.moduleId = safeId(raw.moduleId, "moduleId"); e.topicId = safeId(raw.topicId, "topicId");
+    if (isV5 && e.day && e.day.split('/')[2] !== e.topicId) throw apiError(400, "INVALID_PAYLOAD", "学习任务分类不一致");
+    if (raw.kind === 'assessment' && !['none', 'fuzzy', 'remembered'].includes(raw.rating)) throw apiError(400, "INVALID_PAYLOAD", "缺少学习程度");
+    if (raw.kind === 'exemption') {
+      if (typeof raw.excluded !== 'boolean') throw apiError(400, "INVALID_PAYLOAD", "熟知标记无效");
+      e.excluded = raw.excluded;
+    }
     if (raw.kind === "seed") { e.learned = raw.learned === true; e.wrong = safeInteger(raw.wrong, 0, 100000000); return e; }
     if (raw.questionId) e.questionId = safeId(raw.questionId, "questionId");
     if (["answer", "recall"].includes(raw.kind)) {
@@ -182,7 +212,7 @@ function normalizeLearningEvents(value) {
       e.rating = raw.rating;
     }
     if (raw.phase) {
-      if (!phases.includes(raw.phase)) throw apiError(400, "INVALID_PAYLOAD", "阶段无效");
+      if (!(isV5 ? ['new', 'review'] : phases).includes(raw.phase) || (isV5 && e.day && e.day.split('/')[1] !== raw.phase)) throw apiError(400, "INVALID_PAYLOAD", "阶段无效");
       e.phase = raw.phase;
     }
     e.retry = raw.phase === "retry" && !!e.taskId;
@@ -245,7 +275,7 @@ function createApiHandler({ config, database, exchangeCode = exchangeWechatCode 
 
     try {
       if (request.method === "GET" && requestUrl.pathname === "/health") {
-        return sendJson(response, 200, { ok: true, learningVersion: 4, service: "zhilian-sync-api", serverTime: Date.now() });
+        return sendJson(response, 200, { ok: true, learningVersion: learningModel.VERSION, learningSettingsVersion: 3, learningResetVersion: learningModel.LEARNING_RESET_VERSION, service: "zhilian-sync-api", serverTime: Date.now() });
       }
 
       if (request.method === "POST" && requestUrl.pathname === "/v1/auth/wechat") {

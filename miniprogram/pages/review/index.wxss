@@ -1,8 +1,0 @@
-.review-title { margin-top: 12rpx; }
-.review-focus { margin-top: 32rpx; padding: 28rpx; border-radius: var(--radius-lg); background: var(--color-primary-soft); }
-.review-focus .status-note { margin: 14rpx 0 24rpx; }
-.data-note { display: block; margin: 32rpx 0 16rpx; color: var(--color-text-secondary); font-size: 23rpx; line-height: 1.7; }
-.clear-button.text-button { margin: 0 auto; color: var(--color-text-secondary); font-size: 23rpx; }
-
-/* Custom navigation owns the bottom safe area; reserve its full height once. */
-.page { padding-bottom:calc(48px + 32rpx + env(safe-area-inset-bottom)); }

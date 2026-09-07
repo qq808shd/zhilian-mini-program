@@ -1,17 +1,26 @@
 <view class="page study-page">
-  <view class="home-heading"><text class="kicker">知练 · 每一次积累都有意义</text><text class="page-title">{{greeting}}，慢慢学，稳稳记。</text></view>
-  <view class="continue-card">
-    <view class="continue-top"><text class="pill">今日学习</text><button class="plan-settings" bindtap="onSettings" hover-class="button-pressed">学习设置 ›</button></view>
-    <text class="continue-title">{{daily.subject}}</text>
-    <text class="continue-copy">{{daily.goal ? '每天新学 ' + daily.goal + ' 个 · 先复习，再学新知' : '继续完成已开始的学习安排'}}</text>
-    <view class="daily-counts"><view><text class="count-number">{{daily.due || 0}}</text><text>待复习</text></view><view><text class="count-number">{{daily.fresh || 0}}</text><text>待新学</text></view><view><text class="count-number">{{daily.practice || 0}}</text><text>待练习</text></view></view>
-    <view class="continue-progress"><progress-meter value="{{daily.progress || 0}}" label="今日学习进度" /><text>{{daily.remaining ? '已完成 ' + daily.completed + ' 项 · 预计还需 ' + daily.minutes + ' 分钟' : daily.total ? '今天的安排已完成' : '当前分类暂无新学或到期内容，可调整学习设置'}}</text></view>
-    <text wx:if="{{daily.settingsPending}}" class="pending-note">明日起：{{daily.nextSubject}} · 每天新学 {{daily.nextGoal}} 个</text>
-    <button class="primary-button" hover-class="button-pressed" bindtap="onToday">{{daily.button || '开始今日学习'}} →</button>
+  <view class="scope-card" wx:if="{{topic}}">
+    <view class="scope-main">
+      <view class="scope-copy">
+        <view class="learning-label"><image class="learning-icon small" src="/assets/learning/book.svg" aria-hidden="true" /><text>当前学习</text></view>
+        <view class="scope-top"><button class="scope-title" hover-class="button-pressed" bindtap="onFreeStudy" aria-label="浏览当前学习内容">{{topic.name}}</button><button class="scope-switch" hover-class="button-pressed" bindtap="onScope"><text>切换</text><image class="learning-icon small" src="/assets/learning/swap.svg" aria-hidden="true" /></button></view>
+        <view class="scope-progress-copy"><text>已学 <text class="scope-number">{{scope.learnedCount}}</text> / {{scope.total}}</text></view>
+        <view class="scope-meter"><progress-meter value="{{scope.progress || 0}}" label="已学习进度" /></view>
+      </view>
+      <image class="scope-art" src="/assets/learning/book-sprout.jpg" mode="aspectFit" aria-hidden="true" />
+    </view>
+    <view class="degree-row" aria-label="已学内容的学习程度">
+      <button class="degree-stat" data-value="none" hover-class="button-pressed" bindtap="onDegree"><image src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text><text class="degree-count">{{scope.strangerCount || 0}}</text></button>
+      <button class="degree-stat" data-value="fuzzy" hover-class="button-pressed" bindtap="onDegree"><image src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text><text class="degree-count">{{scope.understoodCount || 0}}</text></button>
+      <button class="degree-stat" data-value="remembered" hover-class="button-pressed" bindtap="onDegree"><image src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text><text class="degree-count">{{scope.masteredCount || 0}}</text></button>
+      <button class="degree-stat" data-value="known" hover-class="button-pressed" bindtap="onDegree"><image src="/assets/learning/known.svg" aria-hidden="true" /><text>熟知</text><text class="degree-count">{{scope.familiarCount || 0}}</text></button>
+    </view>
   </view>
-  <view class="card free-card">
-    <view class="free-heading"><text class="section-title">自由学习</text><text class="section-note">按自己的节奏</text></view>
-    <text class="page-subtitle">言语、数量关系、资料分析、常识理论</text>
-    <button class="secondary-button" bindtap="onFreeStudy" hover-class="button-pressed">开始学习 →</button>
+  <view class="card study-actions">
+    <view class="section-heading"><text class="section-title">今日学习</text><button class="study-settings" hover-class="button-pressed" bindtap="onSettings" aria-label="学习设置"><image class="learning-icon" src="/assets/learning/settings.svg" aria-hidden="true" /></button></view>
+    <view class="study-buttons">
+      <button class="study-action new-action" hover-class="button-pressed" bindtap="onToday"><image src="/assets/learning/new.svg" aria-hidden="true" /><view class="action-copy"><text>新学</text><text class="action-count">{{daily.fresh || 0}}</text></view></button>
+      <button class="study-action review-action" hover-class="button-pressed" bindtap="onReview"><image src="/assets/learning/review.svg" aria-hidden="true" /><view class="action-copy"><text>复习</text><text class="action-count">{{daily.due || 0}}</text></view></button>
+    </view>
   </view>
 </view>
