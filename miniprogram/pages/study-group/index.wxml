@@ -1,0 +1,74 @@
+<view class="group-page">
+  <view wx:if="{{error}}" class="g-card"><text class="g-heading">暂时无法连接小组</text><text class="g-error">{{error}}</text><button class="g-button g-secondary" bindtap="load" loading="{{loading}}">重新连接</button></view>
+  <view wx:if="{{!ready && !error}}" class="g-empty"><text class="g-sub">正在读取学习契约…</text></view>
+  <view wx:if="{{ready && !group && !error}}" class="g-empty">
+    <image class="g-illustration" src="/assets/groups/companions.png" mode="aspectFit" aria-hidden="true" />
+    <text class="g-title">和伙伴一起，\n把学习坚持下去</text>
+    <text class="g-sub">约定每天的学习底线，\n让每一次坚持，都有人看见。</text>
+    <button class="g-button" bindtap="onCreate" hover-class="g-pressed">创建学习小组</button>
+    <button class="g-button g-secondary g-gap" bindtap="onJoin" hover-class="g-pressed">输入邀请码加入</button>
+    <button class="g-link g-gap" bindtap="onHistory">我的契约历史</button>
+  </view>
+  <block wx:if="{{ready && group}}">
+    <view class="group-header">
+      <text class="g-title">{{group.name}}</text>
+      <text class="g-sub g-gap-sm">{{group.study_topic}} · 每日 {{group.baseline_value}} {{group.baseline_unit}}</text>
+      <view class="g-between"><text class="g-small">{{group.count}} / {{rules.maxMembers}} 人 · 长期同行</text><view class="g-row header-links"><button class="g-link" bindtap="onInvite">邀请</button><button class="g-link" bindtap="onRules">契约</button></view></view>
+    </view>
+    <view class="g-card today-card">
+      <view class="g-between"><text class="g-heading">{{cardTitle}}</text><text class="g-pill g-{{me.today.tone}}">{{me.today.symbol}} {{me.statusText}}</text></view>
+      <text wx:if="{{me.recoveredToday}}" class="g-success recovery-banner">✓ 回归成功，今天起恢复正式席</text>
+      <view class="today-value"><text class="g-number">{{me.today.value}}</text><text class="today-baseline"> / {{group.baseline_value}} {{group.baseline_unit}}</text></view>
+      <progress percent="{{progress}}" stroke-width="6" border-radius="99" activeColor="#4D785B" backgroundColor="#DFE7DD" aria-label="今日手动记录进度" />
+      <text class="g-sub g-gap-sm">{{cardHint}}</text>
+      <text wx:if="{{me.status === 'formal' && me.today.state !== 'joined'}}" class="g-small">已结算连续守约 {{me.streak}} 天</text>
+      <view wx:if="{{me.weeklyMiss && me.status === 'formal'}}" class="g-pill g-warning g-gap-sm">! 本周已有 {{me.weeklyMiss}} 次未履约，再次未履约将进入旁听席</view>
+      <view class="g-actions g-gap"><button class="g-button" bindtap="onRecord" disabled="{{busy || loading}}" hover-class="g-pressed">{{me.today.value ? '继续记录' : '记录学习'}}</button><button wx:if="{{canLeave}}" class="g-button g-secondary" bindtap="onDayOff" disabled="{{busy || loading}}">今日请假</button></view>
+      <text class="g-small g-gap-sm">手动记录 · {{date}}（北京时间）</text>
+    </view>
+    <view class="g-card">
+      <view class="g-between"><text class="g-heading">今日履约 {{today.fulfilled}} / {{today.eligible}}</text><button class="g-link" bindtap="onMembers">查看成员</button></view>
+      <text class="g-small">应履约人数不含加入日、请假及旁听席</text>
+      <view class="member-wall g-gap">
+        <button wx:for="{{members}}" wx:key="id" class="wall-member" data-id="{{item.id}}" bindtap="onMember" hover-class="g-pressed" aria-label="{{item.nickname}}，{{item.today.label}}，{{item.today.value}}{{group.baseline_unit}}">
+          <image class="g-avatar" src="{{item.avatarPath}}" /><text class="member-name">{{item.nickname}}</text>
+          <text class="member-state g-{{item.today.tone}}">{{item.today.symbol}} {{item.today.label}}</text>
+          <text class="g-small member-value">{{item.today.value}} {{group.baseline_unit}}</text>
+        </button>
+      </view>
+    </view>
+    <view class="g-card week-card">
+      <text class="g-heading">本周守约</text>
+      <text class="g-small">正式席 {{today.formal}} 人 · 旁听席 {{today.observer}} 人</text>
+      <view class="week-row week-header g-gap-sm"><text class="week-name">成员</text><text wx:for="{{weekdays}}" wx:key="*this" class="week-day">{{item}}</text></view>
+      <view wx:for="{{members}}" wx:key="id" class="week-row"><text class="week-name">{{item.nickname}}</text><view wx:for="{{item.week}}" wx:for-item="day" wx:key="date" class="week-cell" aria-label="{{day.date}} {{day.label}}"><text class="week-dot g-{{day.tone}}">{{day.symbol}}</text></view></view>
+      <view class="week-legend"><text>✓ 履约</text><text>○ 未完成</text><text>休 请假</text><text class="legend-yellow">! 黄牌</text><text class="legend-red">! 红牌</text><text>听 旁听</text><text>回 挑战达标</text><text>+ 加入</text><text>· 无考核</text></view>
+      <text class="g-small g-gap-sm">已结算履约率 {{week.rateText}} · 累计 {{week.displayValue}} {{week.unit}}</text>
+    </view>
+    <view class="g-card">
+      <text class="g-heading">{{month.month}} 小组成绩</text><text class="g-small">正式席累计量截至当前，履约率以结算为准</text>
+      <view class="g-stats g-gap"><view><text class="g-stat-value">{{month.displayValue}}</text><text class="g-small">累计{{month.unit}}</text></view><view><text class="g-stat-value">{{month.rateText}}</text><text class="g-small">履约率</text></view><view><text class="g-stat-value">{{month.fulfilled}}</text><text class="g-small">履约人次</text></view></view>
+      <text wx:if="{{!month.eligible}}" class="g-sub g-gap-sm">本月暂无已结算的考核数据</text>
+      <button class="g-link g-gap-sm" bindtap="onMonth">查看月度详情 ›</button>
+    </view>
+  </block>
+</view>
+<view wx:if="{{sheet}}" class="g-backdrop" bindtap="closeSheet" catchtouchmove="noop">
+  <view class="g-sheet" catchtap="noop">
+    <view class="g-sheet-handle"></view>
+    <view class="g-between"><text class="g-sheet-title">{{sheet === 'record' ? '记录学习' : sheet === 'invite' ? '邀请学习伙伴' : sheet === 'member' ? '成员契约' : sheet === 'members' ? '小组成员' : sheet === 'rules' ? '学习契约' : '操作结果'}}</text><button class="g-link" bindtap="closeSheet" disabled="{{busy}}">关闭</button></view>
+    <text wx:if="{{sheetError}}" class="g-error">{{sheetError}}</text>
+    <block wx:if="{{sheet === 'record'}}">
+      <view class="g-actions g-gap"><button class="g-link record-mode {{recordMode === 'add' ? 'record-selected' : ''}}" data-mode="add" bindtap="onRecordMode" disabled="{{busy}}">本次新增</button><button class="g-link record-mode {{recordMode === 'set' ? 'record-selected' : ''}}" data-mode="set" bindtap="onRecordMode" disabled="{{busy}}">修正今日累计</button></view>
+      <text class="g-label">{{recordMode === 'add' ? '本次学习量' : '今日累计学习量'}}（{{group.baseline_unit}}）</text>
+      <input class="g-input" type="number" value="{{input}}" bindinput="onInput" disabled="{{busy}}" maxlength="6" placeholder="请输入数字" adjust-position="true" cursor-spacing="160" aria-label="学习量" />
+      <text class="g-sub g-gap-sm">{{recordMode === 'set' ? '将今日累计修正为填写的数值，可填 0 撤销误填。' : '确认后累加到今天的记录。'}}跨日后记录锁定。</text>
+      <button class="g-button g-gap" bindtap="onSaveRecord" loading="{{busy}}" disabled="{{busy}}">确认记录</button>
+    </block>
+    <block wx:if="{{sheet === 'invite'}}"><text class="g-sub g-gap">正式席与旁听席共 {{group.count}} / {{rules.maxMembers}} 人，每位成员均可邀请。</text><text class="invite-code">{{group.invite_code}}</text><button class="g-button" open-type="share">分享微信邀请卡片</button><button class="g-button g-secondary g-gap-sm" bindtap="onCopy">复制邀请码</button></block>
+    <block wx:if="{{sheet === 'rules'}}"><scroll-view scroll-y="true" class="rules-scroll"><text wx:for="{{contract}}" wx:key="*this" class="g-contract-line">{{index + 1}}. {{item}}</text><button class="g-link g-gap" bindtap="onHistory">我的契约历史</button><button class="g-button g-secondary g-gap-sm" bindtap="onExit" disabled="{{busy}}">退出学习小组</button></scroll-view></block>
+    <block wx:if="{{sheet === 'members'}}"><scroll-view scroll-y="true" class="rules-scroll"><button wx:for="{{members}}" wx:key="id" class="g-link g-member-stat" data-id="{{item.id}}" bindtap="onMember"><image class="g-avatar" src="{{item.avatarPath}}" /><view class="member-list-copy"><text>{{item.nickname}}</text><text class="g-sub">{{item.statusText}}{{item.isInitiator ? ' · 发起人' : ''}}</text></view><text>›</text></button></scroll-view></block>
+    <block wx:if="{{sheet === 'member'}}"><text wx:if="{{!memberDetail && !sheetError}}" class="g-sub g-gap">正在读取成员契约…</text><block wx:if="{{memberDetail}}"><view class="g-row g-gap"><image class="g-avatar" src="{{memberDetail.member.avatarPath}}" /><view><text class="g-heading">{{memberDetail.member.nickname}}</text><text class="g-sub">{{memberDetail.member.statusText}}{{memberDetail.member.isInitiator ? ' · 发起人' : ''}}</text></view></view><view class="g-between g-member-stat"><text>今日学习</text><text>{{memberDetail.member.today.value}} {{group.baseline_unit}} · {{memberDetail.member.today.label}}</text></view><view class="g-between g-member-stat"><text>本周履约</text><text>{{memberDetail.week.fulfilled}} / {{memberDetail.week.eligible}} 天</text></view><view class="g-between g-member-stat"><text>本月履约率</text><text>{{memberDetail.month.rateText}}</text></view><view class="g-between g-member-stat"><text>连续守约</text><text>{{memberDetail.member.streak}} 天</text></view><view class="g-between g-member-stat"><text>本月请假</text><text>{{memberDetail.month.dayOff}} 天</text></view><text class="g-small g-gap">仅展示本轮学习契约信息，统计以已结算记录为准。</text></block></block>
+    <text wx:if="{{sheet === 'feedback' && busy}}" class="g-sub g-gap">正在保存，请稍候…</text>
+  </view>
+</view>

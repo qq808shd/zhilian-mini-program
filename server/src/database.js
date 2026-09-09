@@ -13,7 +13,7 @@ function toBoolean(value) {
   return Boolean(Number(value));
 }
 
-function createDatabase(dbPath) {
+function createDatabase(dbPath, options = {}) {
   ensureDatabaseDirectory(dbPath);
   const db = new DatabaseSync(dbPath);
   db.exec("PRAGMA foreign_keys = ON");
@@ -77,6 +77,8 @@ function createDatabase(dbPath) {
       PRIMARY KEY (user_id, progress_key)
     );
   `);
+
+  const groups = require("./groups/service").createGroupService(db, options.groups);
 
   const statements = {
     insertLearning: db.prepare("INSERT OR IGNORE INTO learning_events(user_id, event_id, occurred_at, payload) VALUES (?, ?, ?, ?)"),
@@ -374,6 +376,7 @@ function createDatabase(dbPath) {
   }
 
   return {
+    groups,
     getOrCreateUser,
     getUserById,
     getSnapshot,

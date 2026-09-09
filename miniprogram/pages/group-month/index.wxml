@@ -1,0 +1,11 @@
+<view class="group-page">
+  <view class="g-between"><text class="g-title">月度小组成绩</text><picker mode="date" fields="month" value="{{month}}" start="{{minMonth}}" end="{{maxMonth}}" bindchange="onMonth" disabled="{{busy}}"><view class="month-picker">{{month || '本月'}} ▾</view></picker></view>
+  <text class="g-sub g-gap-sm">每一轮契约独立展示，按加入顺序排列。</text>
+  <text wx:if="{{error}}" class="g-error">{{error}}</text><button wx:if="{{error}}" class="g-button g-secondary" bindtap="load">重新读取</button>
+  <text wx:if="{{busy}}" class="g-sub g-gap">正在读取月度记录…</text>
+  <block wx:if="{{result}}">
+    <view class="g-card g-gap"><text class="g-heading">{{result.group.name}}</text><view class="g-stats g-gap"><view><text class="g-stat-value">{{result.summary.displayValue}}</text><text class="g-small">累计{{result.summary.unit}}</text></view><view><text class="g-stat-value">{{result.summary.rateText}}</text><text class="g-small">履约率</text></view><view><text class="g-stat-value">{{result.summary.fulfilled}}</text><text class="g-small">履约人次</text></view></view><text class="g-small g-gap">正式席实际学习量含请假及加入日；履约率只含已结算的应履约日，不含旁听。</text></view>
+    <view wx:if="{{!result.summary.eligible}}" class="g-card g-empty"><image class="g-illustration" src="/assets/groups/companions.png" mode="aspectFit" /><text class="g-heading">本月暂无考核数据</text><text class="g-sub">每天的坚持，会在结算后汇成这份成绩单。</text></view>
+    <view wx:for="{{result.members}}" wx:key="id" class="g-card"><view class="g-between"><view class="g-row"><image class="g-avatar" src="{{item.avatarPath}}" /><text class="month-name">{{item.nickname}}</text></view><text class="g-pill g-neutral">{{item.statusText}}</text></view><view class="month-grid g-gap"><view><text class="g-stat-value">{{item.fulfilled}}</text><text class="g-small">履约天数</text></view><view><text class="g-stat-value">{{item.dayOff}}</text><text class="g-small">请假天数</text></view><view><text class="g-stat-value">{{item.unfulfilled}}</text><text class="g-small">未履约天数</text></view><view><text class="g-stat-value">{{item.streak}}</text><text class="g-small">当前连续守约</text></view></view><text class="g-sub g-gap-sm">本月累计 {{item.totalValue}} {{result.group.baseline_unit}} · 履约率 {{item.rateText}}</text></view>
+  </block>
+</view>

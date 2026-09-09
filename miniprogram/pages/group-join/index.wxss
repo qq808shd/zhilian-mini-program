@@ -1,0 +1,3 @@
+@import "../../styles/groups.wxss";
+.code-input { text-transform:uppercase; letter-spacing:8rpx; font-size:36rpx; }
+.contract-line { display:block; margin-top:16rpx; font-size:24rpx; line-height:1.7; color:var(--color-text-secondary); }

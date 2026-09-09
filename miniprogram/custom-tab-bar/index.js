@@ -1,9 +1,11 @@
 Component({
   data: {
     selected: 0,
+    hidden: false,
     tabs: [
       { route: 'pages/study/index', label: '学习', icon: 'study' },
       { route: 'pages/exam/index', label: '练习', icon: 'exam' },
+      { route: 'pages/study-group/index', label: '小组', icon: 'groups' },
       { route: 'pages/me/index', label: '我的', icon: 'me' }
     ]
   },
@@ -13,6 +15,7 @@ Component({
     refresh() {
       const pages = getCurrentPages(), current = pages[pages.length - 1];
       const selected = this.data.tabs.findIndex((tab) => current && tab.route === current.route);
+      if (current && current.route !== 'pages/study-group/index' && this.data.hidden) this.setData({ hidden: false });
       if (selected >= 0 && selected !== this.data.selected) this.setData({ selected });
     },
     onTab(event) {

@@ -1,0 +1,6 @@
+@import "../../styles/groups.wxss";
+.first-label { margin-top:0; }
+.baseline-input { flex:1; min-width:0; }
+.unit-picker { min-width:88rpx; padding:24rpx 16rpx; border-radius:16rpx; background:var(--color-primary-soft); text-align:center; }
+.group-page button.type-selected { background:var(--color-primary-soft); border-color:var(--color-primary); }
+.contract-line { display:block; margin-top:16rpx; font-size:24rpx; line-height:1.7; color:var(--color-text-secondary); }

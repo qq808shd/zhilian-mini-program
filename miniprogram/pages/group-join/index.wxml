@@ -1,0 +1,16 @@
+<view class="group-page">
+  <text class="g-title">输入伙伴的邀请码</text><text class="g-sub g-gap-sm">先了解约定，再一起出发。</text>
+  <view class="g-card g-gap"><text class="g-label">6 位邀请码</text><input class="g-input code-input" value="{{code}}" bindinput="onCode" maxlength="6" placeholder="例如 ABC234" disabled="{{busy}}" /><button class="g-button g-secondary g-gap" bindtap="onPreview" loading="{{busy}}" disabled="{{busy}}">查看小组契约</button></view>
+  <view wx:if="{{error}}" class="g-card"><image wx:if="{{errorCode === 'INVITE_INVALID'}}" class="g-illustration" src="/assets/groups/companions.png" mode="aspectFit" /><text class="g-heading">{{errorCode === 'GROUP_FULL' ? '小组暂时满员' : errorCode === 'GROUP_ARCHIVED' ? '这一组已归档' : '暂时无法继续'}}</text><text class="g-error">{{error}}</text></view>
+  <block wx:if="{{preview}}">
+    <view class="g-card"><text class="g-heading">{{preview.group.name}}</text><text class="g-sub g-gap-sm">{{preview.group.study_topic}}</text><view class="g-gap"><text class="g-number">{{preview.group.baseline_value}}</text><text> {{preview.group.baseline_unit}} / 天</text></view><text class="g-sub g-gap-sm">{{preview.group.count}} / {{preview.rules.maxMembers}} 人 · 正式席与旁听席合计</text></view>
+    <view wx:if="{{preview.group.archived || preview.group.count >= preview.rules.maxMembers || preview.alreadyCurrent}}" class="g-card"><text class="g-heading">{{preview.group.archived ? '小组已归档' : preview.alreadyCurrent ? (preview.sameGroup ? '你已在这个小组中' : '你已有进行中的契约') : '小组已满'}}</text><text class="g-sub g-gap-sm">{{preview.group.archived ? '本轮同行已结束，邀请码已失效。' : preview.alreadyCurrent ? '每人同时只能参加一个学习小组。' : '旁听也占用席位，可等待伙伴离席后再查看。'}}</text><button class="g-button g-secondary g-gap" bindtap="onCurrent">返回我的小组</button></view>
+    <block wx:else>
+      <view wx:if="{{preview.carry.status === 'observer' || preview.carry.misses || preview.carry.leaves}}" class="g-card"><text class="g-heading">原组契约状态保留</text><text class="g-sub g-gap-sm">{{preview.carry.status === 'observer' ? '重新加入后仍为旁听席，回归挑战从 0 开始。' : '同周未履约记录继续有效。'}}</text><text class="g-sub">本周未履约 {{preview.carry.misses}} 次 · 已请假 {{preview.carry.leaves}} 次</text></view>
+      <view class="g-card"><text class="g-label">你的组内称呼</text><input class="g-input" value="{{nickname}}" bindinput="onNickname" maxlength="{{rules.nicknameMax}}" placeholder="让伙伴认出你" disabled="{{busy}}" /><text class="g-sub g-gap-sm">称呼与契约记录对同组成员可见，使用内置头像。</text></view>
+      <view class="g-card"><text class="g-heading">学习契约</text><text wx:for="{{preview.contract}}" wx:key="*this" class="contract-line">{{index + 1}}. {{item}}</text></view>
+      <checkbox-group bindchange="onAgree"><label class="g-check"><checkbox value="accept" checked="{{accepted}}" color="#4D785B" disabled="{{busy}}" /><text>我接受学习契约，同意组内展示我的契约记录。</text></label></checkbox-group>
+      <button class="g-button" bindtap="onJoin" disabled="{{busy || !accepted}}" loading="{{busy}}">接受学习契约并加入</button>
+    </block>
+  </block>
+</view>

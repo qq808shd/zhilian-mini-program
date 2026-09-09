@@ -10,9 +10,9 @@ function setup() {
   return {component,definition,get calls(){return calls;},get toasts(){return toasts;},get pending(){return pending;},route:v=>{route=v;}};
 }
 const event=index=>({currentTarget:{dataset:{index}}});
-test('all three tabs follow actual routes after direct entry, cached return and successful switch',()=>{
+test('all four tabs follow actual routes after direct entry, cached return and successful switch',()=>{
   const f=setup(),c=f.component;
-  assert.deepEqual(Array.from(c.data.tabs,t=>t.label),['学习','练习','我的']);
+  assert.deepEqual(Array.from(c.data.tabs,t=>t.label),['学习','练习','小组','我的']);
   const config=JSON.parse(fs.readFileSync(require.resolve('../miniprogram/app.json'),'utf8'));
   assert.deepEqual(config.tabBar.list.map(t=>t.pagePath),Array.from(c.data.tabs,t=>t.route));
   for(const [index,tab] of c.data.tabs.entries()) {f.route(tab.route);f.definition.pageLifetimes.show.call(c);assert.equal(c.data.selected,index);}
@@ -22,5 +22,5 @@ test('all three tabs follow actual routes after direct entry, cached return and 
 test('repeated, invalid and failed tab switches do not show a false selected page',()=>{
   const f=setup(),c=f.component;c.onTab(event(0));c.onTab(event(9));assert.equal(f.calls,0);
   c.onTab(event(2));c.onTab(event(3));assert.equal(f.calls,1);f.pending.fail();f.pending.complete();assert.equal(c.data.selected,0);assert.equal(f.toasts,1);
-  c.onTab(event(2));assert.equal(f.calls,2);assert.equal(f.pending.url,'/pages/me/index');
+  c.onTab(event(3));assert.equal(f.calls,2);assert.equal(f.pending.url,'/pages/me/index');
 });

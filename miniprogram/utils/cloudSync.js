@@ -264,6 +264,7 @@ function initializeCloudSync() {
 }
 
 module.exports = {
+  requestAuthenticated(options) { return authorizedRequest({ ...options, runGeneration: generation }); },
   initializeCloudSync,
   syncCloudData,
   scheduleCloudSync,

@@ -22,7 +22,12 @@
     "pages/filing/index",
     "pages/today-study/index",
     "pages/free-study/index",
-    "pages/study-settings/index"
+    "pages/study-settings/index",
+    "pages/study-group/index",
+    "pages/group-create/index",
+    "pages/group-join/index",
+    "pages/group-month/index",
+    "pages/group-history/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F7F8F2",
@@ -49,6 +54,12 @@
         "iconPath": "assets/tabbar/exam.png",
         "selectedIconPath": "assets/tabbar/exam-active.png",
         "text": "练习"
+      },
+      {
+        "pagePath": "pages/study-group/index",
+        "iconPath": "assets/tabbar/groups.png",
+        "selectedIconPath": "assets/tabbar/groups-active.png",
+        "text": "小组"
       },
       {
         "pagePath": "pages/me/index",

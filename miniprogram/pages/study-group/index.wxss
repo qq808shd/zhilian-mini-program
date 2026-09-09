@@ -1,0 +1,29 @@
+@import "../../styles/groups.wxss";
+.group-header { margin-bottom:24rpx; }
+.header-links { gap:0; }
+.today-card { border-color:var(--color-primary-border); }
+.today-value { margin:24rpx 0 16rpx; display:flex; align-items:baseline; gap:8rpx; flex-wrap:wrap; }
+.today-baseline { font-size:28rpx; color:var(--color-text-secondary); }
+.recovery-banner { display:block; padding:12rpx 16rpx; margin-top:16rpx; font-size:24rpx; border-radius:16rpx; }
+.member-wall { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24rpx 16rpx; }
+button.wall-member { display:flex; flex-direction:column; align-items:center; width:100%; min-width:0; padding:0; border:0; background:transparent; line-height:1.5; border-radius:16rpx; }
+.member-name { width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:24rpx; margin-top:8rpx; }
+.member-state { display:block; font-size:22rpx; text-align:center; border-radius:8rpx; padding:0 4rpx; }
+.member-value { margin-top:4rpx; max-width:100%; }
+.week-row { display:grid; grid-template-columns:128rpx repeat(7,minmax(0,1fr)); min-height:72rpx; align-items:center; border-bottom:1rpx solid var(--color-divider); }
+.week-header { min-height:56rpx; color:var(--color-text-secondary); font-size:22rpx; }
+.week-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:8rpx; font-size:24rpx; }
+.week-day,.week-cell { text-align:center; }
+.week-dot { display:inline-flex; align-items:center; justify-content:center; width:32rpx; height:32rpx; border-radius:999rpx; font-size:22rpx; line-height:32rpx; }
+.week-dot.g-warning,.week-dot.g-danger { border-radius:8rpx; }
+.week-dot.g-empty { background:transparent; padding:0; color:var(--color-text-secondary); }
+.week-legend { display:flex; flex-wrap:wrap; gap:8rpx 16rpx; margin-top:16rpx; color:var(--color-text-secondary); font-size:22rpx; }
+.legend-yellow { color:var(--color-warning); }
+.legend-red { color:var(--color-danger); }
+.invite-code { display:block; text-align:center; font-size:52rpx; font-weight:600; letter-spacing:8rpx; margin:32rpx 0; color:var(--color-primary); }
+.g-sheet button.record-mode { flex:1; width:0; border:1rpx solid var(--color-border); }
+.g-sheet button.record-selected { background:var(--color-primary-soft); border-color:var(--color-primary-border); }
+.g-sheet button.g-member-stat { justify-content:flex-start; width:100%; gap:16rpx; }
+.member-list-copy { flex:1; text-align:left; min-width:0; }
+
+.rules-scroll { height:55vh; }

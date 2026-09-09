@@ -5,5 +5,5 @@ module.exports = {
   filingQueryUrl: "https://beian.miit.gov.cn/",
   // 仅在已配置允许访问的业务域名并完成真机验证后启用 web-view。
   filingWebViewEnabled: false,
-  published: false, policyVersion: "2026-09-07-learning-draft", effectiveDate: ""
+  published: false, policyVersion: "2026-09-08-groups-draft", effectiveDate: ""
 };

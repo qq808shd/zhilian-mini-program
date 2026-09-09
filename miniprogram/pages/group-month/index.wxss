@@ -1,0 +1,4 @@
+@import "../../styles/groups.wxss";
+.month-picker { padding:16rpx; border-radius:16rpx; color:var(--color-primary); background:var(--color-primary-soft); font-size:24rpx; }
+.month-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16rpx; }
+.month-name { max-width:300rpx; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
