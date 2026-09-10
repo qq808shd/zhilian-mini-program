@@ -1,4 +1,5 @@
 const engine = require('../../utils/learningEngine');
+const guide = require('../../utils/learningGuide');
 const { getKnowledgeById } = require('../../data/content');
 Page({
   data: { daily: {}, cards: [], currentIndex: 0, positionProgress: 0, task: null, mode: 'new', topicId: '', revealed: false, saving: false, confirming: false, current: {} },
@@ -25,6 +26,7 @@ Page({
     const task = index >= 0 ? cards[index] : null;
     this.setData({ daily, cards, task, currentIndex: Math.max(0, index), positionProgress: task ? Math.round((index + 1) / cards.length * 100) : 100,
       current: task ? task.current : {}, revealed: !!(task && task.revealed), saving: false });
+    if (!task && this.data.mode === 'new' && daily.summary.newCount > 0 && guide.takeHint('new-complete')) this.setData({ firstCompletion: true });
     if (task) engine.beginTask(now, this.data.mode, this.data.topicId);
     wx.setNavigationBarTitle({ title: daily.subject });
   },

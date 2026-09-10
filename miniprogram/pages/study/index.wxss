@@ -1,28 +1,44 @@
-@import "../../styles/learning-theme.wxss";
-.study-page { padding:12px var(--learning-gutter) calc(48px + 20px + env(safe-area-inset-bottom)); }
-.scope-card { overflow:hidden; padding:20px 12px 12px; background:var(--color-primary-soft); border-radius:var(--learning-radius); }
-.scope-main { position:relative; padding:0 8px 20px; }
-.scope-copy { min-width:0; }
-.scope-art { position:absolute; right:0; top:46px; width:74px; height:74px; border-radius:16px; pointer-events:none; }
-.scope-top { display:flex; align-items:center; gap:12px; margin:12px 80px 16px 0; flex-wrap:nowrap; }
-.study-page .scope-title { flex:0 1 auto; width:auto; min-width:0; max-width:100%; min-height:44px; padding:4px 0; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:transparent; text-align:left; font-size:22px; font-weight:600; line-height:36px; color:var(--color-text); }
-.study-page .scope-switch { display:flex; flex:0 0 auto; align-items:center; justify-content:center; gap:6px; width:auto; min-width:44px; min-height:44px; padding:0; margin:0; background:transparent; border:0; border-radius:0; color:var(--color-text); font-size:13px; font-weight:400; }
-.scope-progress-copy { display:flex; align-items:baseline; gap:8px; margin:0 86px 8px 0; font-size:14px; color:var(--color-text); white-space:nowrap; }
-.scope-number { font-weight:500; font-size:16px; font-variant-numeric:tabular-nums; }
-.scope-meter { margin-right:86px; }
-.degree-row { display:flex; padding:12px 0; border-radius:16px; background:rgba(255,255,255,.85); }
-.study-page .degree-stat { flex:1 1 0%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:0; min-width:0; min-height:76px; margin:0; padding:0 4px; border-radius:0; background:transparent; color:var(--color-text); font-size:13px; font-weight:400; line-height:1.3; }
-.degree-stat + .degree-stat { border-left:1px solid var(--color-divider); }
-.degree-stat image { width:22px; height:22px; }
-.degree-count { color:var(--color-text); font-size:18px; font-weight:500; font-variant-numeric:tabular-nums; }
-.study-actions { margin-top:16px; padding:4px 16px 16px; border:0; border-radius:var(--learning-radius); box-shadow:var(--learning-shadow); }
-.study-actions .section-heading { margin:0 0 8px; min-height:44px; }
-.study-actions .section-title { font-size:18px; font-weight:500; }
-.study-page .study-settings { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:44px; min-width:0; height:44px; padding:0; margin-right:-8px; background:transparent; }
-.study-buttons { display:flex; gap:var(--learning-gap); }
-.study-buttons .study-action { display:flex; flex:1 1 0%; flex-direction:column; align-items:center; justify-content:center; gap:10px; width:0; min-width:0; min-height:116px; padding:14px 8px; border:0; border-radius:16px; background:var(--learning-tint); color:var(--color-text); font-size:16px; font-weight:400; line-height:1.3; }
-.study-action image { flex-shrink:0; width:32px; height:32px; }
-.study-buttons .review-action { background:var(--learning-blue-soft); }
-.action-copy { display:flex; flex-direction:column; gap:4px; text-align:center; }
-.action-count { font-size:22px; font-weight:500; font-variant-numeric:tabular-nums; }
-@media (max-width:350px) { .scope-art { width:62px; height:62px; } .scope-top { margin-right:64px; gap:8px; } .scope-title { font-size:20px; } }
+@import "../../styles/learning-experience.wxss";
+.scope-header { display:flex; align-items:center; justify-content:space-between; gap:24rpx; min-height:112rpx; margin-bottom:24rpx; }
+.scope-copy { flex:1; min-width:0; }
+.scope-title { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:36rpx; font-weight:600; line-height:1.4; margin-top:8rpx; }
+.scope-header button { gap:8rpx; }
+.action-meta { display:block; margin-top:16rpx; }
+.action-secondary { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin-top:24rpx; padding-top:16rpx; border-top:1rpx solid var(--color-primary-border); }
+.new-task-copy { flex:1; min-width:0; }
+.study-page .action-secondary .new-task-button { flex:0 0 auto; width:auto; min-width:176rpx; min-height:44px; margin:0; padding:16rpx 24rpx; border:2rpx solid var(--color-primary); background:var(--color-surface); color:var(--color-primary); line-height:1.4; white-space:nowrap; }
+.action-status { display:block; margin-top:24rpx; padding-top:24rpx; border-top:1rpx solid var(--color-primary-border); font-size:24rpx; line-height:1.6; color:var(--color-text-secondary); }
+.progress-section,.degree-section { margin-top:32rpx; }
+.progress-count { font-size:30rpx; font-weight:600; color:var(--color-text); }
+.degree-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+button.degree-stat { width:100%; min-width:0; min-height:88rpx; display:flex; flex-direction:column; justify-content:center; gap:8rpx; margin:0; background:transparent; color:var(--color-text-secondary); font-size:24rpx; line-height:1.5; }
+.degree-stat + .degree-stat { border-left:1rpx solid var(--color-border); border-radius:0; }
+.degree-stat text:last-child { color:var(--color-text); font-size:28rpx; }
+.study-tools { margin-top:32rpx; }
+.study-page button.study-tool { width:100%; min-width:0; min-height:128rpx; margin:0; padding:24rpx; border:1rpx solid var(--color-primary-border); border-radius:20rpx; background:var(--color-surface); color:var(--color-text); text-align:left; line-height:1.5; }
+.study-page button.free-study-tool { display:flex; align-items:center; gap:20rpx; }
+.tool-icon-wrap { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:72rpx; height:72rpx; border-radius:16rpx; background:var(--color-primary-soft); }
+.tool-icon { display:block; width:36rpx; height:36rpx; flex-shrink:0; }
+.tool-copy { flex:1; min-width:0; }
+.tool-title { display:block; font-size:28rpx; font-weight:600; }
+.tool-description { display:block; margin-top:6rpx; font-size:24rpx; font-weight:400; color:var(--color-text-secondary); }
+.tool-arrow { display:block; width:24rpx; height:24rpx; flex-shrink:0; }
+.study-page button.study-tool-pressed { background:var(--color-pressed); border-color:var(--color-primary); }
+.optional-practice { display:flex; align-items:center; justify-content:space-between; margin-top:16rpx; }
+.complete-icon { display:block; width:64rpx; height:64rpx; margin-top:24rpx; }
+.completed-counts { display:flex; flex-wrap:wrap; gap:16rpx 24rpx; margin-top:24rpx; font-size:24rpx; color:var(--color-primary); }
+
+.action-heading { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin:-16rpx 0; }
+.study-page button.plan-adjust { display:flex; align-items:center; justify-content:flex-end; flex-shrink:0; gap:8rpx; width:auto; min-height:44px; padding:8rpx 0 8rpx 12rpx; margin:0; background:transparent; color:var(--color-text-secondary); font-size:24rpx; font-weight:400; line-height:1.5; border-radius:12rpx; }
+.plan-adjust image { width:32rpx; height:32rpx; }
+.plan-adjust image.plan-arrow { width:24rpx; height:24rpx; }
+.study-page button.learning-note { display:flex; align-items:center; gap:12rpx; width:100%; min-height:44px; margin:12rpx 0 0; padding:8rpx 0; background:transparent; color:var(--color-text-secondary); font-size:24rpx; font-weight:400; line-height:1.7; text-align:left; border-radius:12rpx; }
+.note-info { flex-shrink:0; font-size:30rpx; line-height:1.4; }
+.note-copy { flex:1; min-width:0; }
+.note-link { display:inline-block; margin-left:12rpx; color:var(--color-primary); text-decoration:underline; text-underline-offset:4rpx; }
+.study-page button.context-pressed { background:var(--color-pressed); }
+
+.degree-section .section-heading { min-height:44px; margin-top:-12rpx; margin-bottom:8rpx; }
+.study-page button.all-learned-link { display:flex; align-items:center; justify-content:flex-end; gap:8rpx; width:auto; min-height:44px; margin:0; padding:8rpx 0 8rpx 16rpx; background:transparent; color:var(--color-primary); font-size:24rpx; font-weight:400; line-height:1.5; border-radius:12rpx; }
+.all-learned-link image { width:28rpx; height:28rpx; }
+.study-page button.all-learned-link.context-pressed { background:var(--color-pressed); }

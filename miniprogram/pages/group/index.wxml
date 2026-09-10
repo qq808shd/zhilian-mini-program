@@ -1,5 +1,5 @@
 <view class="page" wx:if="{{topic}}">
-  <view class="card topic-overview"><text class="page-title">{{topic.name}}</text><text class="page-subtitle">已学习 {{metrics.learnedCount}} · 已掌握 {{metrics.masteredCount}} · 待复习 {{metrics.dueCount}}</text><button wx:if="{{suggested}}" class="primary-button" bindtap="onContinue">{{suggested.label}}</button><view class="actions-row"><button class="text-button" bindtap="onWeak">我的薄弱项</button><button class="text-button" bindtap="onOpenCatalog">全部内容</button></view></view>
+  <view class="card topic-overview"><text class="page-title">{{topic.name}}</text><text class="page-subtitle">已学习 {{metrics.learnedCount}} · 自评掌握 {{metrics.masteredCount}} · 待复习 {{metrics.dueCount}}</text><button wx:if="{{suggested}}" class="primary-button" bindtap="onContinue">{{suggested.label}}</button><view class="actions-row"><button class="text-button" bindtap="onWeak">我的薄弱项</button><button class="text-button" bindtap="onOpenCatalog">全部内容</button></view></view>
   <text class="crumb">学习 / {{module.name}} / {{topic.name}}</text>
   <text class="page-title group-title">按资料顺序积累</text>
   <text class="page-subtitle">共 {{total}} {{topic.knowledgeUnit}}，每组最多 {{topic.groupSize}} {{topic.knowledgeUnit}}。{{topic.groupBatches ? '已按资料批次排序，原有词库优先。' : ''}}浏览进度不代表掌握，学完后可练习检验。</text>

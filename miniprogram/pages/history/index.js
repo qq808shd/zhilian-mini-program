@@ -1,8 +1,12 @@
-const engine = require("../../utils/learningEngine");
-const { getLearningOverview } = require("../../utils/learningView");
-Page({ data: { recent: [], topics: [] }, onShow() { const view = getLearningOverview(); this.setData({ daily: engine.dailyView(), recent: view.recent, topics: view.topics.filter((topic) => topic.learnedCount) }); },
-  onRecent(event) { const item = this.data.recent[event.currentTarget.dataset.index]; if (item) engine.navigateAction(engine.groupAction(item.topicId, item.setIndex)); },
-  onTopic(event) { wx.navigateTo({ url: "/pages/group/index?topicId=" + event.currentTarget.dataset.id }); },
-  onToday() { wx.navigateTo({ url: "/pages/today-study/index" }); },
-  onStart() { wx.switchTab({ url: "/pages/study/index" }); }
+const engine = require('../../utils/learningEngine');
+const { getLearningOverview } = require('../../utils/learningView');
+const dashboard = require('../../utils/learningDashboard');
+Page({
+  data: { recent: [], topics: [], activity: [], today: {} },
+  onShow() { const now = Date.now(), view = getLearningOverview(), state = engine.getState(now); this.setData({ today: dashboard.completion(state, now), activity: dashboard.recentActivity(state, now), recent: view.recent, topics: view.topics.filter(t => t.learnedCount) }); },
+  onRecent(e) { const item = this.data.recent[e.currentTarget.dataset.index]; if (item) engine.navigateAction(engine.groupAction(item.topicId, item.setIndex)); },
+  onTopic(e) { wx.navigateTo({ url: '/pages/group/index?topicId=' + e.currentTarget.dataset.id }); },
+  onKnowledge(e) { wx.navigateTo({ url: '/pages/detail/index?id=' + e.currentTarget.dataset.id }); },
+  onToday() { wx.switchTab({ url: '/pages/study/index' }); },
+  onStart() { wx.switchTab({ url: '/pages/study/index' }); }
 });

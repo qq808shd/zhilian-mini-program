@@ -1,3 +1,5 @@
-
-
-.history-today { padding: 24rpx; margin-bottom: 24rpx; text-align: left; }
+@import "../../styles/learning-experience.wxss";
+.history-summary { padding:32rpx; }
+button.history-event { width:100%; display:block; padding:24rpx 0; background:transparent; text-align:left; color:var(--color-text); border-bottom:1rpx solid var(--color-border); border-radius:0; }
+.history-event-top { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin-bottom:8rpx; }
+.history-label { color:var(--color-primary); font-size:24rpx; }

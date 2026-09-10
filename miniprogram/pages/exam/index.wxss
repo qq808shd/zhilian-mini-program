@@ -1,3 +1,4 @@
+@import "../../styles/learning-experience.wxss";
 .exam-page {
   padding-top: 34rpx;
 }
@@ -426,3 +427,25 @@
 
 /* Custom navigation owns the bottom safe area; reserve its full height once. */
 .page { padding-bottom:calc(48px + 32rpx + env(safe-area-inset-bottom)); }
+
+/* V6: one recommendation, one main result action. */
+.exam-page { padding-top:24rpx; }
+.exam-page .exam-title { font-size:42rpx; }
+.exam-page .result-hero { background:var(--color-surface); border-color:var(--color-border); padding:32rpx; border-radius:24rpx; text-align:left; }
+.result-overview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16rpx; margin-top:24rpx; }
+.result-overview > view { min-width:0; }
+.result-number { display:block; font-size:44rpx; font-weight:600; line-height:1.4; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.result-denominator { font-size:26rpx; font-weight:400; color:var(--color-text-secondary); }
+.result-time { font-size:36rpx; line-height:1.7; }
+.weak-list { margin-top:16rpx; }
+.weak-list .ux-link-row { border-bottom:1rpx solid var(--color-border); gap:16rpx; }
+.system-feedback { display:block; margin-top:24rpx; padding:24rpx; border-radius:16rpx; background:var(--color-primary-soft); color:var(--color-primary-dark); font-size:24rpx; line-height:1.6; }
+.result-primary { margin-top:32rpx; }
+.result-secondary { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16rpx; margin-top:8rpx; }
+.exam-page .exam-tip { padding:0; margin-top:24rpx; }
+.exam-page .exam-tip .section-title { font-size:28rpx; }
+.exam-page .setup-instruction { margin-top:8rpx; }
+.exam-page .question-card { padding:32rpx; border-radius:28rpx; }
+.exam-page .option { padding:16rpx; }
+.exam-page .count-choice { width:0; min-width:0; min-height:88rpx; }
+.exam-page .ux-note { white-space:pre-line; }

@@ -1,6 +1,7 @@
 const engine = require('../../utils/learningEngine');
 const { getProfile, DEFAULT_AVATAR } = require('../../utils/profile');
-const { getLearningOverview } = require('../../utils/learningView');
+const { buildDashboard } = require('../../utils/learningDashboard');
+const { getQuestionStats } = require('../../utils/storage');
 const { contact } = require('../../utils/productActions');
 const product = require('../../config/product');
 Page({
@@ -8,8 +9,9 @@ Page({
   onShow() {
     const bar = this.getTabBar && this.getTabBar();
     if (bar) bar.refresh();
-    const overview = getLearningOverview();
-    this.setData({ learning: engine.overview(), profile: getProfile(), summary: overview.summary });
+    const now = Date.now(), settings = engine.getStudySettings(now);
+    const view = buildDashboard(engine.getState(now), settings, getQuestionStats(), now);
+    this.setData({ learning: view.learning, profile: getProfile() });
   },
   onAvatarError() { this.setData({ 'profile.avatar': DEFAULT_AVATAR }); },
   onOpen(event) { wx.navigateTo({ url: '/pages/' + event.currentTarget.dataset.page + '/index' }); },

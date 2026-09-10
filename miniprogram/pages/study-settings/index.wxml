@@ -5,7 +5,7 @@
     <view class="quantity-value"><text class="quantity-number">{{newCount}}</text><text>个</text></view>
     <view class="quantity-control"><button class="step-button" data-step="-1" disabled="{{newCount <= 1}}" bindtap="onStep" hover-class="button-pressed" aria-label="减少一个"><image class="learning-icon" src="/assets/learning/minus.svg" aria-hidden="true" /></button><slider class="quantity-slider" min="1" max="{{sliderMax}}" step="1" value="{{sliderValue || 1}}" disabled="{{maxCount <= 1}}" activeColor="#4D785B" backgroundColor="#E5ECE1" block-color="#4D785B" block-size="22" bindchanging="onChanging" bindchange="onCount" aria-label="每天新学数量" /><button class="step-button" data-step="1" disabled="{{newCount >= maxCount}}" bindtap="onStep" hover-class="button-pressed" aria-label="增加一个"><image class="learning-icon" src="/assets/learning/plus.svg" aria-hidden="true" /></button></view>
     <view class="slider-labels"><text>1 个</text><text>{{maxCount}} 个</text></view>
-    <text class="quantity-note">保存后生效</text>
+    <text class="quantity-note">这是你每天计划学习的新内容数量，可以随时调整。已完成的学习不会因为调整计划而撤销。</text>
   </view>
   <button class="reset-entry" disabled="{{clearing || saving}}" bindtap="onClear" hover-class="button-pressed"><view class="reset-icon"><image class="learning-icon" src="/assets/learning/trash.svg" aria-hidden="true" /></view><view class="reset-copy"><text>清空学习记录</text><text class="reset-note">仅重置「{{topicName}}」</text></view><image class="learning-icon small" src="/assets/learning/chevron.svg" aria-hidden="true" /></button>
   <text wx:if="{{error}}" class="form-error">{{error}}</text>

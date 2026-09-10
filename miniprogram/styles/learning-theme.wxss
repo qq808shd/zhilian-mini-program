@@ -15,10 +15,10 @@ page {
   --learning-coral-soft:#faeee9;
   --learning-tint:#f3f6ee;
   --learning-green:#eef3ea;
-  --learning-radius:20px;
+  --learning-radius:28rpx;
   --learning-shadow:0 2px 10px rgba(48,61,54,.045);
-  --learning-gutter:20px;
-  --learning-gap:12px;
+  --learning-gutter:32rpx;
+  --learning-gap:24rpx;
 }
 .learning-icon { display:block; flex-shrink:0; width:22px; height:22px; }
 .learning-icon.small { width:16px; height:16px; }

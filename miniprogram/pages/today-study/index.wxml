@@ -6,7 +6,7 @@
         <scroll-view class="daily-scroll" scroll-y>
           <view wx:if="{{index >= currentIndex - 1 && index <= currentIndex + 1}}" class="card daily-card">
             <view class="daily-meta"><text class="daily-status">{{item.current.degreeLabel}} · {{item.current.learned ? '已学习' : '未学习'}}</text><button class="familiar-button" disabled="{{saving || confirming}}" data-task-id="{{item.id}}" bindtap="onFamiliar" hover-class="button-pressed" aria-label="{{item.current.excluded ? '取消熟知' : '标记熟知'}}"><image src="/assets/learning/{{item.current.excluded ? 'star-active' : 'star'}}.svg" aria-hidden="true" /><text>{{item.current.excluded ? '已熟知' : '熟知'}}</text></button></view>
-            <text class="daily-title">{{item.knowledge.title}}</text>
+            <text class="recall-hint">{{mode === 'review' ? '先试着回忆，再查看内容。' : '先想一想，查看内容为可选操作。'}}</text><text class="daily-title">{{item.knowledge.title}}</text>
             <block wx:if="{{item.revealed}}">
               <math-formula wx:if="{{item.knowledge.formulaLines && item.knowledge.formulaLines.length}}" lines="{{item.knowledge.formulaLines}}" note="{{item.knowledge.formulaNote}}" spoken="{{item.knowledge.summary}}" size="{{item.knowledge.formulaSize}}" />
               <view class="definition-panel"><view class="learning-label"><image class="learning-icon small" src="/assets/learning/book.svg" aria-hidden="true" /><text>{{item.knowledge.formulaLines && item.knowledge.formulaLines.length ? '说明' : '释义'}}</text></view><text class="daily-body">{{item.knowledge.summary}}</text></view>
@@ -19,12 +19,12 @@
       </swiper-item>
     </swiper>
     <view class="daily-footer">
-      <view class="degree-actions">
-        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" data-value="none" bindtap="onRate"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
-        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" data-value="fuzzy" bindtap="onRate"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
-        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" data-value="remembered" bindtap="onRate"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
+      <text class="degree-help">根据实际回忆，选择学习程度</text><view class="degree-actions">
+        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" aria-label="陌生，基本想不起来" data-value="none" bindtap="onRate"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" aria-label="了解，有印象但回忆不完整或费力" data-value="fuzzy" bindtap="onRate"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || current.excluded}}" hover-class="button-pressed" data-task-id="{{task.id}}" aria-label="掌握，能顺利回忆主要内容" data-value="remembered" bindtap="onRate"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
       </view>
     </view>
   </block>
-  <view wx:else class="completion-card"><image class="completion-mark" src="/assets/learning/remembered.svg" aria-hidden="true" /><text class="page-title">{{daily.total ? '本轮已完成' : mode === 'review' ? '暂无待复习' : daily.summary.unlearnedCount ? '今日新学已完成' : '这个分类已学完'}}</text><text class="page-subtitle">{{mode === 'review' ? '今日复习 ' + daily.completed + ' 个' : '今日新学 ' + daily.summary.newCount + ' 个'}}</text><button class="primary-button" hover-class="button-pressed" bindtap="onHome">完成</button></view>
+  <view wx:else class="completion-card"><image class="completion-mark" src="/assets/learning/remembered.svg" aria-hidden="true" /><text class="page-title">{{daily.total ? '本轮已完成' : mode === 'review' ? '暂无待复习' : daily.summary.unlearnedCount ? '今日新学已完成' : '这个分类已学完'}}</text><text class="page-subtitle">{{mode === 'review' ? '今日复习 ' + daily.completed + ' 个' : '今日新学 ' + daily.summary.newCount + ' 个'}}</text><text wx:if="{{firstCompletion}}" class="completion-explain">今日新学完成。已学内容会根据后续反馈安排再次复习。</text><button class="primary-button" hover-class="button-pressed" bindtap="onHome">完成</button></view>
 </view>

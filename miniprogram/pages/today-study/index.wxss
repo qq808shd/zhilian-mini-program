@@ -25,3 +25,8 @@
 .completion-card .page-title { font-size:22px; }
 .completion-card .primary-button { margin-top:32px; max-width:240px; border-radius:16px; }
 @media (max-height:500px) { .daily-page { min-height:460px; height:100vh; } }
+
+.recall-hint { display:block; margin-top:16rpx; text-align:center; font-size:24rpx; line-height:1.5; color:var(--color-text-secondary); }
+.daily-title { margin:48rpx 0; font-size:52rpx; }
+.degree-help { display:block; margin-bottom:16rpx; text-align:center; font-size:24rpx; color:var(--color-text-secondary); }
+.completion-explain { display:block; margin-top:24rpx; font-size:26rpx; line-height:1.6; color:var(--color-text-secondary); }

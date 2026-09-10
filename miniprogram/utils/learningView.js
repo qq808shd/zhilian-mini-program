@@ -39,7 +39,7 @@ function getLearningOverview() {
     stats.masteredCount = actual.masteredCount;
     return { ...topic, ...stats, ...actual, browsedCount, knowledgeCount, learnedCount, setCount: sets.length,
       progress: knowledgeCount ? Math.round(learnedCount / knowledgeCount * 100) : 0,
-      meta: `已学习 ${learnedCount} · 已掌握 ${actual.masteredCount} · 待复习 ${actual.dueCount}`,
+      meta: `已学习 ${learnedCount} · 自评掌握 ${actual.masteredCount} · 待复习 ${actual.dueCount}`,
       badge: stats.activeWrongCount ? `${stats.activeWrongCount} 项待复习` : stats.attempts ? `累计正确率 ${stats.accuracy}%` : "尚未练习" };
   });
   const positions = engine.model.filterResetProgress(wx.getStorageSync(POSITION_KEY), engine.getState().learningResets);

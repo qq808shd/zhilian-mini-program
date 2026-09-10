@@ -15,7 +15,7 @@ Component({
     refresh() {
       const pages = getCurrentPages(), current = pages[pages.length - 1];
       const selected = this.data.tabs.findIndex((tab) => current && tab.route === current.route);
-      if (current && current.route !== 'pages/study-group/index' && this.data.hidden) this.setData({ hidden: false });
+      if (current && current.route !== 'pages/study-group/index' && !(current.data && current.data.guideOpen) && this.data.hidden) this.setData({ hidden: false });
       if (selected >= 0 && selected !== this.data.selected) this.setData({ selected });
     },
     onTab(event) {

@@ -20,3 +20,7 @@
 .reset-note { display:block; margin-top:6rpx; color:var(--color-text-secondary); font-size:13px; }
 .save-footer { position:fixed; z-index:10; left:0; right:0; bottom:0; padding:8px 20px calc(12px + env(safe-area-inset-bottom)); background:var(--color-background); }
 .save-button { gap:16rpx; min-height:96rpx; border-radius:16px; font-size:16px; font-weight:500; }
+
+.plan-page { padding-left:32rpx; padding-right:32rpx; }
+.quantity-note { font-size:24rpx; text-align:left; line-height:1.6; }
+.quantity-card { padding:32rpx; border-radius:24rpx; }

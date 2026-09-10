@@ -1,9 +1,11 @@
-<view class="page exam-page">
+<view class="page exam-page ux-page">
   <block wx:if="{{state === 'module'}}">
-    <view class="page-header"><text class="kicker">以练促学</text><text class="page-title exam-title">把学过的，变成会的。</text><text class="page-subtitle">选一个专项，练习巩固，或测一测掌握程度。</text></view>
-    <view class="mode-intro"><view><text class="section-title">巩固练习</text><text class="status-note">每题确认后看解析</text></view><view><text class="section-title">专项测验</text><text class="status-note">独立作答，交卷后回顾</text></view></view>
-    <view class="section-heading"><text class="section-title">从哪个模块开始？</text></view>
-    <view class="stack"><ui-entry wx:for="{{modules}}" wx:key="id" title="{{item.name}}" symbol="{{item.symbol}}" description="{{item.description}}" data-id="{{item.id}}" bind:activate="onModuleTap" /></view>
+    <view class="page-header"><text class="page-title">练习</text><text class="page-subtitle">检验自己是不是真的会。</text></view>
+    <view class="ux-action"><text class="ux-eyebrow">{{practiceRecommendation.eyebrow}}</text><text class="ux-action-title">{{practiceRecommendation.title}}</text><text class="ux-description">{{practiceRecommendation.description}}</text><button class="primary-button" bindtap="onRecommendedPractice">{{practiceRecommendation.button}}</button></view>
+    <view class="section" id="free-practice"><view class="section-heading"><text class="section-title">自由专项</text><text class="ux-caption">按自己的需要选择</text></view>
+    <view class="stack"><ui-entry wx:for="{{modules}}" wx:key="id" title="{{item.name}}" symbol="{{item.symbol}}" description="{{item.description}}" data-id="{{item.id}}" bind:activate="onModuleTap" /></view></view>
+    <text class="ux-note">巩固练习：逐题确认后查看解析。
+专项测验：独立作答，完成后统一回顾。</text>
   </block>
   <block wx:elif="{{state === 'topic'}}">
     <button class="text-button back-link" bindtap="onBackModules">‹ 返回模块</button>
@@ -20,7 +22,7 @@
       </view>
     </view>
     <view class="setup-section"><text class="setup-label">题目数量</text><view class="count-row"><button wx:for="{{questionCountOptions}}" wx:key="value" class="count-choice {{questionCount === item.value ? 'active' : ''}}" data-value="{{item.value}}" bindtap="onCountTap">{{item.label}} {{questionCount === item.value ? '✓' : ''}}</button></view></view>
-    <view class="exam-tip card"><view><text class="section-title">{{sessionMode === 'assessment' ? '给自己一次独立作答的机会' : '先想清楚，再确认答案'}}</text><text class="status-note setup-instruction">{{sessionMode === 'assessment' ? '不设时限，记录实际作答用时。可用答题卡跳题、标记，交卷前可以修改答案。这是专项自测，不是整套模拟卷。' : '确认后显示正确答案和解题思路，该题答案不可再修改。错题自动进入复习，按次日、3 天、7 天的间隔逐步巩固。'}}</text></view></view>
+    <view class="exam-tip"><view><text class="section-title">{{sessionMode === 'assessment' ? '给自己一次独立作答的机会' : '先想清楚，再确认答案'}}</text><text class="status-note setup-instruction">{{sessionMode === 'assessment' ? '不设时限，交卷前可修改答案，完成后统一回顾。' : '确认后查看解析，该题答案不可修改。'}}</text></view></view>
     <button class="primary-button start-button" disabled="{{!availableCount}}" bindtap="onStartExam">开始{{sessionMode === 'assessment' ? '测验' : '练习'}} · {{questionCount}} 题</button>
   </block>
   <block wx:elif="{{state === 'exam' && currentQuestion}}">
@@ -43,15 +45,20 @@
       <text class="explanation-label">解题思路</text><text class="explanation-text">{{currentFeedback.explanation}}</text>
       <button wx:if="{{currentFeedback.knowledgeTitle}}" class="knowledge-link" data-id="{{currentFeedback.knowledgeId}}" bindtap="onOpenKnowledge">{{currentFeedback.knowledgeTitle}} · 查看知识点 ›</button>
     </view>
-    <text class="answer-hint">{{sessionMode === 'assessment' ? '交卷前可修改答案，暂不展示解析' : currentFeedback ? '已计入学习记录，可以继续下一题' : '选好后确认答案，再看解析'}}</text>
+    <text class="answer-hint">{{sessionMode === 'assessment' ? '交卷前可修改答案，暂不展示解析' : currentFeedback ? '已记录本次作答，可以继续下一题' : '选好后确认答案，再看解析'}}</text>
     <view class="exam-actions"><button class="secondary-button" disabled="{{currentIndex === 0}}" bindtap="onPrevious">上一题</button><button class="primary-button" disabled="{{sessionMode === 'practice' && !selectedAnswer}}" bindtap="onNext">{{sessionMode === 'practice' && !currentFeedback ? '确认答案' : currentIndex === examQuestions.length - 1 ? '提交并查看结果' : '下一题'}}</button></view>
   </block>
   <block wx:elif="{{state === 'result' && resultSummary}}">
-    <view class="page-header"><text class="kicker">这一轮，积累完成</text><text class="page-title exam-title">{{sessionMode === 'assessment' ? '测验反馈' : '练习反馈'}}</text></view>
-    <view class="result-hero card"><text class="result-eyebrow">本次正确率</text><view class="score-line"><text class="score-number">{{resultSummary.accuracy}}</text><text class="score-unit">%</text></view><text class="score-description">答对 {{resultSummary.correctCount}} / {{resultSummary.totalCount}} 题 · 用时 {{elapsed}}</text><progress-meter value="{{resultSummary.accuracy}}" /></view>
-    <view class="recommendation"><view wx:if="{{recommendation.weakTopics.length}}" class="result-weak"><text class="status-note">本次薄弱项</text><text wx:for="{{recommendation.weakTopics}}" wx:key="id" class="status-note">{{item.name}} · {{item.count}} 道错题</text><text class="status-note">{{recommendation.weakTitles}}</text></view><text class="section-title">{{recommendation.title}}</text><text class="status-note">{{recommendation.description}}</text><view class="actions-row"><button wx:if="{{resultSummary.wrongCount}}" class="primary-button" bindtap="onRetryWrong">重练 {{resultSummary.wrongCount}} 道错题</button><button class="secondary-button" bindtap="onStudyTopic">继续专项学习</button></view><button wx:if="{{resultSummary.wrongCount}}" class="text-button" bindtap="onReviewTopic">查看这个分类的复习记录 ›</button></view>
+    <view class="page-header"><text class="page-title">{{sessionMode === 'assessment' ? '测验反馈' : '练习反馈'}}</text><text class="page-subtitle">用这次作答，看看下一步。</text></view>
+    <view class="result-hero card"><text class="section-title">本次表现</text><view class="result-overview"><view><text class="result-number">{{resultSummary.correctCount}}<text class="result-denominator"> / {{resultSummary.totalCount}}</text></text><text class="ux-caption">正确题数</text></view><view><text class="result-number">{{resultSummary.accuracy}}%</text><text class="ux-caption">正确率</text></view><view><text class="result-number result-time">{{elapsed}}</text><text class="ux-caption">用时</text></view></view></view>
+    <view class="recommendation"><text class="section-title">{{resultSummary.wrongCount ? '需要巩固' : '这次全部答对了'}}</text><text class="ux-description">{{resultSummary.wrongCount ? '这次有 ' + resultSummary.wrongCount + ' 道题值得再看看。' : '可以回顾解析，或按自己的节奏继续。'}}</text>
+      <view wx:if="{{weakKnowledge.length}}" class="weak-list"><button wx:for="{{weakKnowledge}}" wx:key="id" class="ux-link-row" data-id="{{item.id}}" bindtap="onOpenKnowledge"><text>{{item.title}}</text><text>›</text></button></view>
+      <text wx:if="{{scheduleUpdated}}" class="system-feedback">✓ 已结合本次作答更新 {{scheduleUpdated}} 个已学知识的复习安排。{{firstScheduleFeedback ? '学习程度仍由你主动判断。' : ''}}</text>
+      <button wx:if="{{resultSummary.wrongCount}}" class="primary-button result-primary" bindtap="onRetryWrong">重练错题 · {{resultSummary.wrongCount}} 题</button><button wx:else class="primary-button result-primary" bindtap="onBackModules">返回练习</button>
+      <view class="result-secondary"><button class="text-button" bindtap="onStudyTopic">{{resultSummary.wrongCount ? '查看相关知识' : '继续专项学习'}} ›</button><button wx:if="{{resultSummary.wrongCount}}" class="text-button" bindtap="onBackModules">返回练习</button></view>
+    </view>
     <view wx:if="{{resultTopics.length > 1}}" class="section"><view class="section-heading"><text class="section-title">本次专项表现</text></view><view wx:for="{{resultTopics}}" wx:key="id" class="performance-row"><text>{{item.name}}</text><text>{{item.correct}} / {{item.total}} 题 · {{item.accuracy}}%</text></view></view>
-    <view class="section" id="explanations"><view class="section-heading"><text class="section-title">逐题理解</text><text class="section-note">{{resultIndex + 1}} / {{filteredResults.length}}</text></view>
+    <view class="section" id="explanations"><view class="section-heading"><text class="section-title">逐题理解</text><text class="section-note">{{filteredResults.length ? resultIndex + 1 : 0}} / {{filteredResults.length}}</text></view>
       <view class="filter-row"><button class="filter-chip {{resultFilter === 'all' ? 'active' : ''}}" data-filter="all" bindtap="onResultFilter">全部 {{resultItems.length}}</button><button class="filter-chip {{resultFilter === 'wrong' ? 'active' : ''}}" data-filter="wrong" bindtap="onResultFilter">只看错题 {{resultSummary.wrongCount}}</button></view>
       <view wx:if="{{resultItem}}" class="result-item card {{resultItem.isCorrect ? 'correct' : 'wrong'}}">
         <view class="result-item-header"><text class="result-status">{{resultItem.isCorrect ? '✓ 回答正确' : '× 回答错误'}}</text><text class="result-category">{{resultItem.topicName}}</text></view>
@@ -59,7 +66,7 @@
         <view class="answers-panel"><view class="answer-line"><text class="answer-label">正确答案</text><text class="answer-value correct-text">{{resultItem.answer}}. {{resultItem.correctText}}</text></view><view class="answer-line"><text class="answer-label">我的答案</text><text class="answer-value {{resultItem.isCorrect ? 'correct-text' : 'wrong-text'}}">{{resultItem.selectedAnswer}} {{resultItem.selectedText}}</text></view></view>
         <view class="explanation"><text class="explanation-label">解题思路</text><text class="explanation-text">{{resultItem.explanation}}</text></view>
         <view wx:if="{{resultItem.memory}}" class="explanation"><text class="explanation-label">记忆与辨析</text><text class="explanation-text">{{resultItem.memory}}</text></view>
-        <text wx:if="{{!resultItem.isCorrect}}" class="saved-note">已记录错题 · 按次日、3 天、7 天的间隔逐步巩固</text>
+        <text wx:if="{{!resultItem.isCorrect}}" class="saved-note">错题已保留在待巩固记录中。对已学知识，作答也会成为后续复习安排的参考。</text>
         <button wx:if="{{resultItem.knowledgeTitle}}" class="knowledge-link" data-id="{{resultItem.knowledgeId}}" bindtap="onOpenKnowledge">{{resultItem.knowledgeTitle}} · 复习知识点 ›</button>
       </view>
       <ui-state wx:else title="本次没有错题" description="可以切回全部，回顾本次解题思路。" mark="✓" />

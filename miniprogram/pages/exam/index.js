@@ -1,4 +1,7 @@
 const engine = require("../../utils/learningEngine");
+const dashboard = require('../../utils/learningDashboard');
+const guide = require('../../utils/learningGuide');
+const { getQuestionStats } = require('../../utils/storage');
 const { modules, questions, getTopicsByModule, getModuleById, getTopicById, getModuleName, getTopicName, getKnowledgeById } = require("../../data/content");
 const { recordQuestionResult, getActiveWrongQuestionIds, consumeExamRequest } = require("../../utils/storage");
 const { getQuestionCountOptions, selectQuestions, formatDuration } = require("../../utils/examSession");
@@ -22,6 +25,17 @@ Page({
       } else this.applyRequest(request);
     }
     if (this.data.state === "exam") this.resumeClock();
+    if (this.data.state === "module") this.refreshRecommendation();
+  },
+  refreshRecommendation() {
+    const settings = engine.getStudySettings();
+    this.setData({ practiceRecommendation: dashboard.getPracticeRecommendation(engine.getState(), getQuestionStats(), getTopicById(settings.topicId)) });
+  },
+  onRecommendedPractice() {
+    this.refreshRecommendation();
+    const r = this.data.practiceRecommendation;
+    if (r.type === 'free') { wx.pageScrollTo({ selector: '#free-practice', duration: 160 }); return; }
+    this.applyRequest({ mode: 'questionIds', questionIds: r.questionIds, direct: true, count: r.count, title: r.type === 'wrong' ? '错题巩固' : '已学内容巩固' });
   },
   onHide() { this.pauseClock(); },
   onUnload() { this.pauseClock(); },
@@ -67,7 +81,7 @@ Page({
     this.setData({ ...values, state: "setup", sheetOpen: false, availableCount: source.length, questionCountOptions: options, questionCount: options.length ? options[0].value : 0 });
     wx.pageScrollTo({ scrollTop: 0, duration: 0 });
   },
-  onBackModules() { this.customSource = null; this.setData({ state: "module", selectedModule: null, selectedTopic: null }); },
+  onBackModules() { this.customSource = null; this.setData({ state: "module", selectedModule: null, selectedTopic: null }); this.refreshRecommendation(); wx.pageScrollTo({ scrollTop: 0, duration: 0 }); },
   onBackTopics() {
     const module = this.data.selectedModule;
     if (!module) { this.onBackModules(); return; }
@@ -83,7 +97,7 @@ Page({
   startWithQuestions(source) {
     const examQuestions = source.slice(0, 20).map((question) => ({ ...question, moduleName: getModuleName(question.moduleId), topicName: getTopicName(question.topicId) }));
     if (!examQuestions.length) { wx.showToast({ title: "当前没有可用题目", icon: "none" }); return; }
-    this.pauseClock(); this.elapsedMs = 0; this.recordedIds = new Set();
+    this.pauseClock(); this.elapsedMs = 0; this.recordedIds = new Set(); this.scheduleUpdates = new Set();
     this.setData({ state: "exam", examQuestions, currentIndex: 0, currentQuestion: examQuestions[0], answers: {}, confirmed: {}, marks: {}, selectedAnswer: "", currentFeedback: null, answeredCount: 0, elapsed: "00:00", sheetOpen: false, resultSummary: null, resultItems: [] });
     this.refreshSheet(); this.resumeClock();
     wx.pageScrollTo({ scrollTop: 0, duration: 0 });
@@ -109,7 +123,9 @@ Page({
   },
   recordOnce(result) {
     if (this.recordedIds.has(result.id)) return;
+    const before = dashboard.scheduleEvidence(engine.getState().records[result.knowledgeId]);
     recordQuestionResult(result.id, result.moduleId, result.topicId, result.isCorrect);
+    if (dashboard.didUpdateSchedule(before, engine.getState().records[result.knowledgeId])) this.scheduleUpdates.add(result.knowledgeId);
     this.recordedIds.add(result.id);
   },
   onConfirm() {
@@ -138,7 +154,7 @@ Page({
   onSubmit() {
     if (this.data.state !== "exam") return;
     const remaining = this.data.sessionMode === "practice" ? this.data.examQuestions.length - Object.keys(this.data.confirmed).length : this.data.examQuestions.length - this.data.answeredCount;
-    wx.showModal({ title: this.data.sessionMode === "practice" ? "结束本次练习？" : "确认交卷？", content: remaining ? `还有 ${remaining} 题${this.data.sessionMode === "practice" ? "未确认" : "未作答"}。未作答将计为错误，提交后查看学习反馈。` : "本次作答将计入统计，错题会自动进入复习。", confirmText: "确认提交", success: (res) => { if (res.confirm) this.submitExam(); } });
+    wx.showModal({ title: this.data.sessionMode === "practice" ? "结束本次练习？" : "确认交卷？", content: remaining ? `还有 ${remaining} 题${this.data.sessionMode === "practice" ? "未确认" : "未作答"}。未作答将计为错误，提交后查看学习反馈。` : "本次作答将计入统计，错题会保留在待巩固记录中。", confirmText: "确认提交", success: (res) => { if (res.confirm) this.submitExam(); } });
   },
   submitExam() {
     if (this.data.state !== "exam") return;
@@ -149,8 +165,10 @@ Page({
     const groups = {};
     resultItems.forEach((item) => { if (!groups[item.topicId]) groups[item.topicId] = { id: item.topicId, name: item.topicName, total: 0, correct: 0 }; groups[item.topicId].total += 1; groups[item.topicId].correct += item.isCorrect ? 1 : 0; });
     const resultTopics = Object.values(groups).map((topic) => ({ ...topic, accuracy: Math.round(topic.correct / topic.total * 100) })).sort((a, b) => a.accuracy - b.accuracy);
-    const weak = resultTopics.find((topic) => topic.correct < topic.total);
-    this.setData({ state: "result", sheetOpen: false, resultItems, resultTopics, resultFilter: "all", filteredResults: resultItems, resultIndex: 0, resultItem: resultItems[0],
+    const scheduleUpdated = this.scheduleUpdates.size;
+    const firstScheduleFeedback = scheduleUpdated > 0 && guide.takeHint('practice-schedule');
+    const weakKnowledge = Array.from(new Map(resultItems.filter(r => !r.isCorrect && r.knowledgeTitle).map(r => [r.knowledgeId, { id: r.knowledgeId, title: r.knowledgeTitle }])).values());
+    this.setData({ state: "result", sheetOpen: false, scheduleUpdated, firstScheduleFeedback, weakKnowledge, resultItems, resultTopics, resultFilter: "all", filteredResults: resultItems, resultIndex: 0, resultItem: resultItems[0],
       elapsed: formatDuration(Math.floor(this.elapsedMs / 1000)),
       resultSummary: { correctCount, wrongCount: resultItems.length - correctCount, totalCount: resultItems.length, accuracy: Math.round(correctCount / resultItems.length * 100) },
       recommendation: engine.recommendation(resultItems) });

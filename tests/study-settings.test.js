@@ -62,10 +62,10 @@ test('ordered offline settings converge while preserving an already-started cano
     {kind:'plan',id:'p2',at:now+3,day,tasks:[],settings:{id:'s',topicId:'poetry',batchId:'',newCount:5}}];
   const a=model.replay(events),b=model.replay(events.slice().reverse());assert.deepEqual(a,b);assert.equal(a.days[day].id,'p');assert.equal(a.studySettings.topicId,'poetry');
 });
-test('home exposes new and review destinations without a duplicate practice entry; scope picker changes real categories',()=>{
+test('home preserves new and review destinations and offers optional practice; scope picker changes real categories',()=>{
   setup();const home=page('study');home.onShow();assert.equal(home.data.recent,undefined);home.onFreeStudy();assert.equal(navigation.at(-1),'/pages/free-study/index');
   home.onToday();assert.equal(navigation.at(-1),'/pages/today-study/index?mode=new');home.onReview();assert.equal(navigation.at(-1),'/pages/today-study/index?mode=review');
-  home.onScope();assert.equal(navigation.at(-1),'/pages/free-study/index?mode=scope');assert.equal(home.onPractice,undefined);
+  home.onScope();assert.equal(navigation.at(-1),'/pages/free-study/index?mode=scope');home.onPractice();assert.equal(navigation.at(-1),'/pages/exam/index');
   home.onSettings();assert.equal(navigation.at(-1),'/pages/study-settings/index');
   const free=page('free-study');free.onShow();assert.equal(free.data.topics.length,5);
   free.onModule(dataset({id:'analysis'}));assert.equal(free.data.topics.length,7);assert.ok(free.data.topics.every(t=>t.moduleId==='analysis'));

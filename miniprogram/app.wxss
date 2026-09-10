@@ -2,18 +2,18 @@
 
 page {
   /* 知练 Design System · Quiet Growth */
-  --color-primary: #456f59;
-  --color-primary-dark: #315440;
-  --color-primary-soft: #edf3e9;
+  --color-primary: #4d785b;
+  --color-primary-dark: #303d36;
+  --color-primary-soft: #edf3e8;
   --color-secondary: #526e4b;
-  --color-secondary-soft: #edf3e9;
-  --color-background: #f7f8f2;
+  --color-secondary-soft: #edf3e8;
+  --color-background: #f8f7f3;
   --color-surface: #ffffff;
   --color-surface-muted: #f3f5ef;
-  --color-text: #28352c;
-  --color-text-secondary: #59665d;
-  --color-text-tertiary: #68736a;
-  --color-border: #dde4d9;
+  --color-text: #303d36;
+  --color-text-secondary: #68736c;
+  --color-text-tertiary: #68736c;
+  --color-border: #e8e9e3;
   --color-divider: #e7ebe2;
   --color-success: #356b4f;
   --color-success-soft: #ecf5ed;
@@ -159,7 +159,7 @@ button::after {
   align-items: center;
   justify-content: center;
   padding: 0 30rpx;
-  border-radius: var(--radius-md);
+  border-radius: 20rpx;
   font-size: 29rpx;
   font-weight: 650;
   line-height: 1.2;

@@ -21,7 +21,7 @@
 
 | 任务 | 文档与实现 |
 | --- | --- |
-| 整体功能/续做需求讨论 | [V5学习与复习](docs/v5-learning.md)为现行学习规则；[2026-09-06功能快照](docs/product-map/README.md)保留旧版导图与其他功能线索，不是当前学习规则或上线验收 |
+| 整体功能/续做需求讨论 | [V6体验与验收](docs/v6-learning-experience.md)为现行页面层级与用户教育；[V5学习与复习](docs/v5-learning.md)仍为底层学习规则和协议；[2026-09-06功能快照](docs/product-map/README.md)保留历史线索，不是当前规则或上线验收 |
 | 产品范围/当前学习、考试、复习、我的 | [项目规则第1、3节](docs/PROJECT_RULES.md#1-项目定位与范围)，再读对应页面 |
 | 新学/复习/学习设置/V5状态 | [V5学习与复习](docs/v5-learning.md)、[学习设置](docs/home-study-settings.md)对应节；learningModel/memoryScheduler/learningEngine；仅查历史时读[V4学习闭环](docs/v4/learning-loop.md) |
 | 首次协议、头像昵称、个人中心 | [项目规则第3.4节](docs/PROJECT_RULES.md#34-我的首次使用与资料)和 [已有说明](docs/designs/account-onboarding/README.md)的现行说明；旧设计不直接继承 |

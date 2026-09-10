@@ -33,9 +33,9 @@
     </view>
     <block wx:else>
       <view class="degree-actions">
-        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="none" bindtap="onRate"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
-        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="fuzzy" bindtap="onRate"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
-        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" data-value="remembered" bindtap="onRate"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" aria-label="陌生，基本想不起来" data-value="none" bindtap="onRate"><image class="degree-icon" src="/assets/learning/none.svg" aria-hidden="true" /><text>陌生</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" aria-label="了解，有印象但回忆不完整或费力" data-value="fuzzy" bindtap="onRate"><image class="degree-icon" src="/assets/learning/fuzzy.svg" aria-hidden="true" /><text>了解</text></button>
+        <button class="degree-button" disabled="{{saving || confirming || learningItems[currentIndex].excluded}}" hover-class="button-pressed" data-index="{{currentIndex}}" aria-label="掌握，能顺利回忆主要内容" data-value="remembered" bindtap="onRate"><image class="degree-icon" src="/assets/learning/remembered.svg" aria-hidden="true" /><text>掌握</text></button>
       </view>
       <button wx:if="{{learningItems[currentIndex].excluded}}" class="text-button familiar-continue" bindtap="advanceAfterRating">继续学习</button>
     </block>

@@ -1,0 +1,19 @@
+<view wx:if="{{open}}" class="guide-backdrop" catchtouchmove="noop">
+  <view class="guide-sheet {{onboarding ? 'is-onboarding' : 'is-rules'}}" role="dialog" aria-label="{{onboarding ? '首次学习引导' : '学习规则'}}">
+    <view class="guide-handle"></view>
+    <view class="guide-heading"><text>{{onboarding ? (step + 1) + ' / 3' : '学习规则'}}</text><button class="guide-close" bindtap="close" aria-label="{{onboarding ? '跳过首次引导' : '关闭学习规则'}}">{{onboarding ? '跳过' : '关闭'}}</button></view>
+    <scroll-view scroll-y class="guide-scroll">
+      <view wx:if="{{onboarding}}" class="guide-step"><image class="guide-art" src="/assets/learning/{{steps[step].icon}}.svg" aria-hidden="true" /><text class="guide-title">{{steps[step].title}}</text><text class="guide-body">{{steps[step].body}}</text><text wx:if="{{step === 2}}" class="guide-ending">你负责学习，知练帮你记住什么时候该再看一遍。</text></view>
+      <view wx:else class="guide-rules">
+        <block wx:for="{{steps}}" wx:key="title"><text class="rule-title">{{item.title}}</text><text class="guide-body">{{item.body}}</text></block>
+        <text class="rule-title">学习程度 · 由你主动判断</text><text class="guide-body">陌生：基本想不起来。
+了解：有印象，但回忆不完整或比较费力。
+掌握：能比较顺利地回忆主要内容。
+熟知：我已经非常熟悉，暂时不再自动安排复习；可以恢复。</text>
+        <text class="guide-body">做题不会替你修改学习程度。新学、复习和练习可以独立进行，不必连续完成。</text>
+        <button class="guide-more" bindtap="more">{{more ? '收起说明' : '了解更多'}} ›</button><text wx:if="{{more}}" class="guide-body">当前使用基于 FSRS 的间隔复习模型及公开默认参数，目标回忆概率为 90%。这是记忆估计，不是对个人真实遗忘率的测量。按北京时间日期安排，当天新学或复习完成后当天不再自动安排。</text>
+      </view>
+    </scroll-view>
+    <button wx:if="{{onboarding}}" class="guide-primary" bindtap="next">{{step === 2 ? '知道了，开始学习' : '下一步'}}</button>
+  </view>
+</view>

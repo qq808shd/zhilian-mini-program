@@ -1,0 +1,21 @@
+@import "learning-theme.wxss";
+.ux-page { padding:24rpx 32rpx calc(48px + 32rpx + env(safe-area-inset-bottom)); }
+.ux-page .page-title { font-size:42rpx; font-weight:600; letter-spacing:0; line-height:1.4; }
+.ux-page .page-subtitle { font-size:26rpx; line-height:1.6; }
+.ux-page .section { margin-top:32rpx; }
+.ux-page .section-title { font-size:32rpx; font-weight:600; }
+.ux-page .section-heading { gap:16rpx; margin-bottom:16rpx; }
+.ux-page button.primary-button { min-height:96rpx; border-radius:20rpx; font-size:28rpx; font-weight:500; box-shadow:none; }
+.ux-page button.secondary-button { min-height:88rpx; border-radius:20rpx; font-size:28rpx; font-weight:500; }
+.ux-page button.text-button { min-height:44px; font-size:24rpx; font-weight:500; }
+.ux-caption { color:var(--color-text-secondary); font-size:24rpx; line-height:1.55; }
+.ux-body { display:block; font-size:28rpx; line-height:1.6; }
+.ux-action { padding:32rpx; border-radius:28rpx; background:var(--color-primary-soft); }
+.ux-eyebrow { display:block; color:var(--color-primary); font-size:24rpx; line-height:1.5; }
+.ux-action-title { display:block; margin-top:16rpx; font-size:44rpx; line-height:1.4; font-weight:600; overflow-wrap:break-word; }
+.ux-description { display:block; margin-top:16rpx; color:var(--color-text-secondary); font-size:26rpx; line-height:1.6; }
+.ux-action .primary-button { margin-top:32rpx; }
+.ux-icon { display:block; width:40rpx; height:40rpx; flex-shrink:0; }
+.ux-icon.small { width:32rpx; height:32rpx; }
+.ux-note { display:block; margin-top:24rpx; color:var(--color-text-secondary); font-size:24rpx; line-height:1.6; }
+button.ux-link-row { width:100%; min-height:88rpx; display:flex; align-items:center; justify-content:space-between; background:transparent; color:var(--color-primary); font-size:26rpx; padding:0; text-align:left; }

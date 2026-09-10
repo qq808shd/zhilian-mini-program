@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "学习",
   "navigationBarBackgroundColor": "#F8F7F3",
-  "backgroundColor": "#F8F7F3"
+  "backgroundColor": "#F8F7F3",
+  "usingComponents": {
+    "learning-guide": "/components/learning-guide/index"
+  }
 }

@@ -1,0 +1,19 @@
+HTML 内容 Webview: pages/study/index
+							25 container
+								26 标签 (selected) Description: 学习, Value: 1
+									27 文本 学习
+								28 标签 (settable, integer) Description: 练习, Value: 0
+									29 文本 练习
+								30 标签 (settable, integer) Description: 小组, Value: 0
+									31 文本 小组
+								32 标签 (settable, integer) Description: 我的, Value: 0
+									33 文本 我的
+							34 文本 今日建议
+							35 文本 选择一个学习内容开始
+							36 文本 从感兴趣的分类开始，按自己的节奏积累。
+							37 按钮 选择学习范围
+							38 按钮 自由学习
+							39 按钮 学习规则
+							40 按钮 学习设置
+							41 按钮 切换验收场景
+						42
