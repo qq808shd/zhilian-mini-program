@@ -33,6 +33,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
     if (!size(id) && run('UPDATE study_groups SET archived_at=? WHERE id=? AND archived_at IS NULL', at, id).changes) logs.push({ scope: 'study_groups', kind: 'group_archived', groupId: id });
   }
   function saveMember(m) {
+    if (m.status === 'ended') run('DELETE FROM group_avatars WHERE membership_id=?', m.id);
     run(`UPDATE group_memberships SET status=?,exited_at=?,end_reason=?,end_status=?,streak=?,longest_streak=?,
       week_key=?,weekly_miss=?,leave_week=?,weekly_leave=?,observer_progress=?,recovered_on=?,last_settled_date=? WHERE id=?`,
     m.status, m.exited_at || null, m.end_reason || null, m.end_status || null, m.streak, m.longest_streak,
@@ -63,7 +64,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
   }
   function prepareUser(userId, at = now()) { const m = current(userId); if (m) catchUpGroup(m.group_id, at); }
   function requireCurrent(userId, expectedId) {
-    const m = current(userId); if (!m || (expectedId && m.id !== expectedId)) fail('MEMBERSHIP_CHANGED', '当前契约已变化，请刷新后重试', 409); return m;
+    const m = current(userId); if (!m || (expectedId && m.id !== expectedId)) fail('MEMBERSHIP_CHANGED', '当前小组状态已变化，请刷新后重试', 409); return m;
   }
   function publicGroup(g) { return { id: g.id, name: g.name, study_topic: g.study_topic, baseline_type: g.baseline_type, baseline_value: g.baseline_value,
     baseline_unit: g.baseline_unit, invite_code: g.invite_code, created_at: g.created_at, archived: !!g.archived_at, count: size(g.id) }; }
@@ -80,11 +81,11 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
       leaves: previous.leave_week === weekKey(today) ? previous.weekly_leave : 0 };
   }
   function addMember(userId, g, data, at) {
-    if (current(userId)) fail('ALREADY_IN_GROUP', '你已有进行中的学习契约，请先退出当前小组', 409);
+    if (current(userId)) fail('ALREADY_IN_GROUP', '你已加入学习小组，请先退出当前小组', 409);
     if (g.archived_at) fail('GROUP_ARCHIVED', '小组已归档，邀请码已失效', 410);
     if (size(g.id) >= RULES.maxMembers) fail('GROUP_FULL', '小组已满，正式席与旁听席合计最多八人', 409);
-    if (data.accepted !== true) fail('CONTRACT_REQUIRED', '请先接受学习契约');
-    const nickname = textField(data.nickname, RULES.nicknameMax, '组内称呼');
+    if (data.accepted !== true) fail('CONTRACT_REQUIRED', '请先接受小组规则');
+    const nickname = (one('SELECT nickname FROM user_profiles WHERE user_id=?', userId) || {}).nickname || textField(data.nickname, RULES.nicknameMax, '组内称呼');
     const today = dateKey(at), inherited = carry(userId, g.id, today), id = randomUUID();
     run(`INSERT INTO group_memberships(id,group_id,user_id,nickname,avatar,status,joined_at,joined_date,evaluation_start_date,
       week_key,weekly_miss,leave_week,weekly_leave,last_settled_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -132,7 +133,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
   function exit(userId, data) {
     const at = now(); prepareUser(userId, at);
     return mutation(userId, 'exit', data, () => {
-      if (!data.membershipId) fail('MEMBERSHIP_REQUIRED', '缺少当前契约标识');
+      if (!data.membershipId) fail('MEMBERSHIP_REQUIRED', '缺少当前小组成员标识');
       const m = requireCurrent(userId, data.membershipId), date = dateKey(at), r = ensureRecord(m, date, at);
       // Leaving ends today's obligation; keep actual study and leave history, but no early daily penalty.
       run(`UPDATE group_daily_records SET daily_state=?,settled=1,settled_at=?,updated_at=? WHERE membership_id=? AND business_date=?`, r.is_day_off ? 'day_off' : 'exited', at, at, m.id, date);
@@ -143,7 +144,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
   function writeToday(userId, data, mode) {
     const at = now(); prepareUser(userId, at);
     return mutation(userId, mode, data, () => {
-      if (!data.membershipId) fail('MEMBERSHIP_REQUIRED', '缺少当前契约标识');
+      if (!data.membershipId) fail('MEMBERSHIP_REQUIRED', '缺少当前小组成员标识');
       const m = requireCurrent(userId, data.membershipId), today = dateKey(at), g = group(m.group_id);
       if (!validDate(data.date) || data.date !== today) fail('DAY_LOCKED', '只能操作北京时间当天的记录，跨日后请刷新', 409);
       const r = ensureRecord(m, today, at);
@@ -167,6 +168,19 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
       return { saved: true, date: today };
     });
   }
+  function writeAvatar(userId, data) {
+    const at = now(); prepareUser(userId, at);
+    return mutation(userId, 'avatar', data, () => {
+      if (!data.membershipId) fail('MEMBERSHIP_REQUIRED', '缺少当前小组成员标识');
+      const m = requireCurrent(userId, data.membershipId);
+      if (data.image === '') { run('DELETE FROM group_avatars WHERE membership_id=?', m.id); return { saved: true }; }
+      const image = require('./avatar').validateAvatar(data.image);
+      run('INSERT INTO group_avatars VALUES(?,?,?) ON CONFLICT(membership_id) DO UPDATE SET image=excluded.image,updated_at=excluded.updated_at', m.id, image, at);
+      return { saved: true };
+    });
+  }
+  function profileName(m) { return m.status === 'ended' ? m.nickname : ((one('SELECT nickname FROM user_profiles WHERE user_id=?', m.user_id) || {}).nickname || m.nickname); }
+  function avatarFor(m) { return m.status === 'ended' ? '' : (one('SELECT image FROM user_profiles WHERE user_id=?', m.user_id) || {}).image || (one('SELECT image FROM group_avatars WHERE membership_id=?', m.id) || {}).image || ''; }
   function recordView(m, r, date, today, g) {
     let state = r && r.daily_state;
     if (!r || !r.settled) {
@@ -196,7 +210,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
       WHERE m.group_id=? AND r.business_date>=? AND r.business_date<=?`, id, from, until);
   }
   function memberView(m, g, today, record) {
-    return { id: m.id, nickname: m.nickname, avatar: m.avatar, status: m.status, isInitiator: m.user_id === g.created_by,
+    return { id: m.id, nickname: profileName(m), avatar: m.avatar, avatarImage: avatarFor(m), status: m.status, isInitiator: m.user_id === g.created_by,
       streak: m.streak, longestStreak: m.longest_streak, joinedDate: m.joined_date, evaluationStart: m.evaluation_start_date,
       weeklyMiss: m.week_key === weekKey(today) ? m.weekly_miss : 0,
       leaveRemaining: m.leave_week === weekKey(today) ? Math.max(0, RULES.weeklyDayOffLimit - m.weekly_leave) : RULES.weeklyDayOffLimit,
@@ -213,7 +227,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
       const date = shiftDate(from, i); return recordView(person, byRecord.get(person.id + date), date, today, g);
     }) }));
     const eligible = views.filter(v => v.status === 'formal' && v.today.state !== 'joined' && v.today.state !== 'day_off');
-    return { date: today, group: publicGroup(g), rules: RULES, contract: contractLines(), me: views.find(v => v.id === m.id), members: views,
+    return { avatarEnabled: true, date: today, group: publicGroup(g), rules: RULES, contract: contractLines(), me: views.find(v => v.id === m.id), members: views,
       today: { fulfilled: eligible.filter(v => v.today.state === 'fulfilled').length, eligible: eligible.length,
         formal: views.filter(v => v.status === 'formal').length, observer: views.filter(v => v.status === 'observer').length },
       week: { start: from, ...aggregate(records.filter(r => r.business_date <= today)) },
@@ -226,13 +240,13 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
     const records = recordsForGroup(g.id, month + '-01', month + '-31');
     const memberships = all('SELECT * FROM group_memberships WHERE group_id=? AND joined_date<=? AND (exited_at IS NULL OR exited_at>=?) ORDER BY joined_at,rowid', g.id, month + '-31', Date.parse(month + '-01T00:00:00+08:00'));
     return { group: publicGroup(g), month, summary: aggregate(records), members: memberships.map(person => ({
-      id: person.id, nickname: person.nickname, avatar: person.avatar, status: person.status, streak: person.streak,
+      id: person.id, nickname: profileName(person), avatar: person.avatar, avatarImage: avatarFor(person), status: person.status, streak: person.streak,
       ...aggregate(records.filter(r => r.membership_id === person.id)) })) };
   }
   function memberDetail(userId, id) {
     const at = now(); prepareUser(userId, at); const mine = requireCurrent(userId), today = dateKey(at), g = group(mine.group_id);
     const m = one("SELECT * FROM group_memberships WHERE id=? AND group_id=? AND status!='ended'", id, mine.group_id);
-    if (!m) fail('MEMBER_FORBIDDEN', '只能查看当前同组成员的契约资料', 403);
+    if (!m) fail('MEMBER_FORBIDDEN', '只能查看当前同组成员的小组资料', 403);
     const records = all('SELECT * FROM group_daily_records WHERE membership_id=? AND business_date>=? AND business_date<=?', id, shiftDate(today.slice(0, 7) + '-01', -7), today);
     return { group: publicGroup(g), member: memberView(m, g, today, records.find(r => r.business_date === today)), week: aggregate(records.filter(r => r.business_date >= weekKey(today))), month: aggregate(records.filter(r => r.business_date.slice(0, 7) === today.slice(0, 7))) };
   }
@@ -253,7 +267,7 @@ function createGroupService(db, { now = Date.now, logger = entry => console.info
     ids.forEach(m => transaction(() => settleMember(m.id, dateKey(at), at)));
     return { count: ids.length, cursor: ids.length === limit ? ids[ids.length - 1].id : null };
   }
-  return { create, preview, join, exit, dashboard, monthDetail, memberDetail, history, writeToday, settleBatch, catchUpGroup,
+  return { create, preview, join, exit, dashboard, monthDetail, memberDetail, history, writeToday, writeAvatar, settleBatch, catchUpGroup,
     rules: () => ({ rules: RULES, contract: contractLines() }) };
 }
 module.exports = { createGroupService };

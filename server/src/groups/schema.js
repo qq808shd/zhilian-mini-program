@@ -44,6 +44,8 @@ function migrate(db) {
       fingerprint TEXT NOT NULL, response TEXT NOT NULL, created_at INTEGER NOT NULL,
       PRIMARY KEY(user_id, request_id)
     );
+    CREATE TABLE IF NOT EXISTS group_avatars(membership_id TEXT PRIMARY KEY REFERENCES group_memberships(id), image TEXT NOT NULL, updated_at INTEGER NOT NULL);
+    INSERT OR IGNORE INTO group_schema_migrations VALUES(2, CAST(strftime('%s','now') AS INTEGER)*1000);
     INSERT OR IGNORE INTO group_schema_migrations VALUES(1, CAST(strftime('%s','now') AS INTEGER)*1000);
     COMMIT;`);
 }

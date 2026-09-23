@@ -2,6 +2,13 @@ const api = require('../../utils/groupApi');
 const { RULES } = require('../../utils/groupRules');
 Page({
   data: { code: '', nickname: '', accepted: false, preview: null, busy: false, error: '', errorCode: '', rules: RULES },
+  async onShow() {
+    try { await require('../../utils/profileSync').restore(); }
+    catch (e) { this.setData({ error: api.errorText(e) }); }
+    const profile = require('../../utils/profile').getProfile();
+    this.setData({ nickname: profile.customized ? profile.nickname : '' });
+  },
+  onProfile() { wx.navigateTo({ url: '/pages/profile/index' }); },
   onLoad(options = {}) { if (options.code) { this.setData({ code: String(options.code).toUpperCase() }); this.onPreview(); } },
   onCode(e) { this.pending = null; this.setData({ code: e.detail.value.trim().toUpperCase(), preview: null, accepted: false, error: '', errorCode: '' }); },
   onNickname(e) { this.pending = null; this.setData({ nickname: e.detail.value }); },
@@ -16,7 +23,7 @@ Page({
   },
   async onJoin() {
     if (this.data.busy || !this.data.preview) return;
-    if (!this.data.accepted || !this.data.nickname.trim()) { this.setData({ error: '请填写组内称呼，并接受学习契约。' }); return; }
+    if (!this.data.accepted || !this.data.nickname.trim()) { this.setData({ error: '请设置个人昵称，并接受小组规则。' }); return; }
     this.setData({ busy: true, error: '' });
     if (!this.pending) this.pending = { requestId: api.requestId(), code: this.data.code, nickname: this.data.nickname, accepted: true };
     try { await api.write('/join', this.pending); this.pending = null; wx.switchTab({ url: '/pages/study-group/index' }); }

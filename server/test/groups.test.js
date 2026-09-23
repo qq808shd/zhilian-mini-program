@@ -127,6 +127,6 @@ test('migration additive, survives reopen, unique current index remains enforced
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'zhilian-group-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const dbPath=path.join(dir,'test.sqlite');
   let db=createDatabase(dbPath,{groups:{logger:()=>{}}});const u=db.getOrCreateUser('old-user','');db.groups.create(u.id,{requestId:'migration-test-request',name:'小组',studyTopic:'行测',baselineType:'duration',baselineValue:60,nickname:'同学',accepted:true});db.close();
   db=createDatabase(dbPath,{groups:{logger:()=>{}}});assert.equal(db.getUserById(u.id).id,u.id);assert.equal(db.groups.dashboard(u.id).group.name,'小组');db.close();
-  const sql=new DatabaseSync(dbPath);assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM group_schema_migrations').get().n,1);assert.ok(sql.prepare("SELECT name FROM sqlite_master WHERE name='question_stats'").get());
+  const sql=new DatabaseSync(dbPath);assert.ok(sql.prepare("SELECT name FROM sqlite_master WHERE name='group_avatars'").get());assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM group_schema_migrations').get().n,2);assert.ok(sql.prepare("SELECT name FROM sqlite_master WHERE name='question_stats'").get());
   assert.throws(()=>sql.exec("INSERT INTO group_memberships SELECT 'duplicate',group_id,user_id,nickname,avatar,status,joined_at,joined_date,evaluation_start_date,exited_at,end_reason,end_status,streak,longest_streak,week_key,weekly_miss,leave_week,weekly_leave,observer_progress,recovered_on,last_settled_date FROM group_memberships"),/UNIQUE/);sql.close();
 });

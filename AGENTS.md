@@ -24,7 +24,7 @@
 | 整体功能/续做需求讨论 | [V6体验与验收](docs/v6-learning-experience.md)为现行页面层级与用户教育；[V5学习与复习](docs/v5-learning.md)仍为底层学习规则和协议；[2026-09-06功能快照](docs/product-map/README.md)保留历史线索，不是当前规则或上线验收 |
 | 产品范围/当前学习、考试、复习、我的 | [项目规则第1、3节](docs/PROJECT_RULES.md#1-项目定位与范围)，再读对应页面 |
 | 新学/复习/学习设置/V5状态 | [V5学习与复习](docs/v5-learning.md)、[学习设置](docs/home-study-settings.md)对应节；learningModel/memoryScheduler/learningEngine；仅查历史时读[V4学习闭环](docs/v4/learning-loop.md) |
-| 首次协议、头像昵称、个人中心 | [项目规则第3.4节](docs/PROJECT_RULES.md#34-我的首次使用与资料)和 [已有说明](docs/designs/account-onboarding/README.md)的现行说明；旧设计不直接继承 |
+| 首次协议、头像昵称、个人中心 | [项目规则第3.4节](docs/PROJECT_RULES.md#34-我的首次使用与资料)和 [本轮资料与周表规格](docs/designs/profile-weekly/README.md)；统一资料为 utils/profileSync.js 与 server/src/profiles.js，旧设计不直接继承 |
 | 学习小组/契约/结算 | [学习小组 V1](docs/study-groups/README.md)、groupRules/groupApi/groupView、server/src/groups；身份守卫沿用现有登录与协议 |
 | UI呈现 | [设计基线](design-system/default/MASTER.md)、[项目规则第5节](docs/PROJECT_RULES.md#5-界面和交互规则)、已有组件；以当前代码和用户最新反馈校准 |
 | 题库、导入、数量、ID或分组 | 修改前读 [数据基线第4节](docs/PROJECT_RULES.md#4-已确认的数据基线)、[迁移第7节](docs/PROJECT_RULES.md#7-id本地统计和迁移约束)；代码索引在第6节 |
@@ -36,7 +36,7 @@
 
 - 资料“新增/补充”默认增量追加，保留既有ID、前缀、释义、顺序和统计；不为整齐重建ID。改变ID/分组必须说明必要性，并验证既有数据与新数据的幂等迁移。
 - 题库本地、用户数据云端、本地优先；离线不能阻断学习，待发事件持久保留，明确确认后移除；事件幂等及用户隔离不得退化。
-- 未同意协议或协议失效不发云请求；旧停止状态不能静默覆盖。本机头像昵称不上传服务端，凭证不进入客户端、Git或测试fixture。
+- 未同意协议或协议失效不发云请求；旧停止状态不能静默覆盖。用户保存个人资料后，头像压缩副本与昵称通过独立 /v1/profile 接口绑定当前账户；小组使用统一资料，旧称呼保留兼容；未同意当前协议不自动同步，凭证不进入客户端、Git或测试fixture。
 - V5学习状态/设置协议3保护旧服务端不误确认新事件；部署同时包含server/src、共享learningModel和memoryScheduler，先服务端后客户端。迁移继续保留V4离线队列与历史完成位置；旧阶段4不自动免复习。恢复/重置不能丢正式学习、自评、熟知决定和今日已完成位置。
 - 打包包含miniprogram/assets及Tab图标，不为体积把assets整体忽略。生产开关/真实微信能力不用于绕过本地测试环境限制。
 

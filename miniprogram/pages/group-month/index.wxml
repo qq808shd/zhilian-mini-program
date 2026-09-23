@@ -1,6 +1,6 @@
 <view class="group-page">
   <view class="g-between"><text class="g-title">月度小组成绩</text><picker mode="date" fields="month" value="{{month}}" start="{{minMonth}}" end="{{maxMonth}}" bindchange="onMonth" disabled="{{busy}}"><view class="month-picker">{{month || '本月'}} ▾</view></picker></view>
-  <text class="g-sub g-gap-sm">每一轮契约独立展示，按加入顺序排列。</text>
+  <text class="g-sub g-gap-sm">每一轮参与记录独立展示，按加入顺序排列。</text>
   <text wx:if="{{error}}" class="g-error">{{error}}</text><button wx:if="{{error}}" class="g-button g-secondary" bindtap="load">重新读取</button>
   <text wx:if="{{busy}}" class="g-sub g-gap">正在读取月度记录…</text>
   <block wx:if="{{result}}">

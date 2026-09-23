@@ -275,7 +275,7 @@ function createApiHandler({ config, database, exchangeCode = exchangeWechatCode 
 
     try {
       if (request.method === "GET" && requestUrl.pathname === "/health") {
-        return sendJson(response, 200, { ok: true, learningVersion: learningModel.VERSION, learningSettingsVersion: 3, learningResetVersion: learningModel.LEARNING_RESET_VERSION, groupVersion: 1, service: "zhilian-sync-api", serverTime: Date.now() });
+        return sendJson(response, 200, { ok: true, learningVersion: learningModel.VERSION, learningSettingsVersion: 3, learningResetVersion: learningModel.LEARNING_RESET_VERSION, groupVersion: 1, profileVersion: 1, service: "zhilian-sync-api", serverTime: Date.now() });
       }
 
       if (request.method === "POST" && requestUrl.pathname === "/v1/auth/wechat") {
@@ -292,6 +292,11 @@ function createApiHandler({ config, database, exchangeCode = exchangeWechatCode 
           user: { id: user.id },
           serverTime: Date.now()
         });
+      }
+
+      if (requestUrl.pathname === "/v1/profile" && ['GET','PUT'].includes(request.method)) {
+        const user = authenticate(request);
+        return sendJson(response, 200, request.method === 'GET' ? database.profiles.get(user.id) : database.profiles.put(user.id, await readJson(request)));
       }
 
       if (requestUrl.pathname === "/v1/groups" || requestUrl.pathname.startsWith("/v1/groups/")) {

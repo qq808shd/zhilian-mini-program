@@ -6,8 +6,7 @@
 .guide-heading { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; min-height:48px; gap:24rpx; font-size:30rpx; font-weight:600; line-height:1.4; }
 .guide-heading .guide-close { display:flex; align-items:center; justify-content:flex-end; flex:0 0 auto; width:44px; min-width:44px; min-height:44px; margin:0; padding:0; background:transparent; color:var(--color-primary); font-size:26rpx; line-height:1.4; }
 .is-rules .guide-heading { padding-bottom:8rpx; border-bottom:1rpx solid var(--color-border); }
-.guide-rules .guide-more { display:flex; align-items:center; justify-content:flex-start; width:100%; min-height:44px; margin:8rpx 0; padding:0; background:transparent; color:var(--color-primary); font-size:26rpx; line-height:1.4; }
-.guide-close::after,.guide-more::after,.guide-primary::after { border:0; }
+.guide-close::after,.guide-primary::after { border:0; }
 .guide-scroll { min-height:0; height:56vh; }
 .is-rules .guide-scroll { flex:1; height:0; }
 .guide-step { padding:32rpx 16rpx; text-align:center; }
@@ -19,3 +18,5 @@
 .guide-rules { padding:8rpx 0 calc(16rpx + env(safe-area-inset-bottom)); }
 .guide-rules > .guide-body { margin-bottom:16rpx; }
 .guide-sheet .guide-primary { flex-shrink:0; display:flex; align-items:center; justify-content:center; min-height:96rpx; width:100%; margin:24rpx 0 0; border-radius:20rpx; background:var(--color-primary); color:white; font-size:28rpx; }
+
+.review-explanation { margin-top:16rpx; }

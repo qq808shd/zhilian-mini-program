@@ -1,18 +1,14 @@
-<view class="page account-page">
-  <view class="page-header"><text class="eyebrow">{{onboarding ? '很高兴遇见你' : '个人资料'}}</text><text class="page-title">{{onboarding ? '用熟悉的头像和昵称' : '让知练认出你'}}</text><text class="page-subtitle">点一下，使用微信提供的头像和昵称。以后随时可以修改。</text></view>
+<view class="profile-page">
+  <view class="profile-heading"><text class="profile-title">设置头像和昵称</text><text wx:if="{{onboarding}}" class="profile-subtitle">让学习伙伴更容易认出你</text></view>
   <form bindsubmit="onSave">
-    <view class="card profile-form">
-      <text class="field-label">头像</text>
-      <button wx:if="{{supported}}" class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{saving}}" aria-label="选择微信头像"><image class="profile-avatar" src="{{avatar}}" mode="aspectFill" binderror="onAvatarError" /><text class="avatar-caption">选择微信头像 ›</text></button>
-      <image wx:else class="profile-avatar" src="{{avatar}}" mode="aspectFill" />
-      <text class="field-label nickname-label">昵称</text>
-      <input class="nickname-input" name="nickname" type="nickname" value="{{nickname}}" maxlength="48" placeholder="点这里，快捷使用微信昵称" bindinput="onNicknameInput" bindblur="onNicknameBlur" bindnicknamereview="onNicknameReview" disabled="{{saving || !supported}}" />
-      <text class="status-note">{{reviewPending ? '收起键盘后，微信将校验昵称' : '无需重新上传头像，也不必手动输入昵称'}}</text>
-    </view>
-    <text class="status-note profile-note">头像昵称仅在本机用于个人展示，不影响学习记录同步。微信侧的修改不会自动覆盖这里的资料。</text>
-    <text wx:if="{{!supported}}" class="form-error">当前微信版本不支持快捷填写，请更新微信；也可以先跳过。</text>
-    <text wx:if="{{error}}" class="form-error">{{error}}</text>
-    <button class="primary-button" form-type="submit" loading="{{saving}}" disabled="{{saving || !supported}}">{{onboarding ? '保存并开始学习' : '保存资料'}}</button>
+    <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{saving || !supported}}" hover-class="profile-pressed" aria-label="选择微信头像或其他图片"><image class="profile-avatar" src="{{avatar}}" mode="aspectFill" binderror="onAvatarError" /><text class="avatar-caption">使用微信头像 ›</text></button>
+    <view class="nickname-field"><text class="field-label">昵称</text><input class="nickname-input {{nicknameFocus ? 'focused' : ''}}" name="nickname" type="nickname" value="{{nickname}}" focus="{{nicknameFocus}}" maxlength="-1" placeholder="选择微信昵称或输入昵称" placeholder-class="nickname-placeholder" bindinput="onNicknameInput" bindfocus="onNicknameFocus" bindblur="onNicknameBlur" bindnicknamereview="onNicknameReview" disabled="{{saving || !supported}}" confirm-type="done" adjust-position="true" cursor-spacing="24" /></view>
+    <text class="profile-feedback">可输入表情，最多 24 个字符；若微信校验未通过，请换一个表情或昵称。</text>
+    <text wx:if="{{reviewPending}}" class="profile-feedback">收起键盘后校验昵称</text>
+    <text wx:if="{{!supported}}" class="profile-error">当前微信版本不支持头像昵称填写，请更新微信。</text>
+    <text wx:if="{{error}}" class="profile-error">{{error}}</text>
+    <button class="profile-submit" form-type="submit" loading="{{saving}}" disabled="{{saving || !supported}}" hover-class="profile-pressed">{{onboarding ? '完成' : '保存'}}</button>
   </form>
-  <button class="text-button centered-action" bindtap="onSkip" disabled="{{saving}}">{{onboarding ? '先跳过，开始学习' : '取消'}}</button>
+  <button class="profile-skip" bindtap="onSkip" disabled="{{saving}}">{{onboarding ? '暂不设置' : '取消'}}</button>
+  <text wx:if="{{!onboarding}}" class="profile-note">头像和昵称保存到你的知练账户，供同组伙伴识别；修改后同步更新。</text>
 </view>

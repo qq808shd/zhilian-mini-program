@@ -15,6 +15,7 @@ async function groupRoute({ request, url, user, groups, readJson }) {
     if (method === 'POST') {
       if (path === '') return groups.create(user.id, body);
       if (path === '/join') return groups.join(user.id, body);
+      if (path === '/avatar') return groups.writeAvatar(user.id, body);
       if (path === '/exit') return groups.exit(user.id, body);
       if (path === '/today') return groups.writeToday(user.id, body, 'add');
       if (path === '/day-off') return groups.writeToday(user.id, body, 'day-off');

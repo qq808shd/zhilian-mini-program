@@ -78,6 +78,7 @@ function createDatabase(dbPath, options = {}) {
     );
   `);
 
+  const profiles = require("./profiles").createProfiles(db);
   const groups = require("./groups/service").createGroupService(db, options.groups);
 
   const statements = {
@@ -376,7 +377,7 @@ function createDatabase(dbPath, options = {}) {
   }
 
   return {
-    groups,
+    groups, profiles,
     getOrCreateUser,
     getUserById,
     getSnapshot,

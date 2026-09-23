@@ -10,7 +10,13 @@ Page({
   async load() {
     if (this.data.loading) return;
     this.setData({ loading: true, error: '' });
-    try { const data = await api.read(); if (!this.disposed) this.setData({ ...view.dashboard(data), loading: false }); }
+    try {
+      let data = await api.read();
+      if (!this.disposed) this.setData({ ...view.dashboard(data), avatarSyncError: '' });
+      try { data = await require('../../utils/groupAvatar').syncAvatar(data); }
+      catch (error) { if (!this.disposed) this.setData({ avatarSyncError: '头像暂未同步，下拉刷新重试。' }); }
+      if (!this.disposed) this.setData({ ...view.dashboard(data), loading: false });
+    }
     catch (error) { if (!this.disposed) this.setData({ error: api.errorText(error), loading: false }); }
   },
   async onPullDownRefresh() { await this.load(); wx.stopPullDownRefresh(); },
@@ -18,6 +24,13 @@ Page({
   onJoin() { wx.navigateTo({ url: '/pages/group-join/index' }); },
   onHistory() { wx.navigateTo({ url: '/pages/group-history/index' }); },
   onMonth() { wx.navigateTo({ url: '/pages/group-month/index' }); },
+  onStatusHelp() {
+    const row = (symbol, name, description, tone) => ({ symbol, name, description, tone });
+    this.showSheet({ sheet: 'status', sheetError: '', statusSections: [
+      { title: '每日状态', items: [row('✓','已履约','完成当天学习底线','success'),row('○','未完成','当天尚未达到学习底线','neutral'),row('休','请假','当天已使用请假，不计未履约','leave'),row('+','加入日','加入当天不参加考核','neutral'),row('·','无考核','当天无需考核或尚未到来','empty')] },
+      { title: '小组状态', items: [row('黄','黄牌','正式席本周第 1 次未履约','warning'),row('红','红牌','正式席本周第 2 次未履约，进入旁听','danger'),row('听','旁听','正在进行回归挑战，不能请假','observer'),row('回','挑战达标',`当天挑战达标；连续 ${RULES.recoveryDays} 天达标后，下一日恢复正式席`,'success'),row('离','系统离席','旁听考核日未达标，离开小组','danger'),row('—','已离席','本轮小组参与已结束','empty')] }
+    ] });
+  },
   onRules() { this.showSheet({ sheet: 'rules', sheetError: '' }); },
   onInvite() { this.showSheet({ sheet: 'invite', sheetError: '' }); },
   onMembers() { this.showSheet({ sheet: 'members', sheetError: '' }); },

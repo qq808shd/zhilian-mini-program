@@ -10,16 +10,13 @@ button.wall-member { display:flex; flex-direction:column; align-items:center; wi
 .member-name { width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:24rpx; margin-top:8rpx; }
 .member-state { display:block; font-size:22rpx; text-align:center; border-radius:8rpx; padding:0 4rpx; }
 .member-value { margin-top:4rpx; max-width:100%; }
-.week-row { display:grid; grid-template-columns:128rpx repeat(7,minmax(0,1fr)); min-height:72rpx; align-items:center; border-bottom:1rpx solid var(--color-divider); }
+.week-row { display:grid; grid-template-columns:136rpx repeat(7,minmax(0,1fr)); min-height:72rpx; align-items:center; border-bottom:1rpx solid var(--color-divider); }
 .week-header { min-height:56rpx; color:var(--color-text-secondary); font-size:22rpx; }
-.week-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:8rpx; font-size:24rpx; }
+.week-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:8rpx; font-size:26rpx; }
 .week-day,.week-cell { text-align:center; }
-.week-dot { display:inline-flex; align-items:center; justify-content:center; width:32rpx; height:32rpx; border-radius:999rpx; font-size:22rpx; line-height:32rpx; }
+.week-dot { display:inline-flex; align-items:center; justify-content:center; width:36rpx; height:36rpx; border-radius:50%; font-size:26rpx; line-height:36rpx; }
 .week-dot.g-warning,.week-dot.g-danger { border-radius:8rpx; }
 .week-dot.g-empty { background:transparent; padding:0; color:var(--color-text-secondary); }
-.week-legend { display:flex; flex-wrap:wrap; gap:8rpx 16rpx; margin-top:16rpx; color:var(--color-text-secondary); font-size:22rpx; }
-.legend-yellow { color:var(--color-warning); }
-.legend-red { color:var(--color-danger); }
 .invite-code { display:block; text-align:center; font-size:52rpx; font-weight:600; letter-spacing:8rpx; margin:32rpx 0; color:var(--color-primary); }
 .g-sheet button.record-mode { flex:1; width:0; border:1rpx solid var(--color-border); }
 .g-sheet button.record-selected { background:var(--color-primary-soft); border-color:var(--color-primary-border); }
@@ -27,3 +24,21 @@ button.wall-member { display:flex; flex-direction:column; align-items:center; wi
 .member-list-copy { flex:1; text-align:left; min-width:0; }
 
 .rules-scroll { height:55vh; }
+
+.week-card { padding:28rpx; }
+.week-title + .g-sub { margin-top:10rpx; }
+.week-header { margin-top:28rpx; margin-bottom:12rpx; }
+.week-row:last-of-type { border-bottom:0; }
+.week-summary { display:block; margin-top:24rpx; padding-top:20rpx; border-top:1rpx solid var(--color-divider); font-size:24rpx; color:var(--color-text-secondary); }
+button.week-help { display:flex; align-items:center; justify-content:center; width:64rpx; height:64rpx; flex:0 0 64rpx; padding:0; margin:0; background:transparent; color:var(--color-text-secondary); }
+.week-help text { display:flex; align-items:center; justify-content:center; width:32rpx; height:32rpx; border:2rpx solid currentColor; border-radius:50%; font-size:24rpx; line-height:1; }
+.status-sheet { overflow:hidden; }
+.status-sheet .g-sheet-title { font-size:34rpx; }
+.status-scroll { height:60vh; margin-top:32rpx; }
+.status-section + .status-section { margin-top:32rpx; }
+.status-section-title { display:block; font-size:26rpx; font-weight:600; color:var(--color-primary); margin-bottom:16rpx; }
+.status-item { display:flex; align-items:center; gap:16rpx; min-height:88rpx; padding:16rpx 0; border-bottom:1rpx solid var(--color-divider); }
+.status-symbol { display:flex; width:52rpx; flex:0 0 52rpx; justify-content:center; }
+.status-copy { min-width:0; }
+.status-name { display:block; font-size:28rpx; font-weight:500; }
+.status-description { display:block; margin-top:8rpx; font-size:24rpx; line-height:1.5; color:var(--color-text-secondary); }

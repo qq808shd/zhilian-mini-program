@@ -6,12 +6,13 @@ const { contact } = require('../../utils/productActions');
 const product = require('../../config/product');
 Page({
   data: { profile: {}, summary: {}, email: product.contactEmail, filing: product.filingNumber || '备案信息 · 待补齐' },
-  onShow() {
+  async onShow() {
     const bar = this.getTabBar && this.getTabBar();
     if (bar) bar.refresh();
     const now = Date.now(), settings = engine.getStudySettings(now);
     const view = buildDashboard(engine.getState(now), settings, getQuestionStats(), now);
     this.setData({ learning: view.learning, profile: getProfile() });
+    try { await require("../../utils/profileSync").restore(); this.setData({ profile: getProfile() }); } catch (_) { /* 资料离线时保留本机展示。 */ }
   },
   onAvatarError() { this.setData({ 'profile.avatar': DEFAULT_AVATAR }); },
   onOpen(event) { wx.navigateTo({ url: '/pages/' + event.currentTarget.dataset.page + '/index' }); },

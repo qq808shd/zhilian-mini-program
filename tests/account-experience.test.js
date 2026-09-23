@@ -69,16 +69,18 @@ test("legacy review links enter automatic review directly", () => {
 });
 
 test("entry requires consent, including legacy local users; preview cannot authorize draft release or changed policy", () => {
+  const original = { ...product };
+  product.published = false;
   setup(); assert.equal(account.needsWelcome(), true); assert.equal(account.isSyncAuthorized(), false);
   account.chooseLocalMode(); assert.equal(account.needsWelcome(), true);
   assert.throws(() => account.enableSyncPreference());
   account.acceptTerms(); assert.equal(account.isSyncAuthorized(), true);
-  const original = { ...product };
   try {
     product.policyVersion += "-changed";
     assert.equal(account.isSyncAuthorized(), false); assert.equal(account.needsWelcome(), true);
     Object.assign(product, original);
     wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: "release" } });
+    product.published = false;
     assert.equal(account.isSyncAuthorized(), false); assert.throws(() => account.acceptTerms());
     Object.assign(product, { published: true, operator: "Test operator", contactEmail: "test@example.invalid", filingNumber: "TEST ONLY", effectiveDate: "2026-09-05" });
     assert.equal(account.hasCurrentConsent(), false);
@@ -161,18 +163,53 @@ test("avatar is copied before save; failed replacement rolls back only the new f
   assert.ok(deleted.includes(saved.avatar)); assert.equal(storage.getGroupProgress("idiom", 0).maxIndex, 3);
 });
 
-test("nickname waits for native review; rejection does not save and approval completes pending submission", async () => {
-  setup(); const p = page("profile"); p.onLoad({});
+test("profile completion requires avatar and reviewed nickname; rejection never enables save", async () => {
+  setup(); account.acceptTerms();
+  const p = load('pages/profile/index.js', true, { '../../utils/profileSync': { save: async () => ({revision:1}) } }); p.onLoad({});
   p.onNicknameInput({ detail: { value: "知行" } }); p.onNicknameBlur({ detail: { value: "知行" } });
   await p.onSave({ detail: { value: { nickname: "知行" } } });
-  assert.equal(profile.getProfile().customized, false); assert.equal(p.data.saving, true);
-  p.onNicknameReview({ detail: { pass: false } });
-  assert.equal(profile.getProfile().customized, false); assert.equal(p.data.saving, false);
+  assert.equal(profile.getProfile().customized, false); assert.equal(p.data.complete, false);
+  p.onNicknameReview({ detail: { pass: false } });assert.equal(p.data.complete,false);
+  p.setData({avatar:'/tmp/avatar.png'});
   p.onNicknameInput({ detail: { value: "小知" } }); p.onNicknameBlur({ detail: { value: "小知" } });
+  assert.equal(p.data.complete,false);p.onNicknameReview({ detail: { pass: true } });assert.equal(p.data.complete,true);
   await p.onSave({ detail: { value: { nickname: "小知" } } });
-  p.onNicknameReview({ detail: { pass: true } }); await flush();
   assert.equal(profile.getProfile().nickname, "小知"); assert.equal(navigations.at(-1), "back");
   assert.equal(timers.size, 0);
+});
+
+test("emoji nickname saves after WeChat review and review failures explain what to change", async () => {
+  setup(); account.acceptTerms();
+  await profile.saveProfile({ nickname: "旧昵称", avatar: "/tmp/avatar.png" });
+  const p = load("pages/profile/index.js", true, { "../../utils/profileSync": { save: async () => ({ revision: 1 }) } });
+  p.onLoad({});
+  p.onNicknameInput({ detail: { value: "小知🌈" } });
+  p.onNicknameBlur({ detail: { value: "小知🌈" } });
+  assert.equal(p.data.complete, false);
+  await p.onSave({ detail: { value: { nickname: "小知🌈" } } });
+  assert.match(p.data.error, /校验/);
+  p.onNicknameReview({ detail: { pass: true } });
+  assert.equal(p.data.complete, true);
+  await p.onSave({ detail: { value: { nickname: "小知🌈" } } });
+  assert.equal(profile.getProfile().nickname, "小知🌈");
+
+  const rejected = load("pages/profile/index.js", true); rejected.onLoad({});
+  rejected.onNicknameInput({ detail: { value: "小知🪄" } });
+  rejected.onNicknameBlur({ detail: { value: "小知🪄" } });
+  rejected.onNicknameReview({ detail: { pass: false } });
+  assert.match(rejected.data.error, /表情/);
+  assert.equal(rejected.data.complete, false);
+
+  rejected.onNicknameInput({ detail: { value: "小知🪄" } });
+  rejected.onNicknameBlur({ detail: { value: "小知🪄" } });
+  rejected.onNicknameReview({ detail: { pass: false, timeout: true } });
+  assert.match(rejected.data.error, /超时/);
+
+  const timeout = load("pages/profile/index.js", true); timeout.onLoad({});
+  timeout.onNicknameInput({ detail: { value: "小知✨" } });
+  timeout.onNicknameBlur({ detail: { value: "小知✨" } });
+  timers.get([...timers.keys()].at(-1))();
+  assert.match(timeout.data.error, /未返回昵称校验结果/);
 });
 
 test("skipping profile leaves it untouched and restores the original learning destination", () => {
@@ -265,7 +302,7 @@ test("page guard blocks deep links, tab re-entry and stale consent while allowin
   finally { product.policyVersion = version; }
 });
 
-test("app registers the consent guard for every page", () => {
+test("app registers consent guard and safe default sharing for every page", () => {
   setup(); let registered, application;
   const file = path.resolve(__dirname, "../miniprogram/app.js");
   const context = vm.createContext({ require: createRequire(file), Page(value) { registered = value; }, App(value) { application = value; } });
@@ -275,6 +312,9 @@ test("app registers the consent guard for every page", () => {
   wx.nextTick = (fn) => fn(); registered.onShow();
   assert.equal(shown, 0); assert.equal(navigations.at(-1), "/pages/welcome/index");
   account.acceptTerms(); registered.onShow(); assert.equal(shown, 1);
+  assert.equal(registered.onShareAppMessage().path, "/pages/study/index");
+  context.Page({ onShareAppMessage() { return { path: "/pages/group-join/index?code=ABC234" }; } });
+  assert.equal(registered.onShareAppMessage().path, "/pages/group-join/index?code=ABC234");
   assert.equal(typeof application.onShow, "function");
 });
 

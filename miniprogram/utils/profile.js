@@ -2,7 +2,7 @@ const KEY = "zhilian_local_profile_v1";
 const DEFAULT_AVATAR = "/assets/account/avatar.svg";
 function getProfile() {
   const profile = wx.getStorageSync(KEY) || {};
-  return { nickname: profile.nickname || "知练同学", avatar: profile.avatar || DEFAULT_AVATAR, customized: !!(profile.nickname || profile.avatar) };
+  return { nickname: profile.nickname || "知练同学", avatar: profile.avatar || DEFAULT_AVATAR, userId: profile.userId || '', customized: !!(profile.nickname || profile.avatar) };
 }
 function normalizeNickname(value) { return String(value || "").trim(); }
 function ownedAvatar(file) { return !!file && file.startsWith(wx.env.USER_DATA_PATH + "/zhilian-avatar-"); }
@@ -30,7 +30,7 @@ async function saveProfile({ nickname, avatar }) {
   const old = getProfile();
   const isNewAvatar = avatar && avatar !== DEFAULT_AVATAR && avatar !== old.avatar;
   const savedAvatar = isNewAvatar ? await persistAvatar(avatar) : avatar || DEFAULT_AVATAR;
-  try { wx.setStorageSync(KEY, { nickname: name, avatar: savedAvatar === DEFAULT_AVATAR ? "" : savedAvatar }); }
+  try { wx.setStorageSync(KEY, { nickname: name, avatar: savedAvatar === DEFAULT_AVATAR ? "" : savedAvatar, userId: old.userId }); }
   catch (_) { if (isNewAvatar) removeAvatar(savedAvatar); throw new Error("资料保存失败，请检查设备空间后重试"); }
   if (old.avatar !== savedAvatar) removeAvatar(old.avatar);
   return getProfile();
@@ -40,4 +40,10 @@ function deleteProfile() {
   wx.removeStorageSync(KEY);
   removeAvatar(profile.avatar);
 }
-module.exports = { getProfile, normalizeNickname, saveProfile, deleteProfile, DEFAULT_AVATAR };
+function restoreProfile(remote) {
+  const old = getProfile();
+  wx.setStorageSync(KEY, { nickname: remote.nickname, avatar: remote.image, userId: remote.userId });
+  if (old.avatar !== remote.image) removeAvatar(old.avatar);
+  return getProfile();
+}
+module.exports = { restoreProfile, getProfile, normalizeNickname, saveProfile, deleteProfile, DEFAULT_AVATAR };

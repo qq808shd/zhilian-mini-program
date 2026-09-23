@@ -55,3 +55,52 @@ test('HTTP system offseat, rejoin and voluntary exits preserve isolated history 
   assert.equal((await f.call('/v1/groups/preview?code='+d.group.invite_code,a)).body.group.archived,true);
   assert.equal((await f.call('/v1/groups/join',a,'POST',f.request({code:d.group.invite_code,nickname:'再次',accepted:true}))).body.code,'GROUP_ARCHIVED');
 });
+
+test('group avatar requires owner, is shared only within group, and is removed on exit',async t=>{
+  const f=await start(t),a=await f.login('avatar-a'),b=await f.login('avatar-b'),c=await f.login('avatar-c');
+  const uid=f.user('avatar-a'),d=f.create(uid),peer=f.join(f.user('avatar-b'),d.group.invite_code);
+  const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6uAAAAAASUVORK5CYII=';
+  const payload=f.request({membershipId:d.me.id,image,accepted:true});
+  assert.equal((await f.call('/v1/groups/avatar',null,'POST',payload)).status,401);
+  assert.equal((await f.call('/v1/groups/avatar',b,'POST',payload)).body.code,'MEMBERSHIP_CHANGED');
+  assert.equal((await f.call('/v1/groups/avatar',a,'POST',f.request({membershipId:d.me.id,image}))).status,200);
+  for(const bad of ['data:image/svg+xml;base64,PHN2Zz4=', 'https://example.com/avatar.png',image.slice(0,-3),'data:image/png;base64,'+'a'.repeat(180000)]) {
+    assert.equal((await f.call('/v1/groups/avatar',a,'POST',f.request({membershipId:d.me.id,image:bad,accepted:true}))).body.code,'INVALID_AVATAR');
+  }
+  assert.equal((await f.call('/v1/groups/avatar',a,'POST',payload)).status,200);
+  assert.equal((await f.call('/v1/groups/avatar',a,'POST',payload)).status,200);
+  const others=(await f.call('/v1/groups',b)).body;
+  assert.equal(others.members.find(x=>x.id===d.me.id).avatarImage,image);
+  assert.equal(others.avatarEnabled,true);
+  assert.equal((await f.call('/v1/groups/members/'+d.me.id,b)).body.member.avatarImage,image);
+  assert.equal((await f.call('/v1/groups/members/'+d.me.id,c)).status,409);
+  assert.ok(!JSON.stringify((await f.call('/v1/groups/preview?code='+d.group.invite_code,c)).body).includes(image));
+  await f.call('/v1/groups/avatar',a,'POST',f.request({membershipId:d.me.id,image:''}));
+  assert.equal((await f.call('/v1/groups',a)).body.me.avatarImage,'');
+  await f.call('/v1/groups/avatar',a,'POST',f.request({membershipId:d.me.id,image,accepted:true}));
+  f.exit(uid);
+  assert.ok(!JSON.stringify(f.service.monthDetail(f.user('avatar-b'))).includes(image));
+  const again=f.join(uid,d.group.invite_code);
+  assert.equal(again.me.avatarImage,'');
+  assert.equal((await f.call('/v1/groups/avatar',a,'POST',f.request({...payload}))).body.code,'MEMBERSHIP_CHANGED');
+});
+
+test('unified profile preserves identity, isolates users, detects conflicts and drives existing and new group display',async t=>{
+ const f=await start(t),a=await f.login('profile-a'),b=await f.login('profile-b');
+ const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6uAAAAAASUVORK5CYII=';
+ const group=f.create(f.user('profile-a'));f.join(f.user('profile-b'),group.group.invite_code);
+ assert.equal((await f.call('/v1/profile',null)).status,401);
+ const initial=(await f.call('/v1/profile',a)).body;assert.equal(initial.revision,0);
+ const data={nickname:'统一昵称',image,revision:0,userId:f.user('profile-b')};
+ const saved=await f.call('/v1/profile',a,'PUT',data);assert.equal(saved.status,200);assert.equal(saved.body.userId,initial.userId);
+ assert.equal((await f.call('/v1/profile',b)).body.nickname,'');
+ assert.equal((await f.call('/v1/profile',a,'PUT',data)).body.revision,1);
+ assert.equal((await f.call('/v1/profile',a,'PUT',{...data,nickname:'冲突'})).status,409);
+ assert.equal((await f.call('/v1/profile',a,'PUT',{...data,nickname:'',revision:1})).status,400);
+ const dashboard=(await f.call('/v1/groups',b)).body;assert.equal(dashboard.members.find(m=>m.id===group.me.id).nickname,'统一昵称');assert.equal(dashboard.members.find(m=>m.id===group.me.id).avatarImage,image);
+ await f.call('/v1/profile',a,'PUT',{...data,nickname:'新的统一昵称',revision:1});
+ assert.equal((await f.call('/v1/groups/members/'+group.me.id,b)).body.member.nickname,'新的统一昵称');
+ await f.call('/v1/groups/exit',a,'POST',f.request({membershipId:group.me.id}));
+ assert.equal((await f.call('/v1/profile',a)).body.nickname,'新的统一昵称');
+ const rejoin=await f.call('/v1/groups/join',a,'POST',f.request({code:group.group.invite_code,nickname:'旧称呼',accepted:true}));assert.equal(rejoin.status,200);assert.equal((await f.call('/v1/groups',a)).body.me.nickname,'新的统一昵称');
+});
